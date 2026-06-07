@@ -1,0 +1,29 @@
+"use client";
+
+import {Button, toast} from "@blakeui/react";
+import {Persons} from "@gravity-ui/icons";
+
+export function Default() {
+  return (
+    <div className="flex h-full max-w-xl flex-col items-center justify-center">
+      <Button
+        size="sm"
+        variant="secondary"
+        onPress={() => {
+          toast("You have been invited to join a team", {
+            actionProps: {
+              children: "Dismiss",
+              onPress: () => toast.clear(),
+              variant: "tertiary",
+            },
+            description: "Bob sent you an invitation to join blakeUI team",
+            indicator: <Persons />,
+            variant: "default",
+          });
+        }}
+      >
+        Show toast
+      </Button>
+    </div>
+  );
+}

@@ -1,0 +1,417 @@
+---
+title: CLI
+description: Use the CLI to manage blakeUI dependencies and initialize projects.
+icon: terminal
+---
+
+The CLI offers a comprehensive suite of commands to initialize, manage, and improve your blakeUI projects. It enables you to `install`, `uninstall`, or `upgrade` individual components, assess the health of your project, download documentation for AI coding agents, and more.
+
+## Installation
+
+Requirements:
+
+- [Node.js version 22.22.0 or later](https://nodejs.org/en/)
+
+
+### Global Installation
+
+To install `@blakeui/cli` globally, execute one of the following commands in your terminal:
+
+
+```npm
+npm install @blakeui/cli@latest -g
+```
+
+### Without Installation
+
+Alternatively, you can use `@blakeui/cli` without a global installation by running one of the following:
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx @blakeui/cli@latest
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx @blakeui/cli@latest
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn dlx @blakeui/cli@latest
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx @blakeui/cli@latest
+    ```
+  </Tab>
+</Tabs>
+
+## Quick Start
+
+Once `@blakeui/cli` is installed, run the following command to display available commands:
+
+```bash
+blakeui
+```
+
+This will produce the following help output:
+
+```bash
+Usage: blakeui [command]
+
+Options:
+  -v, --version                  Output the current version
+  --no-cache                     Disable cache, by default data will be cached for 30m after the first request
+  -d, --debug                    Debug mode will not install dependencies
+  -h --help                      Display help information for commands
+
+Commands:
+  init [options] [projectName]   Initializes a new project
+  install [options]              Installs @blakeui/react and @blakeui/styles to your project
+  upgrade [options]              Upgrades @blakeui/react and @blakeui/styles to the latest versions
+  uninstall [options]            Uninstall @blakeui/react and @blakeui/styles from the project
+  list [options]                 Lists installed BlakeUI packages (@blakeui/react, @blakeui/styles)
+  env [options]                  Displays debugging information for the local environment
+  doctor [options]               Checks for issues in the project
+  agents-md [options]            Downloads BlakeUI documentation for AI coding agents
+  help [command]                 Display help for command
+```
+
+### init
+
+Initialize a new blakeUI project using the `init` command. This sets up your project with the necessary configurations.
+
+```bash
+blakeui init [options]
+```
+
+**Options:**
+
+- `-t --template [string]` The template to use for the new project e.g. app, pages, vite, laravel
+- `-p --package [string]` The package manager to use for the new project
+
+output:
+
+```bash
+BlakeUI CLI <version>
+
+┌  Create a new project
+│
+◇  Select a template (Enter to select)
+│  ● App (A Next.js 16 with app directory template pre-configured with BlakeUI and Tailwind CSS.)
+│  ○ Pages (A Next.js 16 with pages directory template pre-configured with BlakeUI and Tailwind CSS.)
+│  ○ Vite (A Vite template pre-configured with BlakeUI and Tailwind CSS.)
+│  ○ Laravel (A Laravel template pre-configured with BlakeUI and Tailwind CSS.)
+│
+◇  New project name (Enter to skip with default name)
+│  my-blakeui-app
+│
+◇  Select a package manager (Enter to select)
+│  ● npm
+│  ○ yarn
+│  ○ pnpm
+│  ○ bun
+│
+◇  Template created successfully!
+│
+◇  Next steps ───────╮
+│                    │
+│  cd my-blakeui-app  │
+│  npm install       │
+│                    │
+├────────────────────╯
+│
+└  🚀 Get started with npm run dev
+```
+
+
+Install the dependencies to start the local server:
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash
+    cd my-blakeui-app && npm install
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    cd my-blakeui-app && pnpm install
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    cd my-blakeui-app && yarn install
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    cd my-blakeui-app && bun install
+    ```
+  </Tab>
+</Tabs>
+
+Start the local server:
+
+```npm
+npm run dev
+```
+
+### Install
+
+Install `@blakeui/react` and `@blakeui/styles` to your project, along with their peer dependencies. If they are already installed, the command does nothing.
+
+```bash
+blakeui install [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+
+**Output:**
+
+```bash
+BlakeUI CLI <version>
+
+📦 Packages to be installed:
+╭─────────────────────────────────────────────────────────────────────────────╮
+│   Package          │   Version        │   Status   │   Docs                 │
+│─────────────────────────────────────────────────────────────────────────────│
+│   @blakeui/react    │   1.0.0          │   stable   │   https://blakeui.com   │
+│   @blakeui/styles   │   1.0.0          │   stable   │   https://blakeui.com   │
+╰─────────────────────────────────────────────────────────────────────────────╯
+
+╭─────────────── PeerDependencies ────────────────╮
+│  react@18.3.1                      latest       │
+│  react-dom@18.3.1                  latest       │
+│  tailwindcss@4.2.2                 latest       │
+╰─────────────────────────────────────────────────╯
+? Proceed with installation? › - Use arrow-keys. Return to submit.
+❯   Yes
+    No
+
+✅ @blakeui/react and @blakeui/styles installed successfully
+```
+
+### upgrade
+
+
+Upgrade `@blakeui/react` and `@blakeui/styles` with their peer dependencies to the latest versions.
+
+```bash
+blakeui upgrade [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+**Output:**
+
+```bash
+BlakeUI CLI <version>
+
+╭──────────────────────────── Upgrade ────────────────────────────╮
+│  @blakeui/react               ^1.0.0  ->  ^1.1.0                │
+│  @blakeui/styles              ^1.0.0  ->  ^1.1.0                │
+╰─────────────────────────────────────────────────────────────────╯
+
+? Would you like to proceed with the upgrade? › - Use arrow-keys. Return to submit.
+❯   Yes
+    No
+
+✅ Upgrade complete. All packages are up to date.
+```
+
+### uninstall
+
+Uninstall `@blakeui/react` and `@blakeui/styles` from your project. Peer dependencies will not be uninstalled.
+
+```bash
+blakeui uninstall [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+**Output:**
+
+```bash
+BlakeUI CLI <version>
+
+❗️ Packages slated for uninstallation:
+╭──────────────────────────────────────────────────────────────────────────────────────╮
+│   Package          │   Version   │   Status   │   Docs                               │
+│──────────────────────────────────────────────────────────────────────────────────────│
+│   @blakeui/react    │   1.0.0     │   stable   │   https://blakeui.com                 │
+│   @blakeui/styles   │   1.0.0     │   stable   │   https://blakeui.com                 │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+? Confirm uninstallation of these packages: › - Use arrow-keys. Return to submit.
+❯   Yes
+    No
+
+✅ Successfully uninstalled: @blakeui/react, @blakeui/styles
+```
+
+### list
+
+List the installed blakeUI packages (`@blakeui/react`, `@blakeui/styles`).
+
+```bash
+blakeui list [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+**Output:**
+
+```bash
+BlakeUI CLI <version>
+
+Current installed packages:
+
+╭──────────────────────────────────────────────────────────────────────────────────────╮
+│   Package          │   Version          │   Status   │   Docs                        │
+│──────────────────────────────────────────────────────────────────────────────────────│
+│   @blakeui/react    │   1.0.0 🚀latest   │   stable   │   https://blakeui.com          │
+│   @blakeui/styles   │   1.0.0 🚀latest   │   stable   │   https://blakeui.com          │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+### doctor
+
+Check for issues in your project.
+- Check whether `@blakeui/react` and `@blakeui/styles` are installed
+- Check whether `required peer dependencies` are installed and matched minimal requirements in the project
+
+
+```bash
+blakeui doctor [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+**Output:**
+
+If there is a problem in your project, the `doctor` command will display the problem information.
+
+```bash
+BlakeUI CLI <version>
+
+BlakeUI CLI: ❌ Your project has 1 issue that require attention
+
+❗️Issue 1: missingBlakeUIPackages
+
+The following BlakeUI packages are not installed:
+- @blakeui/styles
+
+Run `blakeui install` to install them.
+```
+
+Otherwise, the `doctor` command will display the following message.
+
+```bash
+BlakeUI CLI <version>
+
+✅ Your project has no detected issues.
+```
+
+### env
+
+Display debug information about the local environment.
+
+```bash
+blakeui env [options]
+```
+
+**Options:**
+
+- `-p --packagePath` [string] The path to the package.json file
+
+**Output:**
+
+```bash
+BlakeUI CLI <version>
+
+Current installed packages:
+
+╭──────────────────────────────────────────────────────────────────────────────────────╮
+│   Package          │   Version          │   Status   │   Docs                        │
+│──────────────────────────────────────────────────────────────────────────────────────│
+│   @blakeui/react    │   1.0.0 🚀latest   │   stable   │   https://blakeui.com          │
+│   @blakeui/styles   │   1.0.0 🚀latest   │   stable   │   https://blakeui.com          │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+
+Environment Info:
+  System:
+    OS: darwin
+    CPU: arm64
+  Binaries:
+    Node: v25.8.1
+```
+
+### agents-md
+
+Download blakeUI documentation for AI coding agents (Claude, Cursor, etc.). The command clones the latest docs from the blakeUI repository and injects a compact index into `AGENTS.md` or `CLAUDE.md` so assistants can reference your project's blakeUI setup.
+
+```bash
+blakeui agents-md [options]
+```
+
+**Options:**
+
+- `--react` [boolean] Include React docs only (one library at a time)
+- `--native` [boolean] Include Native docs only
+- `--migration` [boolean] Include migration docs only
+- `--output <file>` [string] Target file path (e.g., `AGENTS.md`, `CLAUDE.md`)
+- `--ssh` [boolean] Use SSH instead of HTTPS for git clone
+
+**Examples:**
+
+Run without flags to enter interactive mode:
+
+```bash
+blakeui agents-md
+```
+
+Download React docs to a specific file:
+
+```bash
+blakeui agents-md --react --output AGENTS.md
+```
+
+Download Native or migration docs:
+
+```bash
+blakeui agents-md --native --output CLAUDE.md
+blakeui agents-md --migration --output AGENTS.md
+```
+
+**How it works:**
+
+1. Clones documentation from the `v3` branch using git sparse-checkout
+2. Generates a compact index of doc and demo files
+3. Injects the index into your markdown file between markers (`<!-- BLAKEUI-REACT-AGENTS-MD-START -->` / `<!-- BLAKEUI-REACT-AGENTS-MD-END -->`, and similar for Native and Migration)
+4. Adds `.blakeui-docs/` to `.gitignore`
+
+Only one of `--react`, `--native`, or `--migration` can be selected at a time.
+
+For more details, see [AGENTS.md](/docs/react/getting-started/agents-md).
+
+<Callout>
+  The `agents-md` command collects anonymous usage data (selection, output file names, duration, success or error). Set `BLAKEUI_ANALYTICS_DISABLED=1` to opt out.
+</Callout>
+
+## Reporting issues
+
+If you found a bug, please report it in [@blakeui/cli Issues](https://github.com/myblakebox/BlakeUI/issues).
+

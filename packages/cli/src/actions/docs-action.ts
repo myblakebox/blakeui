@@ -1,0 +1,498 @@
+import type {DocSelection} from '@helpers/agents-docs/blakeui-agents-md';
+import type {DocsOptions} from '@helpers/type';
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+import chalk from 'chalk';
+
+import {
+  buildDocTree,
+  collectDemoFiles,
+  collectDocFiles,
+  collectMigrationDocFiles,
+  ensureGitignoreEntry,
+  generateBlakeuiMdIndex,
+  getBlakeuiVersions,
+  injectIntoClaudeMd,
+  pullDocs
+} from '@helpers/agents-docs/blakeui-agents-md';
+import {ValidationError} from '@helpers/errors';
+import {Logger} from '@helpers/logger';
+import {getAnalytics, shutdown} from 'src/analytics';
+import {showAnalyticsNotice} from 'src/analytics/notice';
+import {getConfirm, getSelect, getText} from 'src/prompts';
+import {compareVersions} from 'src/scripts/helpers';
+
+const DOCS_DIR_NAME = '.blakeui-docs';
+
+function formatSelectionText(selection: DocSelection): string {
+  if (selection === 'react') return 'BlakeUI React v3';
+  if (selection === 'native') return 'BlakeUI Native';
+
+  return 'BlakeUI Migration (v2→v3)';
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+
+  return `${mb.toFixed(1)} MB`;
+}
+
+function detectInstalledPackages(cwd: string): {
+  hasReact: boolean;
+  hasNative: boolean;
+} {
+  const versions = getBlakeuiVersions(cwd);
+
+  return {
+    hasNative: !!versions.native,
+    hasReact: !!versions.react
+  };
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  warnings: string[];
+}
+
+function validateRequirements(cwd: string, selection: DocSelection): ValidationResult {
+  const packageJsonPath = path.join(cwd, 'package.json');
+
+  if (!fs.existsSync(packageJsonPath)) {
+    // No package.json, skip validation
+    return {isValid: true, warnings: []};
+  }
+
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const dependencies = packageJson.dependencies || {};
+    const devDependencies = packageJson.devDependencies || {};
+    const allDeps = {...dependencies, ...devDependencies};
+
+    const warnings: string[] = [];
+
+    // Check Tailwind CSS >= v4 (only warn if installed with wrong version)
+    const tailwindVersion = allDeps.tailwindcss || allDeps['@tailwindcss/vite'];
+
+    if (tailwindVersion) {
+      const cleanVersion = tailwindVersion.replace(/^[<=>^~]+/, '');
+      // Extract major version number
+      const majorVersion = parseInt(cleanVersion.split('.')[0] || '0', 10);
+
+      if (majorVersion < 4) {
+        warnings.push(
+          `Tailwind CSS version ${tailwindVersion} is installed, but BlakeUI v3 requires Tailwind CSS v4+.`
+        );
+      }
+    }
+
+    // For React docs: Check React >= 19.0.0
+    if (selection === 'react') {
+      const reactVersion = allDeps.react;
+
+      if (reactVersion) {
+        const cleanVersion = reactVersion.replace(/^[<=>^~]+/, '');
+        // Compare with 19.0.0 - returns -1 if cleanVersion < 19.0.0, 0 if equal, 1 if greater
+        const comparison = compareVersions(cleanVersion, '19.0.0');
+
+        if (comparison < 0) {
+          warnings.push(
+            `React version ${reactVersion} is installed, but BlakeUI v3 requires React 19+.`
+          );
+        }
+      } else {
+        warnings.push('React is not installed. BlakeUI v3 requires React 19+.');
+      }
+
+      // Check @blakeui/react >= 2.8.0, @beta, or @latest (version that supports Tailwind v4)
+      // Only check if @blakeui/react is installed
+      const blakeuiReactVersion = allDeps['@blakeui/react'];
+
+      if (blakeuiReactVersion) {
+        // Allow @beta and @latest versions
+        if (
+          blakeuiReactVersion.includes('@beta') ||
+          blakeuiReactVersion === 'beta' ||
+          blakeuiReactVersion.includes('@latest') ||
+          blakeuiReactVersion === 'latest'
+        ) {
+          // Beta and latest versions are allowed, skip version check
+        } else {
+          const cleanVersion = blakeuiReactVersion.replace(/^[<=>^~]+/, '');
+          // Compare with 2.8.0 - returns -1 if cleanVersion < 2.8.0, 0 if equal, 1 if greater
+          const comparison = compareVersions(cleanVersion, '2.8.0');
+
+          if (comparison < 0) {
+            warnings.push(
+              `@blakeui/react version ${blakeuiReactVersion} is installed, but these docs are recommended for version >= 2.8.0, @beta, or @latest (which supports Tailwind CSS v4).`
+            );
+          }
+        }
+      }
+    }
+
+    return {
+      isValid: warnings.length === 0,
+      warnings
+    };
+  } catch (err) {
+    // If we can't parse package.json, skip validation
+    return {isValid: true, warnings: []};
+  }
+}
+
+async function confirmRequirements(cwd: string, selection: DocSelection): Promise<boolean> {
+  if (selection === 'migration') {
+    const confirmed = await getConfirm('Do you want to continue and install the migration docs?');
+
+    return confirmed;
+  }
+
+  const validation = validateRequirements(cwd, selection);
+
+  if (validation.isValid) {
+    return true;
+  }
+
+  Logger.warn('\n⚠️  BlakeUI v3 requirements not met:');
+  for (const warning of validation.warnings) {
+    Logger.warn(`  • ${warning}`);
+  }
+  Logger.newLine();
+  Logger.log(
+    'The downloaded documentation is for BlakeUI v3 and may not be compatible with your current setup.'
+  );
+  Logger.newLine();
+
+  const confirmed = await getConfirm('Do you want to continue anyway?');
+
+  return confirmed;
+}
+
+export async function docsAction(options: DocsOptions) {
+  const startTime = Date.now();
+  const analytics = getAnalytics();
+  const cwd = process.cwd();
+
+  if (analytics) {
+    showAnalyticsNotice();
+  }
+
+  try {
+    // Mode logic:
+    // 1. No flags → autodetect package, prompt only if neither found (or if both found)
+    // 2. Library flags (--react, --native, --migration) → use that selection, prompt for output file if --output not provided
+    // 3. --output alone → autodetect package, use provided output file
+
+    let selection: DocSelection;
+    let outputFiles: string[] | undefined;
+
+    // Determine selection from flags (only one library at a time)
+    const flagCount = [options.react, options.native, options.migration].filter(Boolean).length;
+
+    if (flagCount > 1) {
+      throw new ValidationError(
+        'Only one library option is supported at a time. Use --react, --native, or --migration (not in combination).'
+      );
+    }
+
+    if (options.react || options.native || options.migration) {
+      selection = options.migration ? 'migration' : options.native ? 'native' : 'react';
+    } else {
+      // Autodetect installed packages
+      const {hasNative, hasReact} = detectInstalledPackages(cwd);
+
+      if (hasReact && hasNative) {
+        // Both found - prompt for selection
+        if (options.output) {
+          selection = await promptForLibrarySelection(false);
+        } else {
+          const promptedOptions = await promptForOptions(false);
+
+          selection = promptedOptions.selection;
+          outputFiles = promptedOptions.targetFiles;
+        }
+      } else if (hasReact) {
+        // Only React found - use it automatically
+        selection = 'react';
+        Logger.log(chalk.dim('Detected @blakeui/react, using BlakeUI React v3 docs'));
+      } else if (hasNative) {
+        // Only Native found - use it automatically
+        selection = 'native';
+        Logger.log(chalk.dim('Detected blakeui-native, using BlakeUI Native docs'));
+      } else {
+        // Neither found - prompt for selection with warning
+        if (options.output) {
+          selection = await promptForLibrarySelection(true);
+        } else {
+          const promptedOptions = await promptForOptions(true);
+
+          selection = promptedOptions.selection;
+          outputFiles = promptedOptions.targetFiles;
+        }
+      }
+    }
+
+    // Normalize output files to array (if not already set from prompt)
+    if (!outputFiles) {
+      if (options.output) {
+        outputFiles = Array.isArray(options.output) ? options.output : [options.output];
+      } else {
+        const promptedFile = await promptForOutputFile();
+
+        if (promptedFile) {
+          outputFiles = Array.isArray(promptedFile) ? promptedFile : [promptedFile];
+        } else {
+          outputFiles = ['AGENTS.md'];
+        }
+      }
+    }
+
+    // Validate requirements before downloading (only for React docs)
+    const canContinue = await confirmRequirements(cwd, selection);
+
+    if (!canContinue) {
+      Logger.warn('\nCancelled.');
+      process.exit(0);
+    }
+
+    const docsPath = path.join(cwd, DOCS_DIR_NAME);
+
+    const selectionText = formatSelectionText(selection);
+
+    Logger.log(`\nDownloading ${selectionText} documentation to ${chalk.cyan(DOCS_DIR_NAME)}...`);
+
+    const pullResult = await pullDocs({
+      cwd,
+      docsDir: docsPath,
+      selection,
+      useSsh: options.ssh ?? false
+    });
+
+    if (!pullResult.success) {
+      throw new ValidationError(`Failed to pull docs: ${pullResult.error}`);
+    }
+
+    // Collect and build trees for selected docs
+    let reactSections: ReturnType<typeof buildDocTree> | undefined;
+    let nativeSections: ReturnType<typeof buildDocTree> | undefined;
+    let migrationSections: ReturnType<typeof buildDocTree> | undefined;
+    let reactDemoFiles: {relativePath: string}[] | undefined;
+
+    if (selection === 'react') {
+      const reactDocsPath = path.join(docsPath, 'react');
+
+      if (fs.existsSync(reactDocsPath)) {
+        const reactDocFiles = collectDocFiles(reactDocsPath);
+
+        reactSections = buildDocTree(reactDocFiles);
+      }
+
+      const reactDemosPath = path.join(docsPath, 'react', 'demos');
+
+      if (fs.existsSync(reactDemosPath)) {
+        reactDemoFiles = collectDemoFiles(reactDemosPath);
+      }
+    }
+
+    if (selection === 'native') {
+      const nativeDocsPath = path.join(docsPath, 'native');
+
+      if (fs.existsSync(nativeDocsPath)) {
+        const nativeDocFiles = collectDocFiles(nativeDocsPath);
+
+        nativeSections = buildDocTree(nativeDocFiles);
+      }
+    }
+
+    if (selection === 'migration') {
+      const migrationDocsPath = path.join(docsPath, 'migration');
+
+      if (fs.existsSync(migrationDocsPath)) {
+        const migrationDocFiles = collectMigrationDocFiles(migrationDocsPath);
+
+        migrationSections = buildDocTree(migrationDocFiles);
+      }
+    }
+
+    const reactDocsLinkPath = selection === 'react' ? `./${DOCS_DIR_NAME}/react` : undefined;
+    const nativeDocsLinkPath = selection === 'native' ? `./${DOCS_DIR_NAME}/native` : undefined;
+    const migrationDocsLinkPath =
+      selection === 'migration' ? `./${DOCS_DIR_NAME}/migration` : undefined;
+
+    // Generate index content once (reused for all output files)
+    const indexData: Parameters<typeof generateBlakeuiMdIndex>[0] = {
+      outputFile: outputFiles[0], // Use first file for index generation (for display purposes)
+      selection
+    };
+
+    if (nativeDocsLinkPath) indexData.nativeDocsPath = nativeDocsLinkPath;
+    if (nativeSections) indexData.nativeSections = nativeSections;
+    if (migrationDocsLinkPath) indexData.migrationDocsPath = migrationDocsLinkPath;
+    if (migrationSections) indexData.migrationSections = migrationSections;
+    if (reactDocsLinkPath) indexData.reactDocsPath = reactDocsLinkPath;
+    if (reactSections) indexData.reactSections = reactSections;
+    if (reactDemoFiles) indexData.reactDemoFiles = reactDemoFiles;
+
+    // Generate index content for the selected library only
+    const reactIndexContent =
+      selection === 'react' ? generateBlakeuiMdIndex(indexData, 'react') : undefined;
+    const nativeIndexContent =
+      selection === 'native' ? generateBlakeuiMdIndex(indexData, 'native') : undefined;
+    const migrationIndexContent =
+      selection === 'migration' ? generateBlakeuiMdIndex(indexData, 'migration') : undefined;
+
+    // Write to all output files
+    const gitignoreResult = ensureGitignoreEntry(cwd);
+
+    for (const outputFile of outputFiles) {
+      const filePath = path.join(cwd, outputFile);
+      let sizeBefore = 0;
+      let isNewFile = true;
+      let existingContent = '';
+
+      if (fs.existsSync(filePath)) {
+        existingContent = fs.readFileSync(filePath, 'utf-8');
+        sizeBefore = Buffer.byteLength(existingContent, 'utf-8');
+        isNewFile = false;
+      }
+
+      const newContent = injectIntoClaudeMd(
+        existingContent,
+        reactIndexContent,
+        nativeIndexContent,
+        migrationIndexContent
+      );
+
+      fs.writeFileSync(filePath, newContent, 'utf-8');
+
+      const sizeAfter = Buffer.byteLength(newContent, 'utf-8');
+
+      const action = isNewFile ? 'Created' : 'Updated';
+      const sizeInfo = isNewFile
+        ? formatSize(sizeAfter)
+        : `${formatSize(sizeBefore)} → ${formatSize(sizeAfter)}`;
+
+      Logger.success(`✓ ${action} ${chalk.bold(outputFile)} (${sizeInfo})`);
+    }
+
+    if (gitignoreResult.updated) {
+      Logger.success(`✓ Added ${chalk.bold(DOCS_DIR_NAME)} to .gitignore`);
+    }
+    Logger.newLine();
+
+    // Show description of what was installed
+    Logger.log(chalk.cyan('📚 What was installed:'));
+    Logger.log(`  • Documentation files downloaded to ${chalk.bold(`.${DOCS_DIR_NAME}/`)}`);
+    Logger.log(`  • Index generated in ${chalk.bold(outputFiles.join(', '))}`);
+    if (selection === 'react') {
+      Logger.log(`  • Demo files included for React code examples`);
+    }
+    Logger.newLine();
+    Logger.log(chalk.cyan('💡 How it works:'));
+    Logger.log(
+      `  • AI assistants (like Claude, Cursor) can now reference ${selectionText} docs directly`
+    );
+    Logger.log(
+      `  • The index in ${chalk.bold(outputFiles[0])} helps assistants find relevant documentation`
+    );
+    Logger.log(`  • Run ${chalk.bold('blakeui agents-md')} again to update docs`);
+    Logger.newLine();
+
+    analytics?.track({
+      event: 'AGENTS_MD_SUCCESS',
+      properties: {
+        duration: Date.now() - startTime,
+        outputFileCount: outputFiles.length,
+        outputFiles,
+        selection
+      }
+    });
+    await shutdown();
+    process.exit(0);
+  } catch (error) {
+    analytics?.trackError({
+      error,
+      errorEvent: 'AGENTS_MD_ERROR',
+      fallbackMessage: 'Failed to run agents-md',
+      properties: {duration: Date.now() - startTime}
+    });
+    await shutdown();
+    process.exit(1);
+  }
+}
+
+async function promptForLibrarySelection(neitherFound: boolean = false): Promise<DocSelection> {
+  if (neitherFound) {
+    Logger.warn('Neither @blakeui/react nor blakeui-native is installed in this project.');
+    Logger.newLine();
+  }
+
+  const selection = await getSelect('Select docs to include', [
+    {title: 'BlakeUI React v3', value: 'react'},
+    {title: 'BlakeUI Native', value: 'native'},
+    {title: 'BlakeUI Migration (v2→v3)', value: 'migration'}
+  ]);
+
+  if (selection === undefined) {
+    Logger.warn('\nCancelled.');
+    process.exit(0);
+  }
+
+  return selection as DocSelection;
+}
+
+async function promptForOptions(neitherFound?: boolean): Promise<{
+  selection: DocSelection;
+  targetFiles: string[];
+}> {
+  Logger.log(chalk.cyan('BlakeUI Documentation for AI Agents'));
+  Logger.info('Download the latest BlakeUI documentation for AI agents to the current project\n');
+
+  const selection = await promptForLibrarySelection(neitherFound ?? false);
+  const targetFile = await promptForOutputFile();
+  const targetFiles = Array.isArray(targetFile) ? targetFile : [targetFile];
+
+  return {
+    selection,
+    targetFiles
+  };
+}
+
+async function promptForOutputFile(): Promise<string | string[]> {
+  const targetFileSelect = await getSelect('Target markdown file', [
+    {title: 'AGENTS.md', value: 'AGENTS.md'},
+    {title: 'CLAUDE.md', value: 'CLAUDE.md'},
+    {title: 'Both', value: '__both__'},
+    {title: 'Custom...', value: '__custom__'}
+  ]);
+
+  if (targetFileSelect === undefined) {
+    Logger.warn('\nCancelled.');
+    process.exit(0);
+  }
+
+  if (targetFileSelect === '__both__') {
+    return ['AGENTS.md', 'CLAUDE.md'];
+  }
+
+  let targetFile = targetFileSelect;
+
+  if (targetFile === '__custom__') {
+    const customFile = await getText('Enter custom file path', 'AGENTS.md');
+
+    if (customFile === undefined || !customFile.trim()) {
+      Logger.warn('\nCancelled.');
+      process.exit(0);
+    }
+
+    targetFile = customFile.trim();
+  }
+
+  return targetFile;
+}

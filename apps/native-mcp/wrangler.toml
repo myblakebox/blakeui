@@ -1,0 +1,48 @@
+name = "blakeui-native-mcp-api"
+
+# ------------------------------------------------------------
+# -- General
+# ------------------------------------------------------------
+main = "src/api.ts"
+compatibility_date = "2025-01-18"
+compatibility_flags = ["nodejs_compat"]
+
+routes = [
+  { pattern = "native-mcp-api.blakeui.com", custom_domain = true }
+]
+
+[[r2_buckets]]
+binding = 'R2'
+bucket_name = 'blakeui-mcp-data'
+
+[vars]
+NODE_ENV = "production"
+POSTHOG_HOST = "https://us.i.posthog.com"
+R2_BUCKET_NAME = "blakeui-mcp-data"
+
+[[services]]
+binding = "PLATFORM_API"
+service = "blakeui-native-mcp-api"
+
+# ------------------------------------------------------------
+# -- Worker Settings
+# ------------------------------------------------------------
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[placement]
+mode = "smart"
+
+# ------------------------------------------------------------
+# -- Test Environment (Vitest only)
+# ------------------------------------------------------------
+[env.test]
+
+[[env.test.r2_buckets]]
+binding = 'R2'
+bucket_name = 'blakeui-mcp-data-dev'
+
+[env.test.vars]
+NODE_ENV = "test"
+R2_BUCKET_NAME = "blakeui-mcp-data-dev"

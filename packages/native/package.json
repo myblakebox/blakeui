@@ -1,0 +1,189 @@
+{
+  "name": "@blakeui/native",
+  "version": "1.0.0",
+  "description": "Beautiful, fast and modern React Native UI library",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "source": "./src/index.tsx",
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./styles": "./lib/module/styles/index.css",
+    "./styles/vibrant": "./lib/module/styles/theme-vibrant.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "yarn workspace blakeui-native-example",
+    "test": "jest",
+    "typecheck": "bash ./scripts/typecheck.sh",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"example/src/**/*.{ts,tsx}\"",
+    "clean": "del-cli lib",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path .",
+    "release": "bumpp --execute='yarn changelog' --all",
+    "prepack": "node scripts/update-exports.js prepack",
+    "postpack": "node scripts/update-exports.js postpack",
+    "build": "bob build"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "blake ui",
+    "blake ui native"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myblakebox/BlakeUI.git"
+  },
+  "author": "BlakeUI <support@blakeui.com> (https://github.com/myblakebox)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/myblakebox/BlakeUI/issues"
+  },
+  "homepage": "https://github.com/myblakebox/BlakeUI#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.22.0",
+    "@evilmartians/lefthook": "^1.5.0",
+    "@gorhom/bottom-sheet": "^5.2.14",
+    "@react-native-community/cli": "latest",
+    "@react-native/babel-preset": "0.78.2",
+    "@react-native/eslint-config": "^0.78.0",
+    "@react-native/jest-preset": "0.85.3",
+    "@types/jest": "^29.5.5",
+    "@types/react": "^19.0.12",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "babel-plugin-transform-remove-imports": "^1.8.0",
+    "bumpp": "^9.10.2",
+    "changelogithub": "^13.16.0",
+    "commitlint": "^19.6.1",
+    "conventional-changelog": "^7.1.1",
+    "del-cli": "^5.1.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-builder-bob": "^0.40.12",
+    "react-native-gesture-handler": "~2.31.1",
+    "react-native-reanimated": "4.3.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2",
+    "react-native-svg": "15.15.4",
+    "react-native-worklets": "0.8.3",
+    "tailwind-merge": "^3.4.0",
+    "tailwind-variants": "^3.2.2",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.8.3",
+    "uniwind": "^1.6.3"
+  },
+  "peerDependencies": {
+    "@gorhom/bottom-sheet": "^5.2.9",
+    "react": ">=19.0.0",
+    "react-native": ">=0.81.0",
+    "react-native-gesture-handler": "^2.28.0",
+    "react-native-reanimated": "^4.1.1",
+    "react-native-safe-area-context": "^5.6.0",
+    "react-native-screens": ">=4",
+    "react-native-svg": "^15.12.1",
+    "react-native-worklets": ">=0.5.1",
+    "tailwind-merge": "^3.4.0",
+    "tailwind-variants": "^3.2.2"
+  },
+  "peerDependenciesMeta": {
+    "@gorhom/bottom-sheet": {
+      "optional": true
+    },
+    "react-native-screens": {
+      "optional": true
+    }
+  },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
+  "jest": {
+    "preset": "@react-native/jest-preset",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "bumpp": {
+    "commit": true,
+    "confirm": true,
+    "push": true,
+    "tag": true,
+    "release": "prompt"
+  },
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false,
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ]
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true,
+          "configFile": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "create-react-native-library": {
+    "languages": "js",
+    "type": "library",
+    "version": "0.51.1"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "name": "@blakeui/native-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for BlakeUI Native component documentation via Model Context Protocol",
+  "main": "dist/stdio.js",
+  "bin": {
+    "blakeui-native-mcp": "dist/stdio.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "mcp",
+    "blakeui",
+    "blakeui-native",
+    "react-native",
+    "model-context-protocol",
+    "ai",
+    "llm"
+  ],
+  "author": "BlakeUI <support@blakeui.com> (https://github.com/myblakebox)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myblakebox/BlakeUI.git",
+    "directory": "apps/native-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/myblakebox/BlakeUI/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/myblakebox/BlakeUI/tree/main/apps/native-mcp",
+  "prettier": "@blakeui/config/prettier",
+  "scripts": {
+    "build": "tsup && chmod +x dist/stdio.js",
+    "build:api": "wrangler deploy --dry-run --outdir dist-api --env=\"\"",
+    "dev:stdio": "NODE_ENV=development tsx --watch src/mcp/stdio.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:api": "node test-api.mjs",
+    "test:api:production": "node test-api.mjs --url https://native-mcp-api.blakeui.com",
+    "deploy:api": "wrangler deploy src/api.ts --minify --env=\"\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "mcp:stdio": "NODE_ENV=development tsx src/mcp/stdio.ts",
+    "inspect": "CLIENT_PORT=6275 SERVER_PORT=6278 npx @modelcontextprotocol/inspector tsx src/mcp/stdio.ts",
+    "extract:dev": "./scripts/extract-dev.sh both",
+    "clean": "rm -rf dist dist-api",
+    "prepublishOnly": "pnpm build && node scripts/resolve-workspace-deps.mjs",
+    "postpublish": "node scripts/restore-package.mjs",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path . --tag-prefix native-mcp-v",
+    "release": "bumpp --execute='pnpm run changelog' --all --tag='native-mcp-v%s' --commit='chore(native-mcp): release v%s'",
+    "release:check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+  },
+  "dependencies": {
+    "@blakeui/analytics": "workspace:*",
+    "@blakeui/config": "workspace:*",
+    "@aws-sdk/client-s3": "^3.696.0",
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "@xmldom/xmldom": "^0.8.11",
+    "hono": "^4.10.2",
+    "posthog-node": "^5.9.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.9.13",
+    "@cloudflare/workers-types": "^4.20250920.0",
+    "@hono/zod-validator": "^0.7.4",
+    "@types/node": "^22.18.6",
+    "bumpp": "10.2.0",
+    "changelogithub": "13.16.0",
+    "conventional-changelog": "^7.2.0",
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.38.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@10.17.0"
+}

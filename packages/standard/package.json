@@ -1,0 +1,9 @@
+{
+  "name": "@blakeui/standard",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Standardized code style & lint rules for BlakeUI.",
+  "publishConfig": {
+    "access": "public"
+  }
+}

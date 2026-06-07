@@ -1,0 +1,57 @@
+---
+title: LLMs.txt
+description: Enable AI assistants like Claude, Cursor, and Windsurf to understand blakeUI
+---
+
+We provide [LLMs.txt](https://llmstxt.org/) files to make blakeUI documentation accessible to AI coding assistants.
+
+## Available Files
+
+**Core documentation:**
+- [/react/llms.txt](/react/llms.txt) — Quick reference index for React documentation
+- [/react/llms-full.txt](/react/llms-full.txt) — Complete blakeUI React documentation
+
+**For limited context windows:**
+- [/react/llms-components.txt](/react/llms-components.txt) — Component documentation only
+- [/react/llms-patterns.txt](/react/llms-patterns.txt) — Common patterns and recipes
+
+**All platforms:**
+- [/llms.txt](/llms.txt) — Quick reference index (React + Native)
+- [/llms-full.txt](/llms-full.txt) — Complete documentation (React + Native)
+- [/llms-components.txt](/llms-components.txt) — All component documentation
+- [/llms-patterns.txt](/llms-patterns.txt) — All patterns and recipes
+
+## Integration
+
+**Claude Code:** Tell Claude to reference the documentation:
+```
+Use BlakeUI React documentation from https://blakeui.com/react/llms.txt
+```
+Or add to your project's `.claude` file for automatic loading.
+
+**Cursor:** Use the `@Docs` feature:
+```
+@Docs https://blakeui.com/react/llms-full.txt
+```
+[Learn more](https://docs.cursor.com/context/@-symbols/@-docs)
+
+**Windsurf:** Add to your `.windsurfrules` file:
+```
+#docs https://blakeui.com/react/llms-full.txt
+```
+[Learn more](https://docs.codeium.com/windsurf/memories#memories-and-rules)
+
+**Other AI tools:** Most AI assistants can reference documentation by URL. Simply provide:
+```
+https://blakeui.com/react/llms.txt
+```
+
+**For component-specific documentation:**
+```
+https://blakeui.com/react/llms-components.txt
+```
+
+**For patterns and best practices:**
+```
+https://blakeui.com/react/llms-patterns.txt
+```

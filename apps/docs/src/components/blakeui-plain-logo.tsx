@@ -1,0 +1,37 @@
+interface BlakeUIPlainProps {
+  className?: string;
+  size?: number;
+  height?: number;
+  width?: number;
+}
+
+export function BlakeUIPlainLogo({className, height, size = 26, width}: BlakeUIPlainProps) {
+  const aspectRatio = 38 / 40;
+  const svgHeight = height || size;
+  const svgWidth = width || Math.round(svgHeight * aspectRatio);
+
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height={svgHeight}
+      viewBox="0 0 38 40"
+      width={svgWidth}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        clipRule="evenodd"
+        d="M18.7999 3.19965L2.93749 11.7034V28.2966L18.7999 36.8003L34.6623 28.2966V11.7034L18.7999 3.19965ZM37.5998 10.6343C37.5998 10.1957 37.3599 9.79292 36.9761 9.58715L19.3512 0.13859C19.0065 -0.0461967 18.5933 -0.0461966 18.2487 0.13859L0.62374 9.58715C0.239916 9.79292 0 10.1957 0 10.6343V29.3657C0 29.8043 0.239916 30.2071 0.623739 30.4128L18.2487 39.8614C18.5933 40.0462 19.0065 40.0462 19.3512 39.8614L36.9761 30.4128C37.3599 30.2071 37.5998 29.8043 37.5998 29.3657V10.6343Z"
+        fill="#436283"
+        fillRule="evenodd"
+      />
+      <path
+        clipRule="evenodd"
+        d="M16.2878 9.8803C16.3562 9.6489 16.557 9.48254 16.7952 9.45972L18.7174 9.27566C18.9557 9.25285 19.1838 9.37815 19.2942 9.59242L28.0908 26.6686C28.1915 26.864 28.1765 27.0996 28.0519 27.2805L26.9727 28.8467C26.8481 29.0276 26.6345 29.1238 26.4179 29.0966L13.161 27.4332C12.9895 27.4117 12.8361 27.3151 12.7416 27.1691L11.8135 25.7347C11.719 25.5887 11.693 25.4081 11.7424 25.2409L16.2878 9.8803ZM18.178 13.8525L14.9759 24.6739L24.359 25.8512L18.178 13.8525Z"
+        fill="#436283"
+        fillRule="evenodd"
+      />
+    </svg>
+  );
+}

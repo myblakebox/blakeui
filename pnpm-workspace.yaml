@@ -1,0 +1,9 @@
+packages:
+  - "apps/**/**"
+  - "packages/**/**"
+  # The React Native example app is kept for reference but excluded from the
+  # workspace to avoid pulling Expo/Metro/native deps into the web monorepo.
+  - "!packages/native/example/**"
+  # Build output of @blakeui/native (lib/module, lib/typescript contain a
+  # package.json each); exclude so pnpm does not treat them as workspaces.
+  - "!packages/native/lib/**"

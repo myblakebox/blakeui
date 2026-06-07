@@ -1,0 +1,65 @@
+---
+title: Agent Skills
+description: Enable AI assistants to build UIs with blakeUI components
+---
+
+blakeUI Skills give your AI assistant comprehensive knowledge of blakeUI components, patterns, and best practices.
+
+### Installation
+
+```bash
+curl -fsSL https://blakeui.com/install | bash -s blakeui-react
+```
+
+Or using the skills package:
+
+```bash
+npx skills add myblakebox/BlakeUI
+```
+
+<span className="text-sm text-muted">
+Support Claude Code, Cursor, OpenCode and more.
+</span>
+
+### Usage
+
+Skills are **automatically discovered** by your AI assistant, or call it directly using `/blakeui-react` command.
+
+Simply ask your AI assistant to:
+- Build components using blakeUI
+- Create pages with blakeUI components
+- Customize themes and styles
+- Access component documentation
+
+<Callout>
+  For more complex use cases, use the [MCP Server](/docs/react/getting-started/mcp-server) which provides real-time access to component documentation and source code.
+</Callout>
+
+### What's Included
+
+- blakeUI installation guide
+- All blakeUI components with props, examples, and usage patterns
+- Theming and styling guidelines
+- Design principles and composition patterns
+
+### Structure
+
+```
+skills/blakeui-react/
+├── SKILL.md              # Main skill documentation
+├── LICENSE.txt           # Apache License 2.0
+└── scripts/              # Utility scripts
+    ├── list_components.mjs
+    ├── get_component_docs.mjs
+    ├── get_source.mjs
+    ├── get_styles.mjs
+    ├── get_theme.mjs
+    └── get_docs.mjs
+```
+
+### Related Documentation
+
+- [Agent Skills Specification](https://agentskills.io/home) - Learn about the Agent Skills format
+- [Claude Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) - Claude's Skills documentation
+- [Cursor Skills](https://cursor.com/docs/context/skills) - Using Skills in Cursor
+- [OpenCode Skills](https://opencode.ai/docs/skills) - Using Skills in OpenCode

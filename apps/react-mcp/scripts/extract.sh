@@ -1,0 +1,134 @@
+#!/bin/bash
+
+# Unified extraction script
+# Usage: extract.sh [environment] [target]
+#   environment: development | production
+#   target: components | theme | both
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check for help flag
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    echo "Usage: $0 [environment] [target] [options]"
+    echo ""
+    echo "Arguments:"
+    echo "  environment: development | production (default: development)"
+    echo "  target: components | theme | both (default: both)"
+    echo ""
+    echo "Examples:"
+    echo "  $0 development components             # Extract components to development bucket"
+    echo "  $0 development theme                  # Extract theme to development bucket"
+    echo "  $0 development both                   # Extract both to development bucket"
+    echo ""
+    echo "Required environment variables:"
+    echo "  CLOUDFLARE_ACCOUNT_ID"
+    echo "  R2_ACCESS_KEY_ID"
+    echo "  R2_SECRET_ACCESS_KEY"
+    exit 0
+fi
+
+# Parse arguments
+NODE_ENV=${1:-development}
+TARGET=${2:-both}
+
+# Validate environment
+if [[ ! "$NODE_ENV" =~ ^(development|production)$ ]]; then
+    echo -e "${RED}Error: Invalid environment '$NODE_ENV'${NC}"
+    echo "Usage: $0 [environment] [target]"
+    echo "  environment: development | production"
+    echo "  target: components | theme | both"
+    exit 1
+fi
+
+# Validate target
+if [[ ! "$TARGET" =~ ^(components|both|all|theme)$ ]]; then
+    echo -e "${RED}Error: Invalid target '$TARGET'${NC}"
+    echo "Valid targets: components | theme | both"
+    exit 1
+fi
+
+echo -e "${GREEN}🚀 Starting extraction${NC}"
+echo "Environment: $NODE_ENV"
+echo "Target: $TARGET"
+
+# Set bucket name based on environment
+case "$NODE_ENV" in
+    development)
+        export R2_BUCKET_NAME="blakeui-mcp-data-dev"
+        # Load development vars if available
+        if [ -f .env ]; then
+            echo "Loading development environment variables..."
+            set -a
+            source .env
+            set +a
+        fi
+        ;;
+    production)
+        export R2_BUCKET_NAME="blakeui-mcp-data"
+        ;;
+esac
+
+echo "Using R2 bucket: $R2_BUCKET_NAME"
+
+# Check required environment variables
+REQUIRED_VARS="CLOUDFLARE_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY"
+MISSING_VARS=""
+
+for var in $REQUIRED_VARS; do
+    if [ -z "${!var}" ]; then
+        MISSING_VARS="$MISSING_VARS $var"
+    fi
+done
+
+if [ -n "$MISSING_VARS" ]; then
+    echo -e "${RED}Error: Missing required environment variables:${NC}$MISSING_VARS"
+    echo ""
+    echo "For local development, create a .env file with:"
+    for var in $REQUIRED_VARS; do
+        echo "  $var=your_value"
+    done
+    exit 1
+fi
+
+# Check if GitHub token is set (optional but recommended)
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo -e "${YELLOW}⚠️  Warning: GITHUB_TOKEN not set. You may hit GitHub API rate limits.${NC}"
+    echo "   Consider adding GITHUB_TOKEN to your environment."
+    echo ""
+fi
+
+
+# Execute extraction based on target
+case "$TARGET" in
+    components)
+        echo -e "${GREEN}Extracting BlakeUI components...${NC}"
+        pnpm exec tsx scripts/extract-components.ts
+        ;;
+    both|all)
+        echo -e "${GREEN}Extracting both BlakeUI components and theme...${NC}"
+        pnpm exec tsx scripts/extract-components.ts
+        if [ $? -eq 0 ]; then
+            pnpm exec tsx scripts/extract-theme.ts
+        else
+            echo -e "${RED}Component extraction failed, skipping theme extraction${NC}"
+            exit 1
+        fi
+        ;;
+    theme)
+        echo -e "${GREEN}Extracting BlakeUI theme system...${NC}"
+        pnpm exec tsx scripts/extract-theme.ts
+        ;;
+esac
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Extraction completed successfully!${NC}"
+else
+    echo -e "${RED}❌ Extraction failed${NC}"
+    exit 1
+fi

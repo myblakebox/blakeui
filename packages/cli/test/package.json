@@ -1,0 +1,23 @@
+{
+  "name": "blakeui-cli-test",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "description": "test for blakeui-cli",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "vite": "8.0.13",
+    "vitest": "4.1.6"
+  },
+  "keywords": [
+    "blakeui",
+    "cli",
+    "test"
+  ],
+  "author": "BlakeUI",
+  "license": "MIT"
+}

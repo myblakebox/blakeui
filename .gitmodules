@@ -1,0 +1,12 @@
+[submodule "templates/next-app-template"]
+	path = templates/next-app-template
+	url = git@github.com:myblakebox/next-app-template.git
+[submodule "templates/next-pages-template"]
+	path = templates/next-pages-template
+	url = git@github.com:myblakebox/next-pages-template.git
+[submodule "templates/vite-template"]
+	path = templates/vite-template
+	url = git@github.com:myblakebox/vite-template.git
+[submodule "templates/laravel-template"]
+	path = templates/laravel-template
+	url = git@github.com:myblakebox/laravel-template.git
