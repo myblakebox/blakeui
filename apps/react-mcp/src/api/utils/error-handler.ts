@@ -63,7 +63,7 @@ export const ErrorMessages: Record<
     code: ErrorCode.DATA_NOT_AVAILABLE,
     message: `Data not available: ${metadata?.details || "R2 bucket may be empty"}`,
     userMessage:
-      "Component data is currently being updated. Please try again in a few moments. If the issue persists, contact support@blakeui.com",
+      "Component data is currently being updated. Please try again in a few moments. If the issue persists, contact support@blakebill.com",
     statusCode: 503,
     metadata,
   }),
@@ -72,7 +72,7 @@ export const ErrorMessages: Record<
     code: ErrorCode.R2_CONNECTION_ERROR,
     message: `R2 connection error: ${metadata?.error || "Unknown"}`,
     userMessage:
-      "Unable to connect to the component database. Please try again later or contact support@blakeui.com",
+      "Unable to connect to the component database. Please try again later or contact support@blakebill.com",
     statusCode: 503,
     metadata,
   }),
@@ -113,7 +113,7 @@ export const ErrorMessages: Record<
     code: ErrorCode.INTERNAL_ERROR,
     message: `Internal error: ${metadata?.error || "Unknown"}`,
     userMessage:
-      "An unexpected error occurred. Please try again or contact support@blakeui.com with error code: " +
+      "An unexpected error occurred. Please try again or contact support@blakebill.com with error code: " +
       (metadata?.errorId || "UNKNOWN"),
     statusCode: 500,
     metadata,
@@ -130,7 +130,7 @@ export const ErrorMessages: Record<
   [ErrorCode.INITIALIZATION_ERROR]: (metadata) => ({
     code: ErrorCode.INITIALIZATION_ERROR,
     message: `Initialization error: ${metadata?.error || "Failed to initialize"}`,
-    userMessage: "Failed to initialize MCP server. Please reconnect or contact support@blakeui.com",
+    userMessage: "Failed to initialize MCP server. Please reconnect or contact support@blakebill.com",
     statusCode: 500,
     metadata,
   }),
@@ -138,7 +138,7 @@ export const ErrorMessages: Record<
   [ErrorCode.TOOL_EXECUTION_ERROR]: (metadata) => ({
     code: ErrorCode.TOOL_EXECUTION_ERROR,
     message: `Tool execution error: ${metadata?.tool} - ${metadata?.error}`,
-    userMessage: `Error executing tool "${metadata?.tool}". ${metadata?.suggestion || "Please try again or contact support@blakeui.com"}`,
+    userMessage: `Error executing tool "${metadata?.tool}". ${metadata?.suggestion || "Please try again or contact support@blakebill.com"}`,
     statusCode: 500,
     metadata,
   }),

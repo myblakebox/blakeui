@@ -214,7 +214,7 @@ Please adhere to our [Code of Conduct](../../CODE_OF_CONDUCT.md).
 - 💬 [Discord Community](https://discord.gg/9b6yyZKmH4)
 - 🐦 [X (Twitter)](https://x.com/blake_ui)
 - 🐛 [GitHub Issues](https://github.com/myblakebox/BlakeUI/issues)
-- 📧 [Email Support](mailto:support@blakeui.com)
+- 📧 [Email Support](mailto:support@blakebill.com)
 
 ## License
 
