@@ -21,14 +21,14 @@ This post shows the Pro-first approach: start with `AppLayout`, `Sidebar`, `Navb
 Install blakeUI and blakeUI Pro packages:
 
 ```bash
-npm install @blakeui/styles @blakeui/react @blakeui-pro/react
+npm install @blakeui/styles @blakeui/react @blakeui/pro-react
 ```
 
 blakeUI Pro requires access to the Pro package registry. The dashboard template uses these style imports:
 
 ```css
 @import "@blakeui/styles/css";
-@import "@blakeui-pro/react/css";
+@import "@blakeui/pro-react/css";
 
 @source "../**/*.{ts,tsx}";
 
@@ -46,7 +46,7 @@ The app frame should come from blakeUI Pro `AppLayout`, not a custom flex layout
 
 import type {ReactNode} from "react";
 
-import {AppLayout} from "@blakeui-pro/react";
+import {AppLayout} from "@blakeui/pro-react";
 import {usePathname, useRouter} from "next/navigation";
 import {useCallback} from "react";
 
@@ -82,7 +82,7 @@ blakeUI Pro ships a `Sidebar` compound component and a `Navbar` compound compone
 
 import {Bell, Magnifier} from "@gravity-ui/icons";
 import {Button} from "@blakeui/react";
-import {AppLayout, Navbar, Sidebar} from "@blakeui-pro/react";
+import {AppLayout, Navbar, Sidebar} from "@blakeui/pro-react";
 
 export function DashboardNavbar({title}: {title: string}) {
   return (
@@ -110,7 +110,7 @@ For navigation, render `Sidebar.MenuItem` items instead of building custom activ
 "use client";
 
 import {ChartColumn, Gear, House, Receipt} from "@gravity-ui/icons";
-import {Sidebar} from "@blakeui-pro/react";
+import {Sidebar} from "@blakeui/pro-react";
 
 const items = [
   {href: "/", icon: House, label: "Dashboard"},
@@ -165,7 +165,7 @@ Do not rebuild metric cards with `Card` unless you need a one-off design. Use `K
 ```tsx
 "use client";
 
-import {KPI} from "@blakeui-pro/react";
+import {KPI} from "@blakeui/pro-react";
 
 const chartData = [
   {x: 1, y: 12},
@@ -202,7 +202,7 @@ blakeUI Pro chart components keep chart styling aligned with the rest of the des
 "use client";
 
 import {Card} from "@blakeui/react";
-import {LineChart, NumberValue, TrendChip} from "@blakeui-pro/react";
+import {LineChart, NumberValue, TrendChip} from "@blakeui/pro-react";
 
 const data = [
   {day: "Mon", sessions: 1800, users: 1200},
@@ -268,10 +268,10 @@ Dashboards usually need dense, sortable tables. Use Pro `DataGrid` instead of co
 ```tsx
 "use client";
 
-import type {DataGridColumn, DataGridSortDescriptor} from "@blakeui-pro/react";
+import type {DataGridColumn, DataGridSortDescriptor} from "@blakeui/pro-react";
 
 import {Avatar, SearchField} from "@blakeui/react";
-import {DataGrid} from "@blakeui-pro/react";
+import {DataGrid} from "@blakeui/pro-react";
 import {useMemo, useState} from "react";
 
 type Member = {
