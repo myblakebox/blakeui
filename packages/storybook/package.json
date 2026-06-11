@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "storybook dev --host 127.0.0.1 --port 6006 --no-open",
     "build": "storybook build",
-    "start": "storybook start",
+    "start": "storybook dev --host 127.0.0.1 --port 6006 --no-open",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
