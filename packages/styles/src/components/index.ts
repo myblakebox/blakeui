@@ -35,6 +35,7 @@ export * from "./disclosure-group";
 export * from "./dropdown";
 export * from "./empty-state";
 export * from "./error-message";
+export * from "./fancy-button";
 export * from "./field-error";
 export * from "./fieldset";
 export * from "./header";

@@ -1,0 +1,193 @@
+/* FancyButton component styles */
+
+/* Base fancy button styles */
+.fancy-button {
+  @apply relative isolate inline-flex h-10 w-fit origin-center items-center justify-center gap-2 rounded-3xl px-4 text-sm font-medium whitespace-nowrap outline-none select-none no-highlight md:h-9;
+
+  /**
+   * Transitions
+   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
+   */
+  transition:
+    transform 250ms var(--ease-smooth),
+    background-color 100ms var(--ease-out),
+    box-shadow 100ms var(--ease-out);
+  @apply transform-gpu motion-reduce:transition-none;
+
+  /* Cursor */
+  cursor: var(--cursor-interactive);
+
+  /* Default tokens (fallback behavior) */
+  --fancy-button-bg: transparent;
+  --fancy-button-bg-hover: var(--fancy-button-bg);
+  --fancy-button-bg-pressed: var(--fancy-button-bg-hover);
+  --fancy-button-fg: currentColor;
+
+  background-color: var(--fancy-button-bg);
+  color: var(--fancy-button-fg);
+
+  /* Fancy layer: 1px gradient inner border (padding-box mask trick, edge-only) */
+  &::before {
+    @apply pointer-events-none absolute inset-0 -z-10 rounded-[inherit];
+    content: "";
+    padding: 1px;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--white) 45%, transparent),
+      transparent 60%
+    );
+    mask:
+      linear-gradient(var(--white) 0 0) content-box,
+      linear-gradient(var(--white) 0 0);
+    mask-composite: exclude;
+  }
+
+  /* Fancy layer: translucent top-down sheen, brightens on hover */
+  &::after {
+    @apply pointer-events-none absolute inset-0 -z-10 rounded-[inherit];
+    content: "";
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--white) 14%, transparent),
+      transparent 55%
+    );
+    opacity: 0.6;
+    transition: opacity 100ms var(--ease-out);
+    @apply motion-reduce:transition-none;
+  }
+
+  /* Focus state */
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused;
+  }
+
+  /* Disabled state - also hide the fancy layers so the button reads inert */
+  &:disabled,
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+
+    &::before,
+    &::after {
+      content: none;
+    }
+  }
+
+  /* Pending state */
+  &[data-pending="true"] {
+    @apply status-pending;
+  }
+
+  /* Active / pressed */
+  &:active,
+  &[data-pressed="true"] {
+    background-color: var(--fancy-button-bg-pressed);
+    transform: scale(0.97);
+    @apply motion-reduce:transform-none;
+  }
+
+  /* Hover */
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      background-color: var(--fancy-button-bg-hover);
+
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* SVG icon styling - exclude spinner and link-icon svgs */
+  & svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg) {
+    @apply pointer-events-none -mx-0.5 my-0.5 size-5 shrink-0 self-center sm:my-1 sm:size-4;
+  }
+}
+
+/* Size variants */
+.fancy-button--sm {
+  @apply h-9 px-3 md:h-8;
+
+  & svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg) {
+    @apply size-4;
+  }
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.98);
+    @apply motion-reduce:transform-none;
+  }
+}
+
+.fancy-button--md {
+  /* No styles as this is the default size */
+}
+
+.fancy-button--lg {
+  @apply h-11 text-base md:h-10;
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.96);
+    @apply motion-reduce:transform-none;
+  }
+}
+
+/* Color variants - only set custom property values */
+.fancy-button--primary {
+  --fancy-button-bg: var(--accent);
+  --fancy-button-bg-hover: var(--accent-hover);
+  --fancy-button-bg-pressed: var(--accent-hover);
+  --fancy-button-fg: var(--accent-foreground);
+}
+
+.fancy-button--neutral {
+  /* Theme-inverted ink: dark-on-light in light mode, light-on-dark in dark mode */
+  --fancy-button-bg: var(--background-inverse);
+  --fancy-button-bg-hover: color-mix(in oklab, var(--background-inverse) 90%, var(--background) 10%);
+  --fancy-button-bg-pressed: color-mix(
+    in oklab,
+    var(--background-inverse) 90%,
+    var(--background) 10%
+  );
+  --fancy-button-fg: var(--background);
+}
+
+.fancy-button--danger {
+  --fancy-button-bg: var(--danger);
+  --fancy-button-bg-hover: var(--danger-hover);
+  --fancy-button-bg-pressed: var(--danger-hover);
+  --fancy-button-fg: var(--danger-foreground);
+}
+
+/* Basic variant - quiet bordered button, opts out of the fancy layers */
+.fancy-button--basic {
+  @apply border border-border;
+  --fancy-button-bg: transparent;
+  --fancy-button-bg-hover: color-mix(in srgb, var(--default) 60%, transparent);
+  --fancy-button-bg-pressed: var(--default);
+  --fancy-button-fg: var(--default-foreground);
+
+  &::before,
+  &::after {
+    content: none;
+  }
+}
+
+/* Icon-only modifier */
+.fancy-button--icon-only {
+  @apply w-10 p-0 md:w-9;
+}
+
+.fancy-button--icon-only.fancy-button--sm {
+  @apply w-9 md:w-8;
+}
+
+.fancy-button--icon-only.fancy-button--lg {
+  @apply w-11 md:w-10;
+}
+
+/* Full width modifier */
+.fancy-button--full-width {
+  @apply w-full;
+}

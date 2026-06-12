@@ -1,0 +1,144 @@
+---
+title: FancyButton
+description: A solid button with a fancy gradient finish and fully accessible focus handling
+links:
+  rac: Button
+  source: fancy-button/fancy-button.tsx
+  styles: fancy-button.css
+  storybook: Components/Buttons/FancyButton
+---
+
+## Import
+
+```tsx
+import { FancyButton } from '@blakeui/react';
+```
+
+### Usage
+
+<ComponentPreview
+  name="fancy-button-basic"
+/>
+
+### Variants
+
+<ComponentPreview
+  name="fancy-button-variants"
+/>
+
+The `neutral` variant uses theme-inverted ink: dark-on-light in light mode and light-on-dark in dark mode. The `basic` variant is a quiet bordered button that opts out of the fancy gradient layers.
+
+### With Icons
+
+<ComponentPreview
+  name="fancy-button-with-icons"
+/>
+
+### Icon Only
+
+Icon-only buttons have no visible text, so an `aria-label` is **required** for screen reader users.
+
+<ComponentPreview
+  name="fancy-button-icon-only"
+/>
+
+### Sizes
+
+<ComponentPreview
+  name="fancy-button-sizes"
+/>
+
+### Disabled State
+
+When disabled, the fancy gradient layers are removed so the button reads inert.
+
+<ComponentPreview
+  name="fancy-button-disabled"
+/>
+
+<RelatedComponents component="fancy-button" />
+
+## Accessibility
+
+FancyButton is built on the same React Aria button primitive as [Button](/docs/react/components/button):
+
+- **Focus**: the shared focus ring appears on keyboard focus only (`:focus-visible` / `[data-focus-visible="true"]`) — mouse clicks never show a ring, and the outline is never removed without a replacement.
+- **Disabled**: uses the shared disabled status (reduced opacity, no pointer events, disabled cursor) and hides the decorative gradient layers.
+- **Reduced motion**: the sheen transition and the pressed scale transform are disabled under `prefers-reduced-motion`.
+- **Icon only**: always pass `aria-label` when using `isIconOnly`.
+
+## Styling
+
+### Passing Tailwind CSS classes
+
+```tsx
+import { FancyButton } from '@blakeui/react';
+
+function CustomFancyButton() {
+  return (
+    <FancyButton className="rounded-lg">
+      Custom Radius
+    </FancyButton>
+  );
+}
+```
+
+### Customizing the component classes
+
+To customize the FancyButton component classes, you can use the `@layer components` directive.
+<br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
+
+```css
+@layer components {
+  .fancy-button {
+    @apply rounded-lg;
+  }
+}
+```
+
+blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
+
+### CSS Classes
+
+The FancyButton component uses these CSS classes ([View source styles](https://github.com/myblakebox/BlakeUI/blob/main/packages/styles/components/fancy-button.css)):
+
+#### Base & Size Classes
+- `.fancy-button` - Base fancy button styles (gradient inner border + sheen layers)
+- `.fancy-button--sm` - Small size variant
+- `.fancy-button--md` - Medium size variant
+- `.fancy-button--lg` - Large size variant
+
+#### Variant Classes
+- `.fancy-button--primary`
+- `.fancy-button--neutral`
+- `.fancy-button--danger`
+- `.fancy-button--basic`
+
+#### Modifier Classes
+- `.fancy-button--icon-only`
+- `.fancy-button--icon-only.fancy-button--sm`
+- `.fancy-button--icon-only.fancy-button--lg`
+
+### Interactive States
+
+The fancy button supports both CSS pseudo-classes and data attributes for flexibility:
+
+- **Hover**: `:hover` or `[data-hovered="true"]` (brightens the sheen layer)
+- **Active/Pressed**: `:active` or `[data-pressed="true"]` (includes scale transform)
+- **Focus**: `:focus-visible` or `[data-focus-visible="true"]` (shows focus ring)
+- **Disabled**: `:disabled` or `[aria-disabled="true"]` (reduced opacity, no pointer events, fancy layers removed)
+- **Pending**: `[data-pending]` (no pointer events during loading)
+
+## API Reference
+
+### FancyButton Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'primary' \| 'neutral' \| 'danger' \| 'basic'` | `'primary'` | Visual style variant |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Size of the button |
+| `fullWidth` | `boolean` | `false` | Whether the button should take full width of its container |
+| `isDisabled` | `boolean` | `false` | Whether the button is disabled |
+| `isIconOnly` | `boolean` | `false` | Whether the button contains only an icon (requires `aria-label`) |
+| `onPress` | `(e: PressEvent) => void` | - | Handler called when the button is pressed |
+| `children` | `React.ReactNode \| (values: ButtonRenderProps) => React.ReactNode` | - | Button content or render prop |

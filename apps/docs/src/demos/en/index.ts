@@ -10,6 +10,7 @@ import * as BadgeDemos from "./badge";
 import * as BreadcrumbsDemos from "./breadcrumbs";
 import * as ButtonDemos from "./button";
 import * as ButtonGroupDemos from "./button-group";
+import * as FancyButtonDemos from "./fancy-button";
 import * as CalendarDemos from "./calendar";
 import * as CardDemos from "./card";
 import * as CheckboxDemos from "./checkbox";
@@ -316,6 +317,31 @@ export const demos: Record<string, DemoItem> = {
   "button-custom-render-function": {
     component: ButtonDemos.CustomRenderFunction,
     file: "en/button/custom-render-function.tsx",
+  },
+  // FancyButton demos
+  "fancy-button-basic": {
+    component: FancyButtonDemos.Basic,
+    file: "en/fancy-button/basic.tsx",
+  },
+  "fancy-button-disabled": {
+    component: FancyButtonDemos.Disabled,
+    file: "en/fancy-button/disabled.tsx",
+  },
+  "fancy-button-icon-only": {
+    component: FancyButtonDemos.IconOnly,
+    file: "en/fancy-button/icon-only.tsx",
+  },
+  "fancy-button-sizes": {
+    component: FancyButtonDemos.Sizes,
+    file: "en/fancy-button/sizes.tsx",
+  },
+  "fancy-button-variants": {
+    component: FancyButtonDemos.Variants,
+    file: "en/fancy-button/variants.tsx",
+  },
+  "fancy-button-with-icons": {
+    component: FancyButtonDemos.WithIcons,
+    file: "en/fancy-button/with-icons.tsx",
   },
   // ButtonGroup demos
   "button-group-basic": {

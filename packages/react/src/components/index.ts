@@ -11,6 +11,7 @@ export * from "./badge";
 export * from "./breadcrumbs";
 export * from "./button";
 export * from "./button-group";
+export * from "./fancy-button";
 export * from "./card";
 export * from "./checkbox";
 export * from "./checkbox-group";
