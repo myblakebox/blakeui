@@ -14,6 +14,7 @@ const COMPONENT_GROUPS = [
       "(buttons)/button",
       "(buttons)/button-group",
       "(buttons)/close-button",
+      "(buttons)/fancy-button",
       "(buttons)/toggle-button",
       "(buttons)/toggle-button-group",
     ],

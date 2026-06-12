@@ -46,6 +46,7 @@ const COMPONENT_IMAGE_MAP: Record<string, string> = {
   drawer: "drawer.png",
   dropdown: "dropdown.png",
   "error-message": "errormessage.png",
+  "fancy-button": "fancybutton.png",
   input: "input.png",
   "input-group": "inputgroup.png",
   "input-otp": "otpField.png",
