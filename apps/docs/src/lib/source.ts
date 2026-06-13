@@ -24,9 +24,9 @@ export type Meta = InferMetaType<typeof source>;
 
 /**
  * Pages hidden from the site entirely: navigation, direct URL (404), search,
- * sitemap, and llms.txt. React release notes are hidden so the docs present a
- * single current version. Native releases remain visible.
+ * sitemap, and llms.txt. Nothing is hidden anymore — the React Releases tab is
+ * visible again, with release notes starting at v1.0.1.
  */
-export function isHiddenPage(page: {slugs: string[]}): boolean {
-  return page.slugs[0] === "react" && page.slugs[1] === "releases";
+export function isHiddenPage(_page: {slugs: string[]}): boolean {
+  return false;
 }

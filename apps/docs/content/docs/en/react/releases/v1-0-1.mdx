@@ -1,0 +1,61 @@
+---
+title: v1.0.1
+description: The first public release of BlakeUI — a modern React UI library built on React Aria Components and Tailwind CSS v4.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">June 13, 2026</span>
+</div>
+
+The first public release of BlakeUI. A modern React UI library built on React Aria Components and Tailwind CSS v4, featuring a compound component architecture, CSS-first theming, and accessibility out of the box.
+
+## Installation
+
+Install the latest version:
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## What's New
+
+### Compound Component Architecture
+
+Every component follows a compound pattern (e.g. `Card.Header`, `Card.Content`, `Alert.Title`) built on top of React Aria Components. This exposes each piece for independent styling and composition while keeping accessibility handled for you.
+
+### Tailwind CSS v4 + CSS-First Theming
+
+Styling is powered by Tailwind CSS v4 with a CSS-first theme layer. Design tokens are defined as CSS variables, so you can retheme the entire library without touching component code.
+
+### Accessibility by Default
+
+All interactive components are built on React Aria Components, providing keyboard navigation, focus management, and ARIA semantics with no extra wiring.
+
+## Links
+
+- [Component Docs](/docs/react/components)
+- [MCP Server](/docs/react/getting-started/mcp-server)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
