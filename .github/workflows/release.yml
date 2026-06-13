@@ -36,6 +36,12 @@ jobs:
       - name: Ensure npm supports trusted publishing
         run: npm install -g npm@11
 
+      - name: Remove placeholder auth token so npm uses OIDC trusted publishing
+        run: |
+          npm config delete //registry.npmjs.org/:_authToken --location=user || true
+          echo "---- $NPM_CONFIG_USERCONFIG ----"
+          cat "$NPM_CONFIG_USERCONFIG" 2>/dev/null || echo "(no user config file)"
+
       - name: Determine previous tag
         id: prev-tag
         run: |
