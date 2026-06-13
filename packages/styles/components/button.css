@@ -26,16 +26,55 @@
   background-color: var(--button-bg);
   color: var(--button-fg);
 
+  /* Subtle resting elevation. Applied as a utility (not raw box-shadow) so it
+     composes with the ring via Tailwind's --tw-shadow / --tw-ring-shadow chain. */
+  @apply shadow-surface;
+
+  /* Fancy layer: 1px gradient inner border (padding-box mask trick, edge-only) */
+  &::before {
+    @apply pointer-events-none absolute inset-0 -z-10 rounded-[inherit];
+    content: "";
+    padding: 1px;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--white) 45%, transparent),
+      transparent 60%
+    );
+    mask:
+      linear-gradient(var(--white) 0 0) content-box,
+      linear-gradient(var(--white) 0 0);
+    mask-composite: exclude;
+  }
+
+  /* Fancy layer: translucent top-down sheen, brightens on hover */
+  &::after {
+    @apply pointer-events-none absolute inset-0 -z-10 rounded-[inherit];
+    content: "";
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--white) 14%, transparent),
+      transparent 55%
+    );
+    opacity: 0.6;
+    transition: opacity 100ms var(--ease-out);
+    @apply motion-reduce:transition-none;
+  }
+
   /* Focus state */
   &:focus-visible:not(:focus),
   &[data-focus-visible="true"] {
     @apply status-focused;
   }
 
-  /* Disabled state */
+  /* Disabled state - also drop the elevation and fancy layers so it reads inert */
   &:disabled,
   &[aria-disabled="true"] {
-    @apply status-disabled;
+    @apply status-disabled shadow-none;
+
+    &::before,
+    &::after {
+      content: none;
+    }
   }
 
   /* Pending state */
@@ -55,6 +94,10 @@
     &:hover,
     &[data-hovered="true"] {
       background-color: var(--button-bg-hover);
+
+      &::after {
+        opacity: 1;
+      }
     }
   }
 
@@ -118,6 +161,14 @@
   --button-bg-hover: var(--default);
   --button-bg-pressed: var(--default);
   --button-fg: var(--default-foreground);
+
+  /* Transparent variants stay flat - no elevation, no fancy layers */
+  @apply shadow-none;
+
+  &::before,
+  &::after {
+    content: none;
+  }
 }
 
 .button--outline {

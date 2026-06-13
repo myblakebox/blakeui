@@ -7,6 +7,21 @@
   @apply inline-flex h-auto items-center justify-center gap-0;
 }
 
+/* Grouped buttons: one shadow on the group, segments stay flat inside.
+   Keep the ::after sheen per segment; only the group carries the elevation
+   and the ::before gradient frame is dropped so seams don't double up. */
+.button-group {
+  @apply shadow-surface rounded-3xl;
+}
+
+.button-group .button {
+  @apply shadow-none;
+
+  &::before {
+    content: none;
+  }
+}
+
 /* ==========================================================================
    Orientation variants
    ========================================================================== */
