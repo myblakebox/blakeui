@@ -41,8 +41,6 @@ const COMPONENT_IMAGE_MAP: Record<string, string> = {
   "date-picker": "DatePicker.png",
   "date-range-picker": "DateRangePicker.png",
   description: "description.png",
-  disclosure: "disclosure.png",
-  "disclosure-group": "disclosureGroup.png",
   drawer: "drawer.png",
   dropdown: "dropdown.png",
   "error-message": "errormessage.png",

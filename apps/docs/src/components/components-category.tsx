@@ -56,8 +56,6 @@ const COMPONENT_GROUPS = [
     components: [
       "(navigation)/accordion",
       "(navigation)/breadcrumbs",
-      "(navigation)/disclosure",
-      "(navigation)/disclosure-group",
       "(navigation)/link",
       "(navigation)/pagination",
       "(navigation)/tabs",

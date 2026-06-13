@@ -31,8 +31,6 @@ export * from "./drawer";
 export * from "./progress-bar";
 export * from "./progress-circle";
 export * from "./time-field";
-export * from "./disclosure";
-export * from "./disclosure-group";
 export * from "./error-message";
 export * from "./kbd";
 export * from "./link";

@@ -189,20 +189,6 @@ const componentsMap: Record<string, ComponentInfo> = {
     name: "description",
     title: "Description",
   },
-  disclosure: {
-    category: "layout",
-    description: "Single collapsible content section",
-    href: "/docs/components/disclosure",
-    name: "disclosure",
-    title: "Disclosure",
-  },
-  disclosuregroup: {
-    category: "layout",
-    description: "Group of collapsible panels",
-    href: "/docs/components/disclosure-group",
-    name: "disclosuregroup",
-    title: "DisclosureGroup",
-  },
   drawer: {
     category: "layout",
     description: "Slide-out panel for supplementary content and actions",
@@ -516,7 +502,7 @@ const componentsMap: Record<string, ComponentInfo> = {
 
 // Define relationships between components
 const componentRelationships: Record<string, string[]> = {
-  accordion: ["disclosuregroup", "disclosure"],
+  accordion: [],
   alert: ["closebutton", "button", "spinner", "toast"],
   alertdialog: ["button", "closebutton"],
   autocomplete: [
@@ -630,8 +616,6 @@ const componentRelationships: Record<string, string[]> = {
     "numberfield",
     "datefield",
   ],
-  disclosure: ["accordion", "disclosuregroup", "button"],
-  disclosuregroup: ["accordion", "disclosure", "button", "separator"],
   drawer: ["modal", "button", "closebutton", "alertdialog"],
   dropdown: ["button", "popover", "separator", "listbox"],
   errormessage: ["taggroup"],
@@ -740,17 +724,7 @@ const componentRelationships: Record<string, string[]> = {
     "avatar",
     "combobox",
   ],
-  separator: [
-    "card",
-    "chip",
-    "avatar",
-    "disclosuregroup",
-    "listbox",
-    "select",
-    "combobox",
-    "dropdown",
-    "breadcrumbs",
-  ],
+  separator: ["card", "chip", "avatar", "listbox", "select", "combobox", "dropdown", "breadcrumbs"],
   skeleton: ["card", "avatar"],
   slider: ["label", "form", "description"],
   spinner: [],

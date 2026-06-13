@@ -64,3 +64,13 @@ export type {
 export {accordionVariants} from "@blakeui/styles";
 
 export type {AccordionVariants} from "@blakeui/styles";
+
+/* -------------------------------------------------------------------------------------------------
+ * Hooks
+ * -----------------------------------------------------------------------------------------------*/
+export {useDisclosureGroupNavigation} from "./use-disclosure-group-navigation";
+
+export type {
+  UseDisclosureGroupNavigationProps,
+  UseDisclosureGroupNavigationReturn,
+} from "./use-disclosure-group-navigation";
