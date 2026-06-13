@@ -28,8 +28,6 @@ import * as DateFieldDemos from "./date-field";
 import * as DatePickerDemos from "./date-picker";
 import * as DateRangePickerDemos from "./date-range-picker";
 import * as DescriptionDemos from "./description";
-import * as DisclosureDemos from "./disclosure";
-import * as DisclosureGroupDemos from "./disclosure-group";
 import * as DrawerDemos from "./drawer";
 import * as DropdownDemos from "./dropdown";
 import * as ErrorMessageDemos from "./error-message";
@@ -1039,24 +1037,6 @@ export const demos: Record<string, DemoItem> = {
   "drawer-controlled": {
     component: DrawerDemos.Controlled,
     file: "en/drawer/controlled.tsx",
-  },
-  // Disclosure demos
-  "disclosure-basic": {
-    component: DisclosureDemos.Basic,
-    file: "en/disclosure/basic.tsx",
-  },
-  "disclosure-custom-render-function": {
-    component: DisclosureDemos.CustomRenderFunction,
-    file: "en/disclosure/custom-render-function.tsx",
-  },
-  // DisclosureGroup demos
-  "disclosure-group-basic": {
-    component: DisclosureGroupDemos.Basic,
-    file: "en/disclosure-group/basic.tsx",
-  },
-  "disclosure-group-controlled": {
-    component: DisclosureGroupDemos.Controlled,
-    file: "en/disclosure-group/controlled.tsx",
   },
   // Dropdown demos
   "dropdown-default": {
