@@ -3,5 +3,5 @@
   "description": "blakeUI Release Notes",
   "icon": "rocket",
   "root": true,
-  "pages": ["---Overview---", "index", "---Releases---", "v1-0-1"]
+  "pages": ["---Overview---", "index", "---Releases---", "v1-0-2", "v1-0-1"]
 }

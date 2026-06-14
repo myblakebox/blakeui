@@ -1,0 +1,72 @@
+---
+title: v1.0.2
+description: Table primary variant redesigned with a floating-card look, refined selection states, and consistent header rounding.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">June 14, 2026</span>
+</div>
+
+A focused update redesigning the Table's primary variant toward a cleaner, card-based look, with refinements to selection, resizing, and header consistency.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Improvements
+
+### Table — redesigned primary variant
+
+The primary Table variant now renders as a floating card: a surface card with a soft shadow, a rounded header pill in the default color, a gap between the header and body, and borderless rows for a lighter, more scannable layout.
+
+### Table — refined selection and interaction
+
+Contiguous selected rows now merge into a single rounded block instead of separate per-row pills, with rounded hover highlights on individual rows. Column-resize grips are now full-height for a clearer resize affordance.
+
+### Table — consistent headers
+
+Header titles now match the data text (default foreground color, medium weight) for better prominence, and the header renders as one cohesive rounded pill across standard, paginated, async, and virtualized tables.
+
+## Fixes
+
+- The Actions column header now aligns to the start like the other columns, while action buttons stay right-aligned.
+- Fixed the header gap in the async-loading table and the header rounding in the virtualized table.
+
+## Links
+
+- [Table component](/docs/react/components/table)
+- [Component Docs](/docs/react/components)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
