@@ -1,6 +1,6 @@
 {
   "name": "@blakeui/react",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "🚀 Beautiful and modern React UI library built with Tailwind CSS 4.0.",
   "license": "MIT",
   "type": "module",
