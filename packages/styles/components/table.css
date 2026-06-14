@@ -22,9 +22,139 @@
   scrollbar-gutter: auto;
 }
 
+/* Even padding + white card. This is the one color-ROLE swap (gray<->white) so the
+   gray header pill reads against a white card, like HeroUI. Flagged in the diff.
+   To keep the existing gray frame instead, use bg-surface-secondary here.
+   NOTE: no card shadow existed before (neither root nor .table__body), so this
+   ADDS elevation via the shared `shadow-surface` token (HeroUI shadow-small
+   equivalent, same token card/alert/tabs use) — it was not moved from elsewhere. */
 .table-root--primary {
-  @apply bg-surface-secondary px-1 pb-1;
+  @apply bg-surface p-3 shadow-surface;
   border-radius: min(32px, calc(var(--radius) * 2.5));
+}
+
+.table-root--primary .table__header {
+  @apply border-b-0 bg-transparent;
+}
+/* Header titles match data color (foreground) + medium weight for prominence.
+   Gap is handled by the body spacer row below, not a border.
+   CHANGE 1: header pill bg = the warmer --default color (#E5E4DF), not the
+   cooler surface-secondary. */
+.table-root--primary .table__column {
+  @apply bg-default px-3 py-2.5 text-sm font-medium text-foreground;
+}
+.table-root--primary .table__column::after {
+  content: none;
+}
+
+/* Cohesive pill: round outer columns ONLY when the header is a real <thead> */
+.table-root--primary .table__header:is(thead) .table__column:first-child {
+  @apply rounded-s-lg;
+}
+.table-root--primary .table__header:is(thead) .table__column:last-child {
+  @apply rounded-e-lg;
+}
+
+/* CHANGE B: header→body gap via a spacer row (HeroUI's mechanism), so the
+   first/last-column rounding above rounds all four corners of the pill.
+   The spacer lives on the BODY (tbody::before), not the header: the Async Loading
+   story makes <thead> sticky + bg-surface-secondary, and a spacer row inside that
+   sticky, backgrounded layer makes Chrome over-paint the row-header column's gray
+   background down the full scroll height (a sticky-paint artifact). The tbody is
+   neither sticky nor backgrounded, so the same 6px gap renders cleanly there.
+   Inert (no bg/border) so it can't read as a partial cell. */
+.table-root--primary .table__body:is(tbody)::before {
+  content: "";
+  @apply table-row h-1.5; /* 6px gap below the pill */
+  background: none;
+  border: 0;
+}
+
+/* CHANGE 2: virtualized header reads as one fully-rounded pill. The clip + radius
+   AND the bg must live on the SAME element (this header div, h=42), otherwise the
+   gray column children (h=40) end 2px above the rounded clip edge and their bottom
+   corners read as square. Putting bg-default here makes the rounded clip box itself
+   the pill. Scoped to :not(thead) so the real <thead> keeps its column-carried pill.
+   mb-1.5 = 6px gap below, matching the tbody spacer. */
+.table-root--primary .table__header:not(thead) {
+  @apply mb-1.5 overflow-clip rounded-lg bg-default;
+}
+/* The header div above is the pill (bg + radius + clip on one element). Its column
+   children are 2px shorter than the clip box, so their own bg-default would paint a
+   square-cornered block that hides the rounded bottom. Keep them transparent so only
+   the rounded header bg shows. Scoped to the virtualized (:not(thead)) header. */
+.table-root--primary .table__header:not(thead) .table__column {
+  @apply bg-transparent;
+}
+
+.table-root--primary .table__row,
+.table-root--primary .table__cell {
+  @apply border-0;
+}
+.table-root--primary .table__cell {
+  @apply bg-transparent px-3 py-2;
+}
+
+/* FIX 2: hover = single rounded pill; skip rows that are selected */
+.table-root--primary .table__row {
+  @media (hover: hover) {
+    &:hover:not([data-selected="true"]) .table__cell,
+    &[data-hovered="true"]:not([data-selected="true"]) .table__cell {
+      /* CHANGE 1 companion: moved to the default scale to match the new header pill
+         (was bg-surface-secondary/60). Revert here if not wanted. */
+      @apply bg-default/60;
+    }
+    &:hover:not([data-selected="true"]) .table__cell:first-child,
+    &[data-hovered="true"]:not([data-selected="true"]) .table__cell:first-child {
+      @apply rounded-s-lg;
+    }
+    &:hover:not([data-selected="true"]) .table__cell:last-child,
+    &[data-hovered="true"]:not([data-selected="true"]) .table__cell:last-child {
+      @apply rounded-e-lg;
+    }
+  }
+}
+
+/* Selection fill on every selected cell → continuous block (rows are borderless).
+   CHANGE 1 companion: default scale to match the new header pill
+   (was bg-surface-secondary). Revert here if not wanted. */
+.table-root--primary .table__row[data-selected="true"] .table__cell {
+  @apply bg-default;
+}
+
+/* Round ONLY the outer corners of each contiguous run of selected rows */
+.table-root--primary .table__row[data-selected="true"]:first-child .table__cell:first-child,
+.table-root--primary
+  .table__row:not([data-selected="true"])
+  + .table__row[data-selected="true"]
+  .table__cell:first-child {
+  @apply rounded-ss-lg;
+}
+.table-root--primary .table__row[data-selected="true"]:first-child .table__cell:last-child,
+.table-root--primary
+  .table__row:not([data-selected="true"])
+  + .table__row[data-selected="true"]
+  .table__cell:last-child {
+  @apply rounded-se-lg;
+}
+.table-root--primary .table__row[data-selected="true"]:last-child .table__cell:first-child,
+.table-root--primary
+  .table__row[data-selected="true"]:has(+ .table__row:not([data-selected="true"]))
+  .table__cell:first-child {
+  @apply rounded-es-lg;
+}
+.table-root--primary .table__row[data-selected="true"]:last-child .table__cell:last-child,
+.table-root--primary
+  .table__row[data-selected="true"]:has(+ .table__row:not([data-selected="true"]))
+  .table__cell:last-child {
+  @apply rounded-ee-lg;
+}
+
+/* FIX 3: resize grip reads as a full-height divider at rest. Placed BEFORE the
+   base .table__column-resizer block so its :hover / :resizing / :focus accent
+   states (equal specificity) still win by source order. */
+.table-root--primary .table__column-resizer {
+  @apply h-full w-px bg-separator;
 }
 
 .table-root--secondary {
@@ -38,7 +168,9 @@
 }
 
 .table-root--secondary .table__column {
-  @apply bg-surface-secondary;
+  /* Match the primary header pill color (the warmer --default), so both variants
+     share the same proper header-row color. */
+  @apply bg-default;
 }
 
 .table-root--secondary .table__column:first-child {
