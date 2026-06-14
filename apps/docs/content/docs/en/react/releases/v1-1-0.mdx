@@ -1,0 +1,57 @@
+---
+title: v1.1.0
+description: Buttons gain depth by default — gradient layers, a top-down sheen, and surface elevation on filled variants, with unified ButtonGroup elevation.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">June 13, 2026</span>
+</div>
+
+A styling update that gives buttons more depth out of the box, with gradient layers, a subtle sheen, and surface elevation on the filled variants.
+
+## Installation
+
+Install the latest version:
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Improvements
+
+### Button — fancy layers and surface elevation by default
+
+Filled Button variants (`primary`, `secondary`, `tertiary`, `danger`, `danger-soft`) now ship a gradient inner border, a top-down sheen, and `shadow-surface` elevation by default for a richer, more tactile look. The `ghost` and `outline` variants opt out of both and stay flat, and disabled buttons drop the shadow and layers.
+
+### ButtonGroup — unified elevation
+
+ButtonGroup now carries a single group-level shadow while its segments render flat — no per-segment shadow or gradient frame — keeping the sheen on each segment for a cohesive, seamless group.
+
+## Links
+
+- [Button component](/docs/react/components/button)
+- [Component Docs](/docs/react/components)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
