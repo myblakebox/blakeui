@@ -321,7 +321,7 @@ function DefaultTableTemplate({variant = "primary"}: {variant?: "primary" | "sec
                   <SortableColumnHeader sortDirection={sortDirection}>Status</SortableColumnHeader>
                 )}
               </Table.Column>
-              <Table.Column className="text-end">Actions</Table.Column>
+              <Table.Column>Actions</Table.Column>
             </Table.Header>
             <Table.Body>
               {pagination.paginatedItems.map((user) => (
@@ -369,7 +369,7 @@ function DefaultTableTemplate({variant = "primary"}: {variant?: "primary" | "sec
                     </Chip>
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-end gap-1">
                       <Button isIconOnly size="sm" variant="tertiary">
                         <Icon className="size-4" icon="gravity-ui:eye" />
                       </Button>
