@@ -10,7 +10,6 @@ import * as BadgeDemos from "./badge";
 import * as BreadcrumbsDemos from "./breadcrumbs";
 import * as ButtonDemos from "./button";
 import * as ButtonGroupDemos from "./button-group";
-import * as FancyButtonDemos from "./fancy-button";
 import * as CalendarDemos from "./calendar";
 import * as CardDemos from "./card";
 import * as CheckboxDemos from "./checkbox";
@@ -31,6 +30,7 @@ import * as DescriptionDemos from "./description";
 import * as DrawerDemos from "./drawer";
 import * as DropdownDemos from "./dropdown";
 import * as ErrorMessageDemos from "./error-message";
+import * as FancyButtonDemos from "./fancy-button";
 import * as FieldErrorDemos from "./field-error";
 import * as FieldsetDemos from "./fieldset";
 import * as FormDemos from "./form";
@@ -1774,6 +1774,10 @@ export const demos: Record<string, DemoItem> = {
   "table-tanstack-table": {
     component: TableDemos.TanstackTable,
     file: "en/table/tanstack-table.tsx",
+  },
+  "table-with-filters": {
+    component: TableDemos.WithFilters,
+    file: "en/table/with-filters.tsx",
   },
   // TextArea demos
   "textarea-basic": {
