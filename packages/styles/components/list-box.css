@@ -3,7 +3,12 @@
    ========================================================================== */
 
 .list-box {
-  @apply relative flex w-full flex-col gap-1 overflow-clip p-1;
+  /**
+   * p-1.5 (6px), not p-1 (4px): the item focus ring extends 4px (ring-2 + 2px
+   * ring-offset), so 4px padding lets `overflow-clip` graze the edge items'
+   * rings. 6px clears the ring (inherited by the Select/Autocomplete listboxes).
+   */
+  @apply relative flex w-full flex-col gap-1 overflow-clip p-1.5;
 
   /* This makes the horizontal separator take up 94% of the width and be centered */
   [data-slot="separator"][data-orientation="horizontal"] {
