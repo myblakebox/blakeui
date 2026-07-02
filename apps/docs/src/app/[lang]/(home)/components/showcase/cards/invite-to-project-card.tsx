@@ -11,15 +11,19 @@ import {
   ListBox,
   Select,
   Separator,
+  Spinner,
+  Tag,
+  TagGroup,
   TextField,
   Tooltip,
 } from "@blakeui/react";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {Iconify} from "@/components/iconify";
 
 import {invite} from "../data/placeholder";
 import {GradientAvatar} from "../gradient-avatar";
+import {prefersReducedMotion, useAutoRevert} from "../use-replay";
 
 const PERMISSIONS = [
   {id: "view", label: "can view"},
@@ -27,6 +31,9 @@ const PERMISSIONS = [
   {id: "owner", label: "owner"},
 ];
 
+const SEND_DURATION_MS = 1000;
+
+type InviteState = "idle" | "sending" | "sent";
 type Member = (typeof invite.members)[number];
 
 function PermissionSelect({
@@ -72,26 +79,73 @@ function PermissionSelect({
 
 export function InviteToProjectCard() {
   const [members, setMembers] = useState<Member[]>([...invite.members]);
-  const [email, setEmail] = useState("");
+  const [invitees, setInvitees] = useState<string[]>([]);
+  const [draft, setDraft] = useState("");
   const [invitePermission, setInvitePermission] = useState("view");
+  const [inviteState, setInviteState] = useState<InviteState>("idle");
+  const [isShaking, setIsShaking] = useState(false);
+  const [liveNote, setLiveNote] = useState("");
+  const sendTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const inviteMember = () => {
-    const trimmed = email.trim();
+  useEffect(() => () => clearTimeout(sendTimeoutRef.current), []);
 
-    if (!trimmed.includes("@") || members.some((member) => member.email === trimmed)) return;
+  // Replay rule: the sent state settles back to the idle Invite button.
+  useAutoRevert(inviteState === "sent", () => setInviteState("idle"));
 
-    const name = trimmed.split("@")[0] ?? trimmed;
+  const mintInvitee = () => {
+    const trimmed = draft.trim().replace(/,$/, "");
 
-    setMembers((prev) => [
-      ...prev,
-      {
-        email: trimmed,
-        initials: name.slice(0, 2).toUpperCase(),
-        name,
-        permission: invitePermission,
-      },
-    ]);
-    setEmail("");
+    if (!trimmed || !trimmed.includes("@")) return;
+
+    // Duplicate (already chipped or already a member): quiet shake + note.
+    if (invitees.includes(trimmed) || members.some((member) => member.email === trimmed)) {
+      setIsShaking(true);
+      setLiveNote(`"${trimmed}" is already added`);
+
+      return;
+    }
+
+    setInvitees((prev) => [...prev, trimmed]);
+    setLiveNote(`"${trimmed}" added to invite list`);
+    setDraft("");
+  };
+
+  const onRemoveInvitees = (keys: Set<Key>) => {
+    setInvitees((prev) => prev.filter((email) => !keys.has(email)));
+  };
+
+  const sendInvites = () => {
+    if (inviteState !== "idle" || invitees.length === 0) return;
+
+    const finish = () => {
+      // Invited names join the member rows; chips clear for the next replay.
+      setMembers((prev) => [
+        ...prev,
+        ...invitees.map((email) => {
+          const name = email.split("@")[0] ?? email;
+
+          return {
+            email,
+            initials: name.slice(0, 2).toUpperCase(),
+            name,
+            permission: invitePermission,
+          };
+        }),
+      ]);
+      setLiveNote(`${invitees.length} ${invitees.length === 1 ? "invite" : "invites"} sent`);
+      setInvitees([]);
+      setInviteState("sent");
+    };
+
+    // Reduced motion: the pending spinner becomes an instant swap to success.
+    if (prefersReducedMotion()) {
+      finish();
+
+      return;
+    }
+
+    setInviteState("sending");
+    sendTimeoutRef.current = setTimeout(finish, SEND_DURATION_MS);
   };
 
   const setMemberPermission = (memberEmail: string, permission: string) => {
@@ -115,11 +169,19 @@ export function InviteToProjectCard() {
         </div>
       </Card.Header>
       <Card.Content className="w-full gap-3">
-        <TextField className="w-full" value={email} onChange={setEmail}>
+        <TextField className="w-full" value={draft} onChange={setDraft}>
           <div className="flex items-center gap-1.5">
             <Label className="text-xs font-medium">Invite Members</Label>
             <Tooltip delay={0}>
-              <FancyButton isIconOnly aria-label="About member invites" size="sm" variant="basic">
+              {/* Quiet treatment: tooltip semantics kept, visual ring stripped
+                  (same as C4's Applied Filters info icon). */}
+              <FancyButton
+                isIconOnly
+                aria-label="About member invites"
+                className="border-0 bg-transparent shadow-none"
+                size="sm"
+                variant="basic"
+              >
                 <Iconify className="text-sm text-muted" icon="circle-info" />
               </FancyButton>
               <Tooltip.Content>
@@ -128,30 +190,75 @@ export function InviteToProjectCard() {
               </Tooltip.Content>
             </Tooltip>
           </div>
-          {/* One visual field (AlignUI pattern): the permission Select is
-              embedded at the input's right edge via the group's Suffix slot;
-              the Invite button sits outside. */}
+          {/* Tag input (AlignUI pattern): minted invitee chips live INSIDE the
+              field. TagGroup/List flatten via `contents` so the caret flows on
+              the last chip's line; the group's flex-wrap grows the field.
+              Backspace on an empty input removes the last chip. */}
           <div className="flex w-full items-center gap-2">
-            <InputGroup className="min-w-0 flex-1">
+            <InputGroup
+              className={`min-w-0 flex-1 flex-wrap gap-1.5 py-1 ps-3 ${isShaking ? "sc-dupe-shake" : ""}`}
+              onAnimationEnd={() => setIsShaking(false)}
+            >
+              {invitees.length > 0 && (
+                <TagGroup
+                  aria-label="Invitees"
+                  className="contents"
+                  size="sm"
+                  onRemove={onRemoveInvitees}
+                >
+                  <TagGroup.List className="contents">
+                    {invitees.map((email) => (
+                      <Tag key={email} className="sc-chip-pop" id={email} textValue={email}>
+                        {email}
+                        <Tag.RemoveButton aria-label={`Remove ${email}`} />
+                      </Tag>
+                    ))}
+                  </TagGroup.List>
+                </TagGroup>
+              )}
               <InputGroup.Input
-                className="min-w-0 flex-1"
-                placeholder="name@blakeui.com"
+                className="min-w-24 flex-1 p-0"
+                placeholder={invitees.length ? "Add another…" : "name@blakeui.com"}
                 type="email"
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === ",") {
+                    event.preventDefault();
+                    mintInvitee();
+                  } else if (event.key === "Backspace" && draft === "") {
+                    setInvitees((prev) => prev.slice(0, -1));
+                  }
+                }}
               />
               <InputGroup.Suffix>
                 <PermissionSelect
                   isEmbedded
-                  label="Permission for new member"
+                  label="Permission for new members"
                   value={invitePermission}
                   onChange={setInvitePermission}
                 />
               </InputGroup.Suffix>
             </InputGroup>
-            <FancyButton size="sm" variant="primary" onPress={inviteMember}>
-              Invite
+            <FancyButton
+              isDisabled={invitees.length === 0 && inviteState === "idle"}
+              isPending={inviteState === "sending"}
+              size="sm"
+              variant="primary"
+              onPress={sendInvites}
+            >
+              {inviteState === "sending" ? (
+                <Spinner color="current" size="sm" />
+              ) : inviteState === "sent" ? (
+                <Iconify className="text-base" icon="check" />
+              ) : (
+                "Invite"
+              )}
             </FancyButton>
           </div>
         </TextField>
+        {/* Minting, dupes and sends announced without visual noise. */}
+        <span aria-live="polite" className="sr-only">
+          {liveNote}
+        </span>
         <span className="w-full text-left text-xs font-medium text-muted">Members with access</span>
         <ul className="flex w-full flex-col gap-2">
           {members.map((member) => (

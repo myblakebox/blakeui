@@ -22,8 +22,6 @@ interface CardConfig {
   Component: ComponentType;
   /** Docs link surfaced by the card's floating chip (primary component of the card). */
   chip: {href: string; label: string};
-  /** Chip offset for cards whose top-right corner holds a control (no overlap allowed). */
-  chipOffset?: string;
   /** CARD = elevated surface with hover lift; NAKED = loose element on the canvas. */
   kind?: "naked";
 }
@@ -53,14 +51,10 @@ const CARDS: Record<string, CardConfig> = {
   contact: {
     Component: ContactCard,
     chip: {href: "/docs/react/components/fancy-button", label: "FancyButton"},
-    // Dodges the card's close button.
-    chipOffset: "top-3.5 right-10",
   },
   contactInfo: {
     Component: ContactInfoCard,
     chip: {href: "/docs/react/components/tooltip", label: "Tooltip"},
-    // Sits left of the "View Profile" header link.
-    chipOffset: "top-3.5 right-[100px]",
   },
   fileUpload: {
     Component: FileUploadCard,
@@ -69,8 +63,6 @@ const CARDS: Record<string, CardConfig> = {
   inviteToProject: {
     Component: InviteToProjectCard,
     chip: {href: "/docs/react/components/select", label: "Select"},
-    // Dodges the card's close button.
-    chipOffset: "top-3.5 right-10",
   },
   resetPassword: {
     Component: ResetPasswordCard,
@@ -112,8 +104,8 @@ const COLUMNS: Record<Breakpoint, CardId[][]> = {
   ],
 };
 
-/** Slight vertical stagger per desktop column so the grid reads as masonry. */
-const COLUMN_STAGGER = ["lg:pt-0", "lg:pt-10", "lg:pt-5"];
+/** Bento alignment: all three columns start flush at the same top edge. */
+const COLUMN_STAGGER = ["", "", ""];
 
 /**
  * lg: explicit asymmetric AlignUI grid — 300 / 432 / 300, centered as a unit.
@@ -162,7 +154,7 @@ export function ComponentShowcase() {
 
   return (
     <LazyMotion strict features={domAnimation}>
-      <div className="component-showcase flex w-full justify-center gap-4 px-2">
+      <div className="component-showcase flex w-full items-start justify-center gap-4 px-2">
         {COLUMNS[breakpoint].map((column, columnIndex) => (
           <div
             key={columnIndex}
@@ -183,20 +175,26 @@ export function ComponentShowcase() {
                   data-tile=""
                   initial={reducedMotion ? false : {opacity: 0, scale: 0.98, y: 12}}
                   viewport={{amount: 0.2, once: true}}
-                  whileHover={isNaked || reducedMotion ? undefined : {y: -4}}
                   whileInView={reducedMotion ? undefined : {opacity: 1, scale: 1, y: 0}}
+                  // Hover lift rides its own slower tween (280ms, soft ease-out
+                  // cubic) both directions; the entrance keeps the spring.
                   transition={{
                     damping: 26,
                     delay: columnIndex * 0.06 + rowIndex * 0.07,
                     mass: 0.9,
                     stiffness: 320,
                     type: "spring",
+                    y: reducedMotion ? undefined : {duration: 0.28, ease: [0.33, 1, 0.68, 1]},
                   }}
+                  whileHover={
+                    isNaked || reducedMotion
+                      ? undefined
+                      : {transition: {duration: 0.28, ease: [0.33, 1, 0.68, 1]}, y: -4}
+                  }
                 >
                   <DocsChip
                     href={chip.href}
                     label={chip.label}
-                    offsetClassName={CARDS[cardId]?.chipOffset}
                     placement={isNaked ? "naked" : "card"}
                   />
                   <Component />

@@ -1,6 +1,6 @@
 "use client";
 
-import {Card, FancyButton, Link, Tooltip} from "@blakeui/react";
+import {Card, Dropdown, FancyButton, Label, Link, Tooltip} from "@blakeui/react";
 import {useState} from "react";
 import {Focusable} from "react-aria-components";
 
@@ -53,18 +53,40 @@ export function ContactInfoCard() {
             <span className="text-sm font-semibold">{contactInfo.name}</span>
             <span className="text-xs text-muted">{contactInfo.handle}</span>
           </div>
-          <FancyButton isIconOnly aria-label={`Add ${contactInfo.name}`} size="sm" variant="basic">
-            <Iconify className="text-base" icon="person-plus" />
-          </FancyButton>
+          <Dropdown>
+            <FancyButton
+              isIconOnly
+              aria-label={`Actions for ${contactInfo.name}`}
+              size="sm"
+              variant="basic"
+            >
+              <Iconify className="text-base" icon="person-plus" />
+            </FancyButton>
+            {/* sc-pop carries the showcase popover motion guard (portaled). */}
+            <Dropdown.Popover className="sc-pop">
+              <Dropdown.Menu aria-label={`Actions for ${contactInfo.name}`} onAction={() => {}}>
+                <Dropdown.Item id="follow" textValue="Follow">
+                  <Iconify className="text-base text-muted" icon="person-plus" />
+                  <Label>Follow</Label>
+                </Dropdown.Item>
+                <Dropdown.Item id="message" textValue="Message">
+                  <Iconify className="text-base text-muted" icon="comment" />
+                  <Label>Message</Label>
+                </Dropdown.Item>
+                <Dropdown.Item id="profile" textValue="Profile">
+                  <Iconify className="text-base text-muted" icon="person" />
+                  <Label>Profile</Label>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
         </div>
-        {/* Dashed separators between rows carry the same token treatment as
-            the profile row's dashed border. */}
-        <ul className="flex w-full flex-col divide-y divide-dashed divide-border">
+        <ul className="flex w-full flex-col gap-3">
           {HOVER_ROWS.map((row) => (
             <Tooltip key={row.label} delay={0}>
               <Focusable>
                 <li
-                  className="flex w-full items-center gap-3 rounded-lg py-2.5 transition-colors first:pt-0 hover:bg-default-soft/60"
+                  className="flex w-full items-center gap-3 rounded-lg transition-colors hover:bg-default-soft/60"
                   role="listitem"
                 >
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-default-soft">
@@ -84,7 +106,7 @@ export function ContactInfoCard() {
               </Tooltip.Content>
             </Tooltip>
           ))}
-          <li className="flex w-full items-center gap-3 py-2.5 last:pb-0">
+          <li className="flex w-full items-center gap-3">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-default-soft">
               <Iconify className="text-base text-muted" icon="envelope" />
             </div>

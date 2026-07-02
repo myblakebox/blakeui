@@ -54,11 +54,12 @@
   );
 }
 
-/* Elevated surface treatment for every card in the grid. */
+/* Elevated surface treatment for every card in the grid. The shadow bloom
+ * matches the hover lift's 280ms soft ease (cubic-bezier(0.33,1,0.68,1)). */
 .component-showcase .card {
   background: var(--surface);
   border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
-  transition: box-shadow 200ms var(--ease-out);
+  transition: box-shadow 280ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* Shadow bloom paired with the hover lift (the lift itself is motion-driven). */
@@ -111,7 +112,10 @@
 
 /* C6 — permission Select embedded in the invite InputGroup's Suffix slot:
  * the group carries the field chrome, so the nested trigger sheds its own
- * border/background and reads as part of one visual field. */
+ * border/background and reads as part of one visual field. The end padding
+ * keeps the component's own `pe-7` indicator reserve (select.css positions
+ * the caret absolute at end-2 with a size-4 glyph) — the earlier uniform
+ * 6px override clobbered that reserve and clipped the caret. */
 .component-showcase .sc-embedded-select .select__trigger {
   background: transparent;
   border: 0;
@@ -119,7 +123,8 @@
   height: auto;
   min-height: 0;
   padding-block: 0;
-  padding-inline: calc(var(--spacing) * 1.5);
+  padding-inline-start: calc(var(--spacing) * 1.5);
+  padding-inline-end: calc(var(--spacing) * 7);
 }
 
 /* C6 — popovers portal out of .component-showcase, so the motion guard rides

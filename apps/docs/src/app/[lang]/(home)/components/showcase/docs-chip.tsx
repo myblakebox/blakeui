@@ -19,9 +19,14 @@ interface DocsChipProps {
   offsetClassName?: string;
 }
 
+/**
+ * Both placements straddle the tile's top edge (half in, half out — the naked
+ * tabs chip set the reference); cards are overflow-visible so nothing clips.
+ */
 const PLACEMENT_CLASSES: Record<NonNullable<DocsChipProps["placement"]>, string> = {
-  card: "top-3.5 right-3.5",
-  naked: "-top-4 right-0",
+  card: "-top-4 right-4",
+  // Naked tiles have no padding cushion — mostly above, ~6px straddle.
+  naked: "-top-6 right-0",
 };
 
 /**
@@ -37,7 +42,7 @@ export function DocsChip({href, label, offsetClassName, placement = "card"}: Doc
   return (
     <LinkRoot
       aria-label={`${label} documentation`}
-      className={`pointer-events-none absolute ${offsetClassName ?? PLACEMENT_CLASSES[placement]} z-20 rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-foreground opacity-0 shadow-surface transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus)] motion-reduce:transition-none`}
+      className={`pointer-events-none absolute ${offsetClassName ?? PLACEMENT_CLASSES[placement]} z-20 rounded-full border border-accent bg-surface px-3 py-1 text-sm font-medium text-foreground opacity-0 shadow-surface transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus)] motion-reduce:transition-none`}
       data-docs-chip=""
       href={href}
     >

@@ -91,26 +91,34 @@ export function FileUploadCard() {
     <Card ref={cardRef} className="w-full">
       <Card.Content className="w-full gap-3">
         <div className="flex w-full items-center gap-3">
-          {/* Colorful file-type badge — vivid content color permitted here. */}
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
-            <Iconify className="text-xl text-red-500 dark:text-red-400" icon="file-pdf" />
+          {/* Filled PDF glyph on a saturated coral disc — vivid content color
+              permitted here (candidate A from the review strip). */}
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-500">
+            <Iconify className="text-2xl text-white" icon="file-pdf-fill" />
           </div>
           <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
             <span className="w-full truncate text-left text-sm font-medium">{file.fileName}</span>
-            <span className="flex items-center gap-2 text-xs text-muted">
+            <span className="text-xs text-muted">
               {uploadedMb} MB of {file.sizeMb} MB
-              <Chip color={isUploading ? "default" : "success"} size="sm" variant="soft">
-                {isUploading ? (
-                  "Uploading"
-                ) : (
-                  <>
-                    <Iconify className="text-sm" icon="check" />
-                    Completed
-                  </>
-                )}
-              </Chip>
             </span>
           </div>
+          {/* Flush right at row level — not inside the text-xs size span, whose
+              inherited font metrics squeezed the chip's stock padding. */}
+          <Chip
+            className="shrink-0"
+            color={isUploading ? "default" : "success"}
+            size="sm"
+            variant="soft"
+          >
+            {isUploading ? (
+              "Uploading"
+            ) : (
+              <>
+                <Iconify className="text-sm" icon="check" />
+                Completed
+              </>
+            )}
+          </Chip>
         </div>
         <ProgressBar
           key={runId}
