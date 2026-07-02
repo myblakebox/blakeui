@@ -27,7 +27,13 @@ export function useAutoRevert(active: boolean, revert: () => void, delayMs = REP
   }, [active, delayMs]);
 }
 
-/** Matches the CSS media query at interaction time (not render time). */
+/**
+ * Matches the CSS media query at interaction time (not render time).
+ * `?reduce=1` forces the reduced paths — a test hook for verifying the
+ * reduced-motion stories without flipping the OS setting.
+ */
 export function prefersReducedMotion(): boolean {
+  if (new URLSearchParams(window.location.search).has("reduce")) return true;
+
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

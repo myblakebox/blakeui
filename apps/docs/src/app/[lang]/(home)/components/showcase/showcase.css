@@ -73,15 +73,20 @@
   z-index: 5;
 }
 
-/* Docs chip springs in on hover/focus-within; opacity + pointer-events live in
- * the component's Tailwind classes so keyboard reveal keeps working. */
+/* Docs chip springs in on hover / keyboard focus; opacity + pointer-events
+ * live in the component's Tailwind classes. Reveal keys off :has(:focus-visible)
+ * rather than :focus-within so mouse clicks inside a card can't latch the chip
+ * open (the stuck-chip bug) while Tab still reveals it.
+ * Bounce: scale 0.8 → overshoot ~1.06 → 1 (curve peak 1.3 over the 0.2 delta),
+ * one visible bounce, ~450ms — spring-equivalent stiffness ≈ 400, damping ≈ 20. */
 .component-showcase [data-docs-chip] {
-  scale: 0.9;
-  transition: scale 350ms var(--sc-spring);
+  scale: 0.8;
+  transition: scale 450ms
+    linear(0, 0.19 6%, 0.7 18%, 1.12 32%, 1.3 45%, 1.22 60%, 1.05 75%, 0.98 87%, 1);
 }
 
 .component-showcase [data-tile]:hover [data-docs-chip],
-.component-showcase [data-tile]:focus-within [data-docs-chip] {
+.component-showcase [data-tile]:has(:focus-visible) [data-docs-chip] {
   scale: 1;
 }
 
@@ -125,6 +130,14 @@
   padding-block: 0;
   padding-inline-start: calc(var(--spacing) * 1.5);
   padding-inline-end: calc(var(--spacing) * 7);
+}
+
+/* C6 — the embedded select's popover: the stock `min-w-(--trigger-width)`
+ * inherits the tiny embedded trigger's width (~90px), cramping options
+ * against the selection indicator. A comfortable floor fixes it; RAC's
+ * collision handling keeps it on-screen at small viewports. */
+.sc-embedded-pop {
+  min-width: 10rem;
 }
 
 /* C6 — popovers portal out of .component-showcase, so the motion guard rides

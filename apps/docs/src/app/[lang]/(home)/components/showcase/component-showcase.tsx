@@ -2,7 +2,7 @@
 
 import type {ComponentType} from "react";
 
-import {LazyMotion, domAnimation, m, useReducedMotion} from "motion/react";
+import {LazyMotion, domMax, m, useReducedMotion} from "motion/react";
 import {useEffect, useState} from "react";
 
 import {AccountMenuCard} from "./cards/account-menu-card";
@@ -11,6 +11,7 @@ import {AddTagsCard} from "./cards/add-tags-card";
 import {AppliedFiltersCard} from "./cards/applied-filters-card";
 import {ContactCard} from "./cards/contact-card";
 import {ContactInfoCard} from "./cards/contact-info-card";
+import {ControlClusterCard} from "./cards/control-cluster-card";
 import {FileUploadCard} from "./cards/file-upload-card";
 import {InviteToProjectCard} from "./cards/invite-to-project-card";
 import {ResetPasswordCard} from "./cards/reset-password-card";
@@ -56,6 +57,11 @@ const CARDS: Record<string, CardConfig> = {
     Component: ContactInfoCard,
     chip: {href: "/docs/react/components/tooltip", label: "Tooltip"},
   },
+  controlCluster: {
+    Component: ControlClusterCard,
+    chip: {href: "/docs/react/components/checkbox", label: "Checkbox"},
+    kind: "naked",
+  },
   fileUpload: {
     Component: FileUploadCard,
     chip: {href: "/docs/react/components/progress-bar", label: "ProgressBar"},
@@ -81,7 +87,7 @@ type Breakpoint = "desktop" | "mobile" | "tablet";
 const COLUMNS: Record<Breakpoint, CardId[][]> = {
   desktop: [
     ["accountMenu", "actionBar", "contact", "appliedFilters"],
-    ["fileUpload", "inviteToProject", "contactInfo"],
+    ["fileUpload", "controlCluster", "inviteToProject", "contactInfo"],
     ["resetPassword", "addTags"],
   ],
   // Reset password and file upload lead on mobile as the strongest hooks.
@@ -89,6 +95,7 @@ const COLUMNS: Record<Breakpoint, CardId[][]> = {
     [
       "resetPassword",
       "fileUpload",
+      "controlCluster",
       "accountMenu",
       "actionBar",
       "contact",
@@ -99,7 +106,7 @@ const COLUMNS: Record<Breakpoint, CardId[][]> = {
     ],
   ],
   tablet: [
-    ["accountMenu", "resetPassword", "fileUpload", "contactInfo"],
+    ["accountMenu", "resetPassword", "fileUpload", "controlCluster", "contactInfo"],
     ["inviteToProject", "addTags", "actionBar", "contact", "appliedFilters"],
   ],
 };
@@ -153,7 +160,8 @@ export function ComponentShowcase() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <LazyMotion strict features={domAnimation}>
+    // domMax (not domAnimation): the C5 card needs layout/popLayout crossfades.
+    <LazyMotion strict features={domMax}>
       <div className="component-showcase flex w-full items-start justify-center gap-4 px-2">
         {COLUMNS[breakpoint].map((column, columnIndex) => (
           <div

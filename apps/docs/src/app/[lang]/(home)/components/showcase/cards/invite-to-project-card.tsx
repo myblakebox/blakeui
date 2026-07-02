@@ -62,8 +62,10 @@ function PermissionSelect({
         <Select.Indicator />
       </Select.Trigger>
       {/* sc-pop scopes the showcase popover motion guard (popovers portal
-          out of .component-showcase, so the class rides along instead). */}
-      <Select.Popover className="sc-pop">
+          out of .component-showcase, so the class rides along instead).
+          The embedded trigger is tiny, so its popover opts out of the
+          trigger-width minimum — otherwise options crowd the ✓ indicator. */}
+      <Select.Popover className={`sc-pop ${isEmbedded ? "sc-embedded-pop" : ""}`}>
         <ListBox>
           {PERMISSIONS.map((permission) => (
             <ListBox.Item key={permission.id} id={permission.id} textValue={permission.label}>
@@ -92,21 +94,24 @@ export function InviteToProjectCard() {
   // Replay rule: the sent state settles back to the idle Invite button.
   useAutoRevert(inviteState === "sent", () => setInviteState("idle"));
 
+  // Single-email field: one minted chip at a time.
+  const isFull = invitees.length >= 1;
+
   const mintInvitee = () => {
     const trimmed = draft.trim().replace(/,$/, "");
 
-    if (!trimmed || !trimmed.includes("@")) return;
+    if (isFull || !trimmed || !trimmed.includes("@")) return;
 
-    // Duplicate (already chipped or already a member): quiet shake + note.
-    if (invitees.includes(trimmed) || members.some((member) => member.email === trimmed)) {
+    // Already a member: quiet shake + note.
+    if (members.some((member) => member.email === trimmed)) {
       setIsShaking(true);
-      setLiveNote(`"${trimmed}" is already added`);
+      setLiveNote(`"${trimmed}" is already a member`);
 
       return;
     }
 
-    setInvitees((prev) => [...prev, trimmed]);
-    setLiveNote(`"${trimmed}" added to invite list`);
+    setInvitees([trimmed]);
+    setLiveNote(`"${trimmed}" ready to invite`);
     setDraft("");
   };
 
@@ -190,26 +195,26 @@ export function InviteToProjectCard() {
               </Tooltip.Content>
             </Tooltip>
           </div>
-          {/* Tag input (AlignUI pattern): minted invitee chips live INSIDE the
-              field. TagGroup/List flatten via `contents` so the caret flows on
-              the last chip's line; the group's flex-wrap grows the field.
-              Backspace on an empty input removes the last chip. */}
+          {/* Tag input (AlignUI pattern), capped at ONE chip: the minted email
+              lives INSIDE the field and the text input collapses while a chip
+              is present (readOnly, zero width — kept mounted so Backspace
+              still removes the chip and restores it). Single-line always. */}
           <div className="flex w-full items-center gap-2">
             <InputGroup
-              className={`min-w-0 flex-1 flex-wrap gap-1.5 py-1 ps-3 ${isShaking ? "sc-dupe-shake" : ""}`}
+              className={`min-w-0 flex-1 gap-1.5 py-1 ps-3 ${isShaking ? "sc-dupe-shake" : ""}`}
               onAnimationEnd={() => setIsShaking(false)}
             >
-              {invitees.length > 0 && (
+              {!!isFull && (
                 <TagGroup
-                  aria-label="Invitees"
+                  aria-label="Invitee"
                   className="contents"
                   size="sm"
                   onRemove={onRemoveInvitees}
                 >
                   <TagGroup.List className="contents">
                     {invitees.map((email) => (
-                      <Tag key={email} className="sc-chip-pop" id={email} textValue={email}>
-                        {email}
+                      <Tag key={email} className="sc-chip-pop min-w-0" id={email} textValue={email}>
+                        <span className="truncate">{email}</span>
                         <Tag.RemoveButton aria-label={`Remove ${email}`} />
                       </Tag>
                     ))}
@@ -217,15 +222,17 @@ export function InviteToProjectCard() {
                 </TagGroup>
               )}
               <InputGroup.Input
-                className="min-w-24 flex-1 p-0"
-                placeholder={invitees.length ? "Add another…" : "name@blakeui.com"}
+                aria-label="Invitee email"
+                className={isFull ? "w-2 min-w-0 grow-0 p-0 opacity-0" : "min-w-20 flex-1 p-0"}
+                placeholder={isFull ? undefined : "name@blakeui.com"}
+                readOnly={isFull}
                 type="email"
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === ",") {
                     event.preventDefault();
                     mintInvitee();
                   } else if (event.key === "Backspace" && draft === "") {
-                    setInvitees((prev) => prev.slice(0, -1));
+                    setInvitees([]);
                   }
                 }}
               />

@@ -42,7 +42,7 @@ export function DocsChip({href, label, offsetClassName, placement = "card"}: Doc
   return (
     <LinkRoot
       aria-label={`${label} documentation`}
-      className={`pointer-events-none absolute ${offsetClassName ?? PLACEMENT_CLASSES[placement]} z-20 rounded-full border border-accent bg-surface px-3 py-1 text-sm font-medium text-foreground opacity-0 shadow-surface transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus)] motion-reduce:transition-none`}
+      className={`pointer-events-none absolute ${offsetClassName ?? PLACEMENT_CLASSES[placement]} z-20 rounded-full border border-accent bg-surface px-3 py-1 text-sm font-medium text-foreground opacity-0 shadow-surface transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-has-[:focus-visible]:pointer-events-auto group-has-[:focus-visible]:opacity-100 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus)] motion-reduce:transition-none`}
       data-docs-chip=""
       href={href}
     >
