@@ -10,7 +10,6 @@ import {
   Label,
   ListBox,
   Select,
-  Separator,
   Spinner,
   Tag,
   TagGroup,
@@ -236,7 +235,9 @@ export function InviteToProjectCard() {
                   }
                 }}
               />
-              <InputGroup.Suffix>
+              {/* ms-auto pins the select to the field's END in every state —
+                  minting a chip collapses the input, but the select stays put. */}
+              <InputGroup.Suffix className="ms-auto">
                 <PermissionSelect
                   isEmbedded
                   label="Permission for new members"
@@ -288,11 +289,6 @@ export function InviteToProjectCard() {
             </li>
           ))}
         </ul>
-        <Separator />
-        <div className="flex w-full items-center gap-2 text-sm text-muted">
-          <Iconify className="text-base" icon="link" />
-          Members with link can view
-        </div>
       </Card.Content>
     </Card>
   );

@@ -2,7 +2,7 @@
 
 import type {ComponentType} from "react";
 
-import {LazyMotion, domMax, m, useReducedMotion} from "motion/react";
+import {LazyMotion, domAnimation, m, useReducedMotion} from "motion/react";
 import {useEffect, useState} from "react";
 
 import {AccountMenuCard} from "./cards/account-menu-card";
@@ -160,8 +160,7 @@ export function ComponentShowcase() {
   const reducedMotion = useReducedMotion();
 
   return (
-    // domMax (not domAnimation): the C5 card needs layout/popLayout crossfades.
-    <LazyMotion strict features={domMax}>
+    <LazyMotion strict features={domAnimation}>
       <div className="component-showcase flex w-full items-start justify-center gap-4 px-2">
         {COLUMNS[breakpoint].map((column, columnIndex) => (
           <div

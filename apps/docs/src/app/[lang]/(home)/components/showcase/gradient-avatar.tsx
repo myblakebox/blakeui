@@ -33,16 +33,28 @@ const PERSONAS: Record<string, {gradient: number; peep: string}> = {
   "Sam Okafor": {gradient: 4, peep: "/images/avatar-peep-sam.svg"},
 };
 
+/**
+ * Pool of extra Open Peeps for people invited at runtime (static downloads,
+ * seeds: Maya, Kai, Ezra, Idris, Sana, Tomas, Nia, Skye). Hash-picked per
+ * name so different invitees get different peeps while re-renders stay
+ * stable for the same person.
+ */
+const PEEP_POOL = Array.from({length: 8}, (_, i) => `/images/avatar-peep-pool-${i + 1}.svg`);
+
+function nameHash(name: string): number {
+  let hash = 0;
+
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 997;
+
+  return hash;
+}
+
 function gradientFor(name: string): string {
   const persona = PERSONAS[name];
 
   if (persona) return GRADIENTS[persona.gradient] as string;
 
-  let hash = 0;
-
-  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 997;
-
-  return GRADIENTS[hash % GRADIENTS.length] as string;
+  return GRADIENTS[nameHash(name) % GRADIENTS.length] as string;
 }
 
 /**
@@ -88,7 +100,9 @@ interface GradientAvatarProps {
  * component.
  */
 export function GradientAvatar({className, name, size}: GradientAvatarProps) {
-  const peep = PERSONAS[name]?.peep;
+  // Named personas keep their fixed peep; everyone else (e.g. runtime
+  // invitees) draws from the pool by name hash.
+  const peep = PERSONAS[name]?.peep ?? PEEP_POOL[nameHash(name) % PEEP_POOL.length];
 
   return (
     <Avatar

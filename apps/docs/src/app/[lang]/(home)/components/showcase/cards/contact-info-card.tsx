@@ -62,8 +62,11 @@ export function ContactInfoCard() {
             >
               <Iconify className="text-base" icon="person-plus" />
             </FancyButton>
-            {/* sc-pop carries the showcase popover motion guard (portaled). */}
-            <Dropdown.Popover className="sc-pop">
+            {/* sc-pop carries the showcase popover motion guard (portaled);
+                sc-menu-pop drops the stock md:min-w-55 so the menu fits its
+                longest item, and "bottom end" opens it leftward from the
+                trigger's right edge — away from the neighboring column. */}
+            <Dropdown.Popover className="sc-pop sc-menu-pop" placement="bottom end">
               <Dropdown.Menu aria-label={`Actions for ${contactInfo.name}`} onAction={() => {}}>
                 <Dropdown.Item id="follow" textValue="Follow">
                   <Iconify className="text-base text-muted" icon="person-plus" />

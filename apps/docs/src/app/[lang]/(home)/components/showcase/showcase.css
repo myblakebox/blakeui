@@ -140,6 +140,13 @@
   min-width: 10rem;
 }
 
+/* C7 — the action menu sizes to its longest item: the stock dropdown popover
+ * forces md:min-w-55 (220px), far wider than Follow/Message/Profile need. */
+.sc-menu-pop {
+  min-width: 0;
+  width: max-content;
+}
+
 /* C6 — popovers portal out of .component-showcase, so the motion guard rides
  * on a class passed to Select.Popover instead. The open/close scale+fade is
  * the stock RAC data-entering/data-exiting animation from popover.css. */

@@ -23,8 +23,21 @@ export function ControlClusterCard() {
         </Switch.Control>
       </Switch>
 
-      <RadioGroup aria-label="Example radio" defaultValue="on" name="showcase-cluster-radio">
-        <Radio aria-label="Example radio, selected" value="on">
+      {/* A real two-option group: selecting one deselects the other.
+          The empty radio leads, matching the reference. */}
+      <RadioGroup
+        aria-label="Example radio pair"
+        className="flex-row items-center gap-3"
+        defaultValue="on"
+        name="showcase-cluster-radio"
+        orientation="horizontal"
+      >
+        <Radio aria-label="Option A" value="off">
+          <Radio.Control>
+            <Radio.Indicator />
+          </Radio.Control>
+        </Radio>
+        <Radio aria-label="Option B, selected" value="on">
           <Radio.Control>
             <Radio.Indicator />
           </Radio.Control>
