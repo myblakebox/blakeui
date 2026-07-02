@@ -6,8 +6,8 @@ import {Footer} from "@/components/footer";
 import {getDictionary, hasLocale} from "@/lib/dictionaries";
 import {i18n} from "@/lib/i18n";
 
-import {DemoShowcase} from "./components/demo-showcase";
 import {ProBanner} from "./components/pro-banner";
+import {WorkingWall} from "./components/working-wall/working-wall";
 
 export const dynamic = "force-static";
 export const revalidate = false;
@@ -47,7 +47,7 @@ export default async function HomePage({params}: {params: Promise<{lang: string}
             </LinkRoot>
           </div>
         </div>
-        <DemoShowcase />
+        <WorkingWall />
       </section>
       <Footer dict={dict.footer} />
       <ProBanner />
