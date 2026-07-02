@@ -1,5 +1,8 @@
 "use client";
 
+import type {ComponentType} from "react";
+
+import {LazyMotion, domAnimation, m, useReducedMotion} from "motion/react";
 import {useEffect, useState} from "react";
 
 import {AccountMenuCard} from "./cards/account-menu-card";
@@ -11,18 +14,69 @@ import {ContactInfoCard} from "./cards/contact-info-card";
 import {FileUploadCard} from "./cards/file-upload-card";
 import {InviteToProjectCard} from "./cards/invite-to-project-card";
 import {ResetPasswordCard} from "./cards/reset-password-card";
+import {DocsChip} from "./docs-chip";
 
-const CARDS = {
-  accountMenu: AccountMenuCard,
-  actionBar: ActionBarCard,
-  addTags: AddTagsCard,
-  appliedFilters: AppliedFiltersCard,
-  contact: ContactCard,
-  contactInfo: ContactInfoCard,
-  fileUpload: FileUploadCard,
-  inviteToProject: InviteToProjectCard,
-  resetPassword: ResetPasswordCard,
-} as const;
+import "./showcase.css";
+
+interface CardConfig {
+  Component: ComponentType;
+  /** Docs link surfaced by the card's floating chip (primary component of the card). */
+  chip: {href: string; label: string};
+  /** Chip offset for cards whose top-right corner holds a control (no overlap allowed). */
+  chipOffset?: string;
+  /** CARD = elevated surface with hover lift; NAKED = loose element on the canvas. */
+  kind?: "naked";
+}
+
+/**
+ * NOTE: Menu's docs live under the `dropdown` slug (no menu.mdx exists);
+ * every other slug matches its component docs page 1:1.
+ */
+const CARDS: Record<string, CardConfig> = {
+  accountMenu: {
+    Component: AccountMenuCard,
+    chip: {href: "/docs/react/components/dropdown", label: "Menu"},
+  },
+  actionBar: {
+    Component: ActionBarCard,
+    chip: {href: "/docs/react/components/toggle-button-group", label: "ToggleButtonGroup"},
+    kind: "naked",
+  },
+  addTags: {
+    Component: AddTagsCard,
+    chip: {href: "/docs/react/components/tag-group", label: "TagGroup"},
+  },
+  appliedFilters: {
+    Component: AppliedFiltersCard,
+    chip: {href: "/docs/react/components/tag-group", label: "TagGroup"},
+  },
+  contact: {
+    Component: ContactCard,
+    chip: {href: "/docs/react/components/fancy-button", label: "FancyButton"},
+    // Dodges the card's close button.
+    chipOffset: "top-3.5 right-10",
+  },
+  contactInfo: {
+    Component: ContactInfoCard,
+    chip: {href: "/docs/react/components/tooltip", label: "Tooltip"},
+    // Sits left of the "View Profile" header link.
+    chipOffset: "top-3.5 right-[100px]",
+  },
+  fileUpload: {
+    Component: FileUploadCard,
+    chip: {href: "/docs/react/components/progress-bar", label: "ProgressBar"},
+  },
+  inviteToProject: {
+    Component: InviteToProjectCard,
+    chip: {href: "/docs/react/components/select", label: "Select"},
+    // Dodges the card's close button.
+    chipOffset: "top-3.5 right-10",
+  },
+  resetPassword: {
+    Component: ResetPasswordCard,
+    chip: {href: "/docs/react/components/text-field", label: "TextField"},
+  },
+};
 
 type CardId = keyof typeof CARDS;
 type Breakpoint = "desktop" | "mobile" | "tablet";
@@ -86,23 +140,57 @@ function useBreakpoint(): Breakpoint {
   return breakpoint;
 }
 
+/**
+ * Motion: one LazyMotion root, m.* only. Entrance stagger runs once per card;
+ * hover lifts the card while the scoped CSS blooms its shadow. Everything
+ * collapses to instant states under prefers-reduced-motion.
+ */
 export function ComponentShowcase() {
   const breakpoint = useBreakpoint();
+  const reducedMotion = useReducedMotion();
 
   return (
-    <div className="flex w-full justify-center gap-6 px-2">
-      {COLUMNS[breakpoint].map((column, columnIndex) => (
-        <div
-          key={columnIndex}
-          className={`flex w-full max-w-[360px] min-w-0 flex-col gap-6 ${COLUMN_STAGGER[columnIndex] ?? ""}`}
-        >
-          {column.map((cardId) => {
-            const CardComponent = CARDS[cardId];
+    <LazyMotion strict features={domAnimation}>
+      <div className="component-showcase flex w-full justify-center gap-6 px-2">
+        {COLUMNS[breakpoint].map((column, columnIndex) => (
+          <div
+            key={columnIndex}
+            className={`flex w-full max-w-[300px] min-w-0 flex-col gap-5 ${COLUMN_STAGGER[columnIndex] ?? ""}`}
+          >
+            {column.map((cardId, rowIndex) => {
+              const {Component, chip, kind} = CARDS[cardId] as CardConfig;
+              const isNaked = kind === "naked";
 
-            return <CardComponent key={cardId} />;
-          })}
-        </div>
-      ))}
-    </div>
+              return (
+                <m.div
+                  key={cardId}
+                  className="group relative w-full"
+                  data-tile=""
+                  initial={reducedMotion ? false : {opacity: 0, scale: 0.98, y: 12}}
+                  viewport={{amount: 0.2, once: true}}
+                  whileHover={isNaked || reducedMotion ? undefined : {y: -4}}
+                  whileInView={reducedMotion ? undefined : {opacity: 1, scale: 1, y: 0}}
+                  transition={{
+                    damping: 26,
+                    delay: columnIndex * 0.06 + rowIndex * 0.07,
+                    mass: 0.9,
+                    stiffness: 320,
+                    type: "spring",
+                  }}
+                >
+                  <DocsChip
+                    href={chip.href}
+                    label={chip.label}
+                    offsetClassName={CARDS[cardId]?.chipOffset}
+                    placement={isNaked ? "naked" : "card"}
+                  />
+                  <Component />
+                </m.div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </LazyMotion>
   );
 }

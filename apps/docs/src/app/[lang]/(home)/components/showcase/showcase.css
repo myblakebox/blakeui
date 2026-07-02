@@ -1,0 +1,175 @@
+/**
+ * Component Showcase — homepage-scoped polish layer. Every rule is scoped
+ * under `.component-showcase`; packages/** stay untouched. Ported from the
+ * working-wall technique (field strokes, spring easing, docs-chip reveal).
+ */
+
+.component-showcase {
+  /**
+   * Field surfaces (Input, Select trigger, InputGroup) get a visible stroke —
+   * the default theme ships borderless fields (--field-border: transparent /
+   * --field-border-width: 0px). The hover/focus mixes are re-declared because
+   * the theme computes them at :root from the transparent value; re-declaring
+   * here re-derives them from the new border.
+   */
+  --field-border-width: 1px;
+  /* The components consume the @theme alias (--border-width-field), which the
+   * theme resolves at :root where --field-border-width is still 0px — so the
+   * alias must be re-pointed here too. */
+  --border-width-field: var(--field-border-width);
+  --field-border: var(--border);
+  --field-border-hover: color-mix(
+    in oklab,
+    var(--field-border) 88%,
+    var(--field-foreground, var(--foreground)) 10%
+  );
+  --field-border-focus: color-mix(
+    in oklab,
+    var(--field-border) 74%,
+    var(--field-foreground, var(--foreground)) 22%
+  );
+
+  /* Springy easing shared by the docs chip and pop-in chips.
+   * linear() approximation of spring(mass:1 stiffness:100 damping:10). */
+  --sc-spring: linear(
+    0,
+    0.008 1.1%,
+    0.031 2.2%,
+    0.129 4.8%,
+    0.257 7.2%,
+    0.671 14.2%,
+    0.789 16.5%,
+    0.881 18.6%,
+    0.957 20.7%,
+    1.019 22.9%,
+    1.063 25.1%,
+    1.094 27.4%,
+    1.109 30%,
+    1.107 32.8%,
+    1.084 38.4%,
+    1.032 47.9%,
+    0.997 59%,
+    0.986 76.9%,
+    1
+  );
+}
+
+/* Elevated surface treatment for every card in the grid. */
+.component-showcase .card {
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  transition: box-shadow 200ms var(--ease-out);
+}
+
+/* Shadow bloom paired with the hover lift (the lift itself is motion-driven). */
+.component-showcase [data-tile]:hover .card {
+  box-shadow: var(--overlay-shadow);
+}
+
+/* Docs chip springs in on hover/focus-within; opacity + pointer-events live in
+ * the component's Tailwind classes so keyboard reveal keeps working. */
+.component-showcase [data-docs-chip] {
+  scale: 0.9;
+  transition: scale 350ms var(--sc-spring);
+}
+
+.component-showcase [data-tile]:hover [data-docs-chip],
+.component-showcase [data-tile]:focus-within [data-docs-chip] {
+  scale: 1;
+}
+
+/* C2 — naked segmented pill: surface container, selected segment raised with
+ * shadow, unselected muted. Rides the ToggleButton CSS custom properties so
+ * React Aria state handling stays untouched. */
+.component-showcase .sc-segmented {
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  border-radius: 9999px;
+  box-shadow: var(--surface-shadow);
+  padding: calc(var(--spacing) * 1);
+}
+
+.component-showcase .sc-segmented .toggle-button {
+  border-radius: 9999px;
+  --toggle-button-bg: transparent;
+  --toggle-button-bg-hover: color-mix(in srgb, var(--default) 50%, transparent);
+  --toggle-button-bg-pressed: var(--default);
+  --toggle-button-fg: var(--muted);
+  --toggle-button-bg-selected: var(--surface);
+  --toggle-button-bg-selected-hover: var(--surface);
+  --toggle-button-bg-selected-pressed: var(--surface);
+  --toggle-button-fg-selected: var(--foreground);
+}
+
+.component-showcase .sc-segmented .toggle-button[data-selected="true"] {
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow: var(--surface-shadow);
+}
+
+/* Dark mode: --surface-shadow computes to transparent, so the raised segment
+ * needs an elevated tone (token-derived) to stay distinguishable. */
+.dark .component-showcase .sc-segmented .toggle-button {
+  --toggle-button-bg-selected: color-mix(in oklab, var(--surface) 90%, var(--foreground) 10%);
+  --toggle-button-bg-selected-hover: color-mix(in oklab, var(--surface) 88%, var(--foreground) 12%);
+  --toggle-button-bg-selected-pressed: color-mix(in oklab, var(--surface) 88%, var(--foreground) 12%);
+}
+
+/* C4/C9 — freshly minted chips pop in on the shared spring. The class is
+ * set only on tags added after mount, so the initial set renders quietly.
+ * (A class, not a data-attribute — RAC collection items drop custom data-*.) */
+.component-showcase .sc-chip-pop {
+  animation: sc-chip-pop 350ms var(--sc-spring);
+}
+
+@keyframes sc-chip-pop {
+  from {
+    scale: 0.5;
+    opacity: 0;
+  }
+
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* C9 — quiet shake when a duplicate tag is rejected. */
+.component-showcase .sc-dupe-shake {
+  animation: sc-dupe-shake 300ms var(--ease-out);
+}
+
+@keyframes sc-dupe-shake {
+  0%,
+  100% {
+    translate: 0;
+  }
+
+  25% {
+    translate: -4px;
+  }
+
+  50% {
+    translate: 4px;
+  }
+
+  75% {
+    translate: -2px;
+  }
+}
+
+/* Reduced motion: every scoped transition collapses to instant states. */
+@media (prefers-reduced-motion: reduce) {
+  .component-showcase .card,
+  .component-showcase [data-docs-chip] {
+    transition: none;
+  }
+
+  .component-showcase [data-docs-chip] {
+    scale: 1;
+  }
+
+  .component-showcase .sc-chip-pop,
+  .component-showcase .sc-dupe-shake {
+    animation: none;
+  }
+}
