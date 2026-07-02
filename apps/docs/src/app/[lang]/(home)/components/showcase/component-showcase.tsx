@@ -39,7 +39,7 @@ const CARDS: Record<string, CardConfig> = {
   },
   actionBar: {
     Component: ActionBarCard,
-    chip: {href: "/docs/react/components/toggle-button-group", label: "ToggleButtonGroup"},
+    chip: {href: "/docs/react/components/tabs", label: "Tabs"},
     kind: "naked",
   },
   addTags: {
@@ -151,11 +151,11 @@ export function ComponentShowcase() {
 
   return (
     <LazyMotion strict features={domAnimation}>
-      <div className="component-showcase flex w-full justify-center gap-6 px-2">
+      <div className="component-showcase flex w-full justify-center gap-4 px-2">
         {COLUMNS[breakpoint].map((column, columnIndex) => (
           <div
             key={columnIndex}
-            className={`flex w-full max-w-[300px] min-w-0 flex-col gap-5 ${COLUMN_STAGGER[columnIndex] ?? ""}`}
+            className={`flex w-full max-w-[300px] min-w-0 flex-col gap-3 ${COLUMN_STAGGER[columnIndex] ?? ""}`}
           >
             {column.map((cardId, rowIndex) => {
               const {Component, chip, kind} = CARDS[cardId] as CardConfig;

@@ -107,7 +107,7 @@ export function AddTagsCard() {
             <InputGroup.Prefix>
               <Iconify className="text-base text-muted" icon="tag" />
             </InputGroup.Prefix>
-            <InputGroup.Input placeholder="Add a tag" />
+            <InputGroup.Input className="min-w-0 flex-1" placeholder="Add a tag" />
             <InputGroup.Suffix>
               <FancyButton
                 isIconOnly

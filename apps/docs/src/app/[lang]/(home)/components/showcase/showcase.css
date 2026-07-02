@@ -66,6 +66,12 @@
   box-shadow: var(--overlay-shadow);
 }
 
+/* At the 12px rhythm the bloom reaches under the next tile — lift the hovered
+ * tile's stacking so neighbors never clip its shadow. */
+.component-showcase [data-tile]:hover {
+  z-index: 5;
+}
+
 /* Docs chip springs in on hover/focus-within; opacity + pointer-events live in
  * the component's Tailwind classes so keyboard reveal keeps working. */
 .component-showcase [data-docs-chip] {
@@ -78,40 +84,29 @@
   scale: 1;
 }
 
-/* C2 — naked segmented pill: surface container, selected segment raised with
- * shadow, unselected muted. Rides the ToggleButton CSS custom properties so
- * React Aria state handling stays untouched. */
-.component-showcase .sc-segmented {
-  background: var(--surface);
-  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
-  border-radius: 9999px;
-  box-shadow: var(--surface-shadow);
-  padding: calc(var(--spacing) * 1);
+/* C2 — hand-rolled Tabs pill (visual only; structure/keyboard stay on the
+ * real Tabs). RAC's SelectionIndicator remounts per selection under
+ * Next 16 / React 19.2 so it can't transition — this persistent element
+ * carries the identical `.tabs__indicator` visual recipe instead. Positioned
+ * from JS via ref + ResizeObserver; translate/width/height are inline. */
+.component-showcase .sc-tab-pill {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-3xl);
+  background: var(--segment);
+  box-shadow: var(--shadow-surface);
+  transition-duration: 250ms;
+  transition-property: translate, width, height;
+  transition-timing-function: var(--ease-out-fluid);
 }
 
-.component-showcase .sc-segmented .toggle-button {
-  border-radius: 9999px;
-  --toggle-button-bg: transparent;
-  --toggle-button-bg-hover: color-mix(in srgb, var(--default) 50%, transparent);
-  --toggle-button-bg-pressed: var(--default);
-  --toggle-button-fg: var(--muted);
-  --toggle-button-bg-selected: var(--surface);
-  --toggle-button-bg-selected-hover: var(--surface);
-  --toggle-button-bg-selected-pressed: var(--surface);
-  --toggle-button-fg-selected: var(--foreground);
-}
-
-.component-showcase .sc-segmented .toggle-button[data-selected="true"] {
-  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-  box-shadow: var(--surface-shadow);
-}
-
-/* Dark mode: --surface-shadow computes to transparent, so the raised segment
- * needs an elevated tone (token-derived) to stay distinguishable. */
-.dark .component-showcase .sc-segmented .toggle-button {
-  --toggle-button-bg-selected: color-mix(in oklab, var(--surface) 90%, var(--foreground) 10%);
-  --toggle-button-bg-selected-hover: color-mix(in oklab, var(--surface) 88%, var(--foreground) 12%);
-  --toggle-button-bg-selected-pressed: color-mix(in oklab, var(--surface) 88%, var(--foreground) 12%);
+/* Tabs ride above the pill (the stock z:-1 trick only works tab-locally). */
+.component-showcase .sc-tabs .tabs__tab {
+  position: relative;
+  z-index: 1;
 }
 
 /* C4/C9 — freshly minted chips pop in on the shared spring. The class is
@@ -160,7 +155,8 @@
 /* Reduced motion: every scoped transition collapses to instant states. */
 @media (prefers-reduced-motion: reduce) {
   .component-showcase .card,
-  .component-showcase [data-docs-chip] {
+  .component-showcase [data-docs-chip],
+  .component-showcase .sc-tab-pill {
     transition: none;
   }
 

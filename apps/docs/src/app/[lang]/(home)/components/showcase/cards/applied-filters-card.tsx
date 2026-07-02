@@ -57,7 +57,14 @@ export function AppliedFiltersCard() {
       <Card.Header className="w-full flex-row items-center gap-1.5">
         <Card.Title className="text-sm font-semibold">Applied Filters</Card.Title>
         <Tooltip delay={0}>
-          <FancyButton isIconOnly aria-label="About applied filters" size="sm" variant="basic">
+          {/* Quiet treatment: tooltip semantics kept, visual ring stripped. */}
+          <FancyButton
+            isIconOnly
+            aria-label="About applied filters"
+            className="border-0 bg-transparent shadow-none"
+            size="sm"
+            variant="basic"
+          >
             <Iconify className="text-base text-muted" icon="circle-info" />
           </FancyButton>
           <Tooltip.Content>
