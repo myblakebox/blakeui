@@ -81,7 +81,14 @@ export function AddTagsCard() {
         <Card.Title className="text-sm font-semibold">Add Tags</Card.Title>
         <span className="text-xs text-muted">(max.{addTags.maxTags})</span>
         <Tooltip delay={0}>
-          <FancyButton isIconOnly aria-label="About tags" size="sm" variant="basic">
+          {/* Quiet treatment: tooltip semantics kept, visual ring stripped. */}
+          <FancyButton
+            isIconOnly
+            aria-label="About tags"
+            className="border-0 bg-transparent shadow-none"
+            size="sm"
+            variant="basic"
+          >
             <Iconify className="text-sm text-muted" icon="circle-info" />
           </FancyButton>
           <Tooltip.Content>
@@ -100,8 +107,10 @@ export function AddTagsCard() {
           }}
         >
           <Label className="sr-only">New tag</Label>
+          {/* sc-seamless-field drops the prefix/suffix slot dividers so the
+              group's outer stroke is the only line — one seamless field. */}
           <InputGroup
-            className={`w-full ${isShaking ? "sc-dupe-shake" : ""}`}
+            className={`sc-seamless-field w-full ${isShaking ? "sc-dupe-shake" : ""}`}
             onAnimationEnd={() => setIsShaking(false)}
           >
             <InputGroup.Prefix>
@@ -163,7 +172,9 @@ export function AddTagsCard() {
           </Checkbox>
           <Label htmlFor="disable-commenting">Disable commenting</Label>
         </div>
-        <Separator />
+        {/* Dashed rules between the settings groups — C7's dashed language
+            (1px token border) via utilities over the real Separator. */}
+        <Separator className="h-0 border-t border-dashed border-border bg-transparent" />
         <div className="flex w-full items-center justify-between gap-2">
           <span className="flex items-center gap-2 text-sm">
             <Iconify className="text-base text-muted" icon="folder-open" />
@@ -173,6 +184,7 @@ export function AddTagsCard() {
             Choose
           </FancyButton>
         </div>
+        <Separator className="h-0 border-t border-dashed border-border bg-transparent" />
         <div className="flex w-full items-center justify-between gap-2">
           <span className="flex items-center gap-2 text-sm">
             <Iconify className="text-base text-muted" icon="arrow-down-to-line" />

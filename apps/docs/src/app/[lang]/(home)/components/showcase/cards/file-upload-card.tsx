@@ -7,6 +7,7 @@ import {useEffect, useRef, useState} from "react";
 import {Iconify} from "@/components/iconify";
 
 import {uploadFiles} from "../data/placeholder";
+import {RING_GUTTER_PX} from "../ring-gutter";
 import {prefersReducedMotion} from "../use-replay";
 
 const UPLOAD_DURATION_S = 2;
@@ -99,11 +100,17 @@ export function FileUploadCard() {
    * Reduced motion: height stays auto — instant swap, no tween. */
   return (
     <Card ref={cardRef} className="w-full">
+      {/* p-1/-m-1 = the shared focus-ring gutter (see ring-gutter.ts); the
+          height target adds the vertical gutter back (border-box sizing). */}
       <m.div
-        animate={reducedMotion ? undefined : {height: contentHeight}}
-        className="w-full overflow-hidden"
+        className="-m-1 overflow-hidden p-1"
         style={reducedMotion ? {height: "auto"} : undefined}
         transition={{duration: 0.28, ease: [0.33, 1, 0.68, 1]}}
+        animate={
+          reducedMotion
+            ? undefined
+            : {height: contentHeight === "auto" ? "auto" : contentHeight + RING_GUTTER_PX * 2}
+        }
       >
         <div ref={contentRef} className="w-full">
           {uploadState === "idle" ? (

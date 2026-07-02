@@ -158,6 +158,50 @@
   }
 }
 
+/* C8 — stage crossfade (~200ms, keep in sync with STAGE_FADE_MS): the
+ * outgoing stage's inert copy fades out while the keyed-in new stage fades
+ * in over it. CSS animations rather than motion enter/exit — AnimatePresence
+ * never starts its tweens under this Next/React 19.2 setup. */
+.component-showcase .sc-stage-in {
+  animation: sc-stage-in 200ms ease-out both;
+}
+
+.component-showcase .sc-stage-out {
+  animation: sc-stage-out 200ms ease-out both;
+}
+
+@keyframes sc-stage-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sc-stage-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* C9 — one seamless tag field: input-group.css draws 1px slot dividers
+ * (prefix border-right, suffix border-left) from the same --field-border the
+ * showcase turns on for field strokes. Inside the group they're redundant
+ * with the outer stroke, so this field drops them. */
+.component-showcase .sc-seamless-field .input-group__prefix {
+  border-right: none;
+}
+
+.component-showcase .sc-seamless-field .input-group__suffix {
+  border-left: none;
+}
+
 /* C4/C9 — freshly minted chips pop in on the shared spring. The class is
  * set only on tags added after mount, so the initial set renders quietly.
  * (A class, not a data-attribute — RAC collection items drop custom data-*.) */
@@ -214,7 +258,9 @@
   }
 
   .component-showcase .sc-chip-pop,
-  .component-showcase .sc-dupe-shake {
+  .component-showcase .sc-dupe-shake,
+  .component-showcase .sc-stage-in,
+  .component-showcase .sc-stage-out {
     animation: none;
   }
 }

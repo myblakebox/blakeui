@@ -72,7 +72,7 @@ const CARDS: Record<string, CardConfig> = {
   },
   resetPassword: {
     Component: ResetPasswordCard,
-    chip: {href: "/docs/react/components/text-field", label: "TextField"},
+    chip: {href: "/docs/react/components/input-otp", label: "InputOTP"},
   },
 };
 
@@ -115,14 +115,14 @@ const COLUMNS: Record<Breakpoint, CardId[][]> = {
 const COLUMN_STAGGER = ["", "", ""];
 
 /**
- * lg: explicit asymmetric AlignUI grid — 300 / 432 / 300, centered as a unit.
- * Below lg the middle column loses its extra width and every card caps at
+ * lg: explicit asymmetric AlignUI grid — 300 / 432 / 372, centered as a unit.
+ * Below lg the columns lose their extra width and every card caps at
  * 300px (complete class strings so Tailwind detects them).
  */
 const DESKTOP_COLUMN_WIDTHS = [
   "w-full max-w-[300px]",
   "w-full max-w-[432px]",
-  "w-full max-w-[300px]",
+  "w-full max-w-[372px]",
 ];
 
 function useBreakpoint(): Breakpoint {
