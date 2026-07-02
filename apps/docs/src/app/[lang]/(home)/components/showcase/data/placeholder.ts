@@ -20,10 +20,12 @@ export const contact = {
   subtitle: "Product Designer",
 };
 
-export const upload = {
-  fileName: "blakeui-styleguide.pdf",
-  sizeMb: 12,
-};
+/** Preset rotation for the upload story — "Change" advances to the next file. */
+export const uploadFiles = [
+  {fileName: "blakeui-styleguide.pdf", sizeMb: 12},
+  {fileName: "brand-assets.pdf", sizeMb: 8},
+  {fileName: "components-spec.pdf", sizeMb: 15},
+] as const;
 
 export const invite = {
   members: [

@@ -109,6 +109,30 @@
   z-index: 1;
 }
 
+/* C6 — permission Select embedded in the invite InputGroup's Suffix slot:
+ * the group carries the field chrome, so the nested trigger sheds its own
+ * border/background and reads as part of one visual field. */
+.component-showcase .sc-embedded-select .select__trigger {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  height: auto;
+  min-height: 0;
+  padding-block: 0;
+  padding-inline: calc(var(--spacing) * 1.5);
+}
+
+/* C6 — popovers portal out of .component-showcase, so the motion guard rides
+ * on a class passed to Select.Popover instead. The open/close scale+fade is
+ * the stock RAC data-entering/data-exiting animation from popover.css. */
+@media (prefers-reduced-motion: reduce) {
+  .sc-pop[data-entering="true"],
+  .sc-pop[data-exiting="true"] {
+    animation: none;
+    transition: none;
+  }
+}
+
 /* C4/C9 — freshly minted chips pop in on the shared spring. The class is
  * set only on tags added after mount, so the initial set renders quietly.
  * (A class, not a data-attribute — RAC collection items drop custom data-*.) */

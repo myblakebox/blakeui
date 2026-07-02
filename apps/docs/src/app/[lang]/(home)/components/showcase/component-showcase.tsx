@@ -115,6 +115,17 @@ const COLUMNS: Record<Breakpoint, CardId[][]> = {
 /** Slight vertical stagger per desktop column so the grid reads as masonry. */
 const COLUMN_STAGGER = ["lg:pt-0", "lg:pt-10", "lg:pt-5"];
 
+/**
+ * lg: explicit asymmetric AlignUI grid — 300 / 432 / 300, centered as a unit.
+ * Below lg the middle column loses its extra width and every card caps at
+ * 300px (complete class strings so Tailwind detects them).
+ */
+const DESKTOP_COLUMN_WIDTHS = [
+  "w-full max-w-[300px]",
+  "w-full max-w-[432px]",
+  "w-full max-w-[300px]",
+];
+
 function useBreakpoint(): Breakpoint {
   // Default to desktop so SSR/first paint matches the most common viewport.
   const [breakpoint, setBreakpoint] = useState<Breakpoint>("desktop");
@@ -155,7 +166,11 @@ export function ComponentShowcase() {
         {COLUMNS[breakpoint].map((column, columnIndex) => (
           <div
             key={columnIndex}
-            className={`flex w-full max-w-[300px] min-w-0 flex-col gap-3 ${COLUMN_STAGGER[columnIndex] ?? ""}`}
+            className={`flex min-w-0 flex-col gap-3 ${
+              breakpoint === "desktop"
+                ? (DESKTOP_COLUMN_WIDTHS[columnIndex] ?? "w-full max-w-[300px]")
+                : "w-full max-w-[300px]"
+            } ${COLUMN_STAGGER[columnIndex] ?? ""}`}
           >
             {column.map((cardId, rowIndex) => {
               const {Component, chip, kind} = CARDS[cardId] as CardConfig;

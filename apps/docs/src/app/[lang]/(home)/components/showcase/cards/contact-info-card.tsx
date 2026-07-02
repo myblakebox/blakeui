@@ -47,7 +47,7 @@ export function ContactInfoCard() {
         </Link>
       </Card.Header>
       <Card.Content className="w-full gap-3">
-        <div className="flex w-full items-center gap-3 rounded-xl border border-border p-3">
+        <div className="flex w-full items-center gap-3 rounded-xl border border-dashed border-border p-3">
           <GradientAvatar name={contactInfo.name} />
           <div className="flex min-w-0 flex-1 flex-col items-start">
             <span className="text-sm font-semibold">{contactInfo.name}</span>
@@ -57,12 +57,14 @@ export function ContactInfoCard() {
             <Iconify className="text-base" icon="person-plus" />
           </FancyButton>
         </div>
-        <ul className="flex w-full flex-col gap-3">
+        {/* Dashed separators between rows carry the same token treatment as
+            the profile row's dashed border. */}
+        <ul className="flex w-full flex-col divide-y divide-dashed divide-border">
           {HOVER_ROWS.map((row) => (
             <Tooltip key={row.label} delay={0}>
               <Focusable>
                 <li
-                  className="flex w-full items-center gap-3 rounded-lg transition-colors hover:bg-default-soft/60"
+                  className="flex w-full items-center gap-3 rounded-lg py-2.5 transition-colors first:pt-0 hover:bg-default-soft/60"
                   role="listitem"
                 >
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-default-soft">
@@ -82,7 +84,7 @@ export function ContactInfoCard() {
               </Tooltip.Content>
             </Tooltip>
           ))}
-          <li className="flex w-full items-center gap-3">
+          <li className="flex w-full items-center gap-3 py-2.5 last:pb-0">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-default-soft">
               <Iconify className="text-base text-muted" icon="envelope" />
             </div>

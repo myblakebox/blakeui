@@ -1,36 +1,41 @@
 "use client";
 
 import {Card, Chip, FancyButton, ProgressBar} from "@blakeui/react";
+import {animate, useInView} from "motion/react";
 import {useEffect, useRef, useState} from "react";
 
 import {Iconify} from "@/components/iconify";
 
-import {upload} from "../data/placeholder";
-import {prefersReducedMotion, useAutoRevert} from "../use-replay";
+import {uploadFiles} from "../data/placeholder";
+import {prefersReducedMotion} from "../use-replay";
 
-const UPLOAD_DURATION_MS = 2000;
+const UPLOAD_DURATION_S = 2;
 
-/** "resting" is the neutral completed file; "uploaded" is the fresh success. */
-type UploadState = "idle" | "resting" | "uploaded" | "uploading";
-
-function easeOutCubic(t: number): number {
-  return 1 - (1 - t) ** 3;
-}
+type UploadState = "idle" | "uploaded" | "uploading";
 
 export function FileUploadCard() {
-  const [uploadState, setUploadState] = useState<UploadState>("resting");
-  const [progress, setProgress] = useState(100);
-  const frameRef = useRef(0);
+  const [fileIndex, setFileIndex] = useState(0);
+  // Remount key for ProgressBar: a fresh run starts from a fresh element at 0,
+  // so the fill never animates backwards from the previous run's 100.
+  const [runId, setRunId] = useState(0);
+  const [uploadState, setUploadState] = useState<UploadState>("uploading");
+  const [progress, setProgress] = useState(0);
+  const animationRef = useRef<ReturnType<typeof animate>>(undefined);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const hasAutoplayed = useRef(false);
+  const isInView = useInView(cardRef, {amount: 0.4, once: true});
 
-  useEffect(() => () => cancelAnimationFrame(frameRef.current), []);
+  const file = uploadFiles[fileIndex % uploadFiles.length] as (typeof uploadFiles)[number];
 
-  // Replay rule: the success chip settles back to the neutral completed row.
-  useAutoRevert(uploadState === "uploaded", () => setUploadState("resting"));
+  const run = (nextFileIndex = fileIndex) => {
+    animationRef.current?.stop();
+    // Full reset BEFORE the new run: file, key, progress, state — no half-reset.
+    setFileIndex(nextFileIndex);
+    setRunId((id) => id + 1);
+    setProgress(0);
+    setUploadState("uploading");
 
-  const startUpload = () => {
-    cancelAnimationFrame(frameRef.current);
-
-    // Reduced motion: the animated fill becomes an instant completed swap.
+    // Reduced motion: jump straight to completed.
     if (prefersReducedMotion()) {
       setProgress(100);
       setUploadState("uploaded");
@@ -38,39 +43,40 @@ export function FileUploadCard() {
       return;
     }
 
-    setProgress(0);
-    setUploadState("uploading");
-
-    const startedAt = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = Math.min((now - startedAt) / UPLOAD_DURATION_MS, 1);
-
-      setProgress(Math.round(easeOutCubic(elapsed) * 100));
-
-      if (elapsed < 1) {
-        frameRef.current = requestAnimationFrame(tick);
-      } else {
-        setUploadState("uploaded");
-      }
-    };
-
-    frameRef.current = requestAnimationFrame(tick);
+    animationRef.current = animate(0, 100, {
+      duration: UPLOAD_DURATION_S,
+      ease: "easeOut",
+      onComplete: () => setUploadState("uploaded"),
+      onUpdate: (value) => setProgress(Math.round(value)),
+    });
   };
 
+  // Autoplay exactly once, on first scroll-into-view. The terminal state
+  // persists — this card's replay is manual (Change / Upload File).
+  useEffect(() => {
+    if (!isInView || hasAutoplayed.current) return;
+
+    hasAutoplayed.current = true;
+    // Deferred a tick so the kick-off isn't a synchronous setState in-effect.
+    const kickoff = setTimeout(run, 0);
+
+    return () => clearTimeout(kickoff);
+  }, [isInView]);
+
+  useEffect(() => () => animationRef.current?.stop(), []);
+
   const removeFile = () => {
-    cancelAnimationFrame(frameRef.current);
-    setProgress(100);
+    animationRef.current?.stop();
     setUploadState("idle");
   };
 
   if (uploadState === "idle") {
     return (
-      <Card className="w-full">
+      <Card ref={cardRef} className="w-full">
         <Card.Content className="w-full items-center gap-2 py-6 text-center">
           <Iconify className="text-2xl text-muted" icon="file" />
           <p className="text-sm text-muted">No file uploaded</p>
-          <FancyButton size="sm" variant="basic" onPress={startUpload}>
+          <FancyButton size="sm" variant="basic" onPress={() => run()}>
             Upload File
           </FancyButton>
         </Card.Content>
@@ -79,29 +85,23 @@ export function FileUploadCard() {
   }
 
   const isUploading = uploadState === "uploading";
-  const uploadedMb = Math.round((progress / 100) * upload.sizeMb);
+  const uploadedMb = Math.round((progress / 100) * file.sizeMb);
 
   return (
-    <Card className="w-full">
+    <Card ref={cardRef} className="w-full">
       <Card.Content className="w-full gap-3">
-        {/* Status chip rides the size line (not the corner) so the filename gets
-            full width at 300px and the docs chip owns the top-right. */}
         <div className="flex w-full items-center gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-default-soft">
-            <Iconify className="text-xl text-muted" icon="file-pdf" />
+          {/* Colorful file-type badge — vivid content color permitted here. */}
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
+            <Iconify className="text-xl text-red-500 dark:text-red-400" icon="file-pdf" />
           </div>
           <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-            <span className="w-full truncate text-left text-sm font-medium">{upload.fileName}</span>
+            <span className="w-full truncate text-left text-sm font-medium">{file.fileName}</span>
             <span className="flex items-center gap-2 text-xs text-muted">
-              {uploadedMb} MB of {upload.sizeMb} MB
+              {uploadedMb} MB of {file.sizeMb} MB
               <Chip color={isUploading ? "default" : "success"} size="sm" variant="soft">
                 {isUploading ? (
                   "Uploading"
-                ) : uploadState === "uploaded" ? (
-                  <>
-                    <Iconify className="text-sm" icon="check" />
-                    Uploaded
-                  </>
                 ) : (
                   <>
                     <Iconify className="text-sm" icon="check" />
@@ -113,7 +113,8 @@ export function FileUploadCard() {
           </div>
         </div>
         <ProgressBar
-          aria-label={`Upload progress for ${upload.fileName}`}
+          key={runId}
+          aria-label={`Upload progress for ${file.fileName}`}
           className="w-full"
           value={progress}
         >
@@ -127,7 +128,7 @@ export function FileUploadCard() {
             isDisabled={isUploading}
             size="sm"
             variant="basic"
-            onPress={startUpload}
+            onPress={() => run(fileIndex + 1)}
           >
             Change
           </FancyButton>
@@ -141,9 +142,9 @@ export function FileUploadCard() {
             Remove
           </FancyButton>
         </div>
-        {/* Success announced for screen readers, not just the chip color. */}
+        {/* Completion announced for screen readers, not just the chip color. */}
         <span aria-live="polite" className="sr-only">
-          {uploadState === "uploaded" ? `${upload.fileName} uploaded` : ""}
+          {uploadState === "uploaded" ? `${file.fileName} uploaded` : ""}
         </span>
       </Card.Content>
     </Card>

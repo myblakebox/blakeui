@@ -31,11 +31,14 @@ type Member = (typeof invite.members)[number];
 
 function PermissionSelect({
   className,
+  isEmbedded,
   label,
   onChange,
   value,
 }: {
   className?: string;
+  /** Borderless trigger for nesting inside an InputGroup slot. */
+  isEmbedded?: boolean;
   label: string;
   onChange?: (permission: string) => void;
   value: string;
@@ -43,7 +46,7 @@ function PermissionSelect({
   return (
     <Select
       aria-label={label}
-      className={className}
+      className={`${isEmbedded ? "sc-embedded-select" : ""} ${className ?? ""}`}
       selectedKey={value}
       onSelectionChange={(key: Key | null) => key != null && onChange?.(String(key))}
     >
@@ -51,7 +54,9 @@ function PermissionSelect({
         <Select.Value />
         <Select.Indicator />
       </Select.Trigger>
-      <Select.Popover>
+      {/* sc-pop scopes the showcase popover motion guard (popovers portal
+          out of .component-showcase, so the class rides along instead). */}
+      <Select.Popover className="sc-pop">
         <ListBox>
           {PERMISSIONS.map((permission) => (
             <ListBox.Item key={permission.id} id={permission.id} textValue={permission.label}>
@@ -100,7 +105,7 @@ export function InviteToProjectCard() {
       <CloseButton aria-label="Dismiss invite card" className="absolute top-3 right-3" />
       <Card.Header className="w-full flex-row items-center gap-3 pr-10">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
-          <Iconify className="text-xl text-accent-soft-foreground" icon="persons" />
+          <Iconify className="text-xl text-accent-soft-foreground" icon="person-plus" />
         </div>
         <div className="flex min-w-0 flex-col items-start">
           <Card.Title className="text-sm font-semibold">Invite to Project</Card.Title>
@@ -123,22 +128,28 @@ export function InviteToProjectCard() {
               </Tooltip.Content>
             </Tooltip>
           </div>
-          {/* Stacked at the 300px card width so the email field keeps room. */}
-          <div className="flex w-full flex-col gap-2">
-            <InputGroup className="w-full">
-              <InputGroup.Input placeholder="name@blakeui.com" type="email" />
-            </InputGroup>
-            <div className="flex w-full items-center gap-2">
-              <PermissionSelect
+          {/* One visual field (AlignUI pattern): the permission Select is
+              embedded at the input's right edge via the group's Suffix slot;
+              the Invite button sits outside. */}
+          <div className="flex w-full items-center gap-2">
+            <InputGroup className="min-w-0 flex-1">
+              <InputGroup.Input
                 className="min-w-0 flex-1"
-                label="Permission for new member"
-                value={invitePermission}
-                onChange={setInvitePermission}
+                placeholder="name@blakeui.com"
+                type="email"
               />
-              <FancyButton size="sm" variant="primary" onPress={inviteMember}>
-                Invite
-              </FancyButton>
-            </div>
+              <InputGroup.Suffix>
+                <PermissionSelect
+                  isEmbedded
+                  label="Permission for new member"
+                  value={invitePermission}
+                  onChange={setInvitePermission}
+                />
+              </InputGroup.Suffix>
+            </InputGroup>
+            <FancyButton size="sm" variant="primary" onPress={inviteMember}>
+              Invite
+            </FancyButton>
           </div>
         </TextField>
         <span className="w-full text-left text-xs font-medium text-muted">Members with access</span>
