@@ -1,26 +1,60 @@
 "use client";
 
-import {Avatar, Card, Chip, Label, Menu, MenuItem, Separator, Switch} from "@blakeui/react";
+import {Card, Chip, Label, Menu, MenuItem, Separator, Switch} from "@blakeui/react";
 import {useTheme} from "next-themes";
+import {useEffect, useRef, useState} from "react";
 
 import {Iconify} from "@/components/iconify";
 import {useIsMounted} from "@/hooks/use-is-mounted";
 
 import {account} from "../data/placeholder";
+import {GradientAvatar} from "../gradient-avatar";
+import {prefersReducedMotion} from "../use-replay";
+
+/** Matches the switch thumb's 300ms margin transition (switch.css). */
+const THUMB_SLIDE_MS = 320;
 
 export function AccountMenuCard() {
   const {resolvedTheme, setTheme} = useTheme();
   const isMounted = useIsMounted();
-  // Drives the real page theme through the same next-themes state as the
-  // header toggle, so flipping either keeps both in sync.
-  const isDark = isMounted && resolvedTheme === "dark";
+  const themeIsDark = isMounted && resolvedTheme === "dark";
+
+  /**
+   * The switch is locally controlled rather than derived straight from
+   * resolvedTheme: fumadocs' RootProvider runs next-themes with
+   * disableTransitionOnChange, which injects `* { transition: none !important }`
+   * for the exact window in which the theme flips — so a theme-derived thumb
+   * could never animate. Instead the thumb slides on local state immediately
+   * and the real setTheme is deferred until the slide has played.
+   */
+  const [isDark, setIsDark] = useState(false);
+  const pendingThemeRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(pendingThemeRef.current), []);
+
+  // Sync from external changes (the header toggle drives the same next-themes
+  // state). Delayed a tick so the slide starts after next-themes has removed
+  // its transition-kill style — the thumb animates in this direction too.
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsDark(themeIsDark), 60);
+
+    return () => clearTimeout(timeout);
+  }, [themeIsDark]);
+
+  const toggleTheme = (selected: boolean) => {
+    setIsDark(selected);
+    clearTimeout(pendingThemeRef.current);
+
+    // Reduced motion: no slide to wait for — flip the theme immediately.
+    const delay = prefersReducedMotion() ? 0 : THUMB_SLIDE_MS;
+
+    pendingThemeRef.current = setTimeout(() => setTheme(selected ? "dark" : "light"), delay);
+  };
 
   return (
     <Card className="w-full">
       <Card.Header className="w-full flex-row items-center gap-3">
-        <Avatar>
-          <Avatar.Fallback>{account.initials}</Avatar.Fallback>
-        </Avatar>
+        <GradientAvatar name={account.name} />
         <div className="flex min-w-0 flex-1 flex-col items-start">
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-semibold">{account.name}</span>
@@ -35,7 +69,7 @@ export function AccountMenuCard() {
         <Switch
           className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-1.5"
           isSelected={isDark}
-          onChange={(selected) => setTheme(selected ? "dark" : "light")}
+          onChange={toggleTheme}
         >
           <span className="flex items-center gap-2 text-sm">
             <Iconify className="text-base text-muted" icon="moon" />

@@ -52,8 +52,16 @@ export const addTags = {
 };
 
 export const appliedFilters = [
-  {icon: "person", id: "owner", label: "Owner: Blake"},
-  {icon: "calendar", id: "due", label: "Due: This week"},
-  {icon: "layers", id: "team", label: "Team: Design"},
-  {icon: "globe", id: "visibility", label: "Public"},
+  {color: "accent", icon: "person", id: "owner", label: "Owner: Blake"},
+  {color: "warning", icon: "calendar", id: "due", label: "Due: This week"},
+  {color: "default", icon: "layers", id: "team", label: "Team: Design"},
+  {color: "success", icon: "globe", id: "visibility", label: "Public"},
+] as const;
+
+/** Preset extras the "+" button appends one at a time; order matters. */
+export const extraFilters = [
+  {color: "success", icon: "circle-check", id: "status", label: "Status: Active"},
+  {color: "danger", icon: "arrow-up", id: "priority", label: "Priority: High"},
+  {color: "accent", icon: "person-plus", id: "assignee", label: "Assignee: Riley"},
+  {color: "default", icon: "tag", id: "tag", label: "Tag: Web"},
 ] as const;

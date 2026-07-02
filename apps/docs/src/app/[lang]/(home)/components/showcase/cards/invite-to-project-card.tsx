@@ -3,7 +3,6 @@
 import type {Key} from "@blakeui/react";
 
 import {
-  Avatar,
   Card,
   CloseButton,
   FancyButton,
@@ -20,6 +19,7 @@ import {useState} from "react";
 import {Iconify} from "@/components/iconify";
 
 import {invite} from "../data/placeholder";
+import {GradientAvatar} from "../gradient-avatar";
 
 const PERMISSIONS = [
   {id: "view", label: "can view"},
@@ -123,31 +123,36 @@ export function InviteToProjectCard() {
               </Tooltip.Content>
             </Tooltip>
           </div>
-          <div className="flex w-full items-center gap-2">
-            <InputGroup className="min-w-0 flex-1">
+          {/* Stacked at the 300px card width so the email field keeps room. */}
+          <div className="flex w-full flex-col gap-2">
+            <InputGroup className="w-full">
               <InputGroup.Input placeholder="name@blakeui.com" type="email" />
             </InputGroup>
-            <PermissionSelect
-              className="w-[110px] shrink-0"
-              label="Permission for new member"
-              value={invitePermission}
-              onChange={setInvitePermission}
-            />
-            <FancyButton size="sm" variant="primary" onPress={inviteMember}>
-              Invite
-            </FancyButton>
+            <div className="flex w-full items-center gap-2">
+              <PermissionSelect
+                className="min-w-0 flex-1"
+                label="Permission for new member"
+                value={invitePermission}
+                onChange={setInvitePermission}
+              />
+              <FancyButton size="sm" variant="primary" onPress={inviteMember}>
+                Invite
+              </FancyButton>
+            </div>
           </div>
         </TextField>
         <span className="w-full text-left text-xs font-medium text-muted">Members with access</span>
         <ul className="flex w-full flex-col gap-2">
           {members.map((member) => (
             <li key={member.email} className="flex w-full items-center gap-2">
-              <Avatar size="sm">
-                <Avatar.Fallback>{member.initials}</Avatar.Fallback>
-              </Avatar>
+              <GradientAvatar name={member.name} size="sm" />
               <div className="flex min-w-0 flex-1 flex-col items-start">
                 <span className="w-full truncate text-left text-sm font-medium">{member.name}</span>
-                <span className="w-full truncate text-left text-xs text-muted">{member.email}</span>
+                {/* Live readout: re-renders as this row's Select changes. */}
+                <span className="w-full truncate text-left text-xs text-muted">
+                  {member.email} &middot;{" "}
+                  {PERMISSIONS.find((p) => p.id === member.permission)?.label}
+                </span>
               </div>
               <PermissionSelect
                 className="w-[110px] shrink-0"

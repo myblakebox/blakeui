@@ -21,18 +21,53 @@ import {Iconify} from "@/components/iconify";
 
 import {addTags} from "../data/placeholder";
 
+/**
+ * Tag has no color prop in 1.1.2, so the chip color variety comes from the
+ * semantic soft tokens Chip uses, hashed per tag name so colors stay stable
+ * as tags come and go.
+ */
+const TAG_COLOR_CLASSES = [
+  "bg-accent-soft text-accent-soft-foreground",
+  "bg-success-soft text-success-soft-foreground",
+  "bg-warning-soft text-warning-soft-foreground",
+  "", // default
+  "bg-danger-soft text-danger-soft-foreground",
+];
+
+function tagColorClass(tag: string): string {
+  let hash = 0;
+
+  for (const char of tag) hash = (hash * 31 + char.charCodeAt(0)) % 997;
+
+  return TAG_COLOR_CLASSES[hash % TAG_COLOR_CLASSES.length] as string;
+}
+
 export function AddTagsCard() {
   const [tags, setTags] = useState<string[]>([...addTags.tags]);
   const [draft, setDraft] = useState("");
+  // Only chips minted after mount pop in; the initial set renders quietly.
+  const [popTags, setPopTags] = useState<Set<string>>(new Set());
+  const [isShaking, setIsShaking] = useState(false);
+  const [liveNote, setLiveNote] = useState("");
 
   const isFull = tags.length >= addTags.maxTags;
 
   const addTag = () => {
     const trimmed = draft.trim();
 
-    if (!trimmed || isFull || tags.includes(trimmed)) return;
+    if (!trimmed || isFull) return;
+
+    // Duplicate: quiet shake on the field plus a screen-reader note.
+    if (tags.includes(trimmed)) {
+      setIsShaking(true);
+      setLiveNote(`"${trimmed}" is already added`);
+
+      return;
+    }
 
     setTags((prev) => [...prev, trimmed]);
+    setPopTags((prev) => new Set(prev).add(trimmed));
+    setLiveNote(`"${trimmed}" added`);
     setDraft("");
   };
 
@@ -65,7 +100,10 @@ export function AddTagsCard() {
           }}
         >
           <Label className="sr-only">New tag</Label>
-          <InputGroup className="w-full">
+          <InputGroup
+            className={`w-full ${isShaking ? "sc-dupe-shake" : ""}`}
+            onAnimationEnd={() => setIsShaking(false)}
+          >
             <InputGroup.Prefix>
               <Iconify className="text-base text-muted" icon="tag" />
             </InputGroup.Prefix>
@@ -73,7 +111,7 @@ export function AddTagsCard() {
             <InputGroup.Suffix>
               <FancyButton
                 isIconOnly
-                aria-label="Add tag"
+                aria-label={isFull ? "Add tag — tag limit reached" : "Add tag"}
                 isDisabled={isFull || !draft.trim()}
                 size="sm"
                 variant="basic"
@@ -88,7 +126,12 @@ export function AddTagsCard() {
           <TagGroup aria-label="Tags" onRemove={onRemove}>
             <TagGroup.List className="flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <Tag key={tag} id={tag} textValue={tag}>
+                <Tag
+                  key={tag}
+                  className={`${tagColorClass(tag)} ${popTags.has(tag) ? "sc-chip-pop" : ""}`}
+                  id={tag}
+                  textValue={tag}
+                >
                   {tag}
                   <Tag.RemoveButton aria-label={`Remove ${tag}`} />
                 </Tag>
@@ -96,6 +139,10 @@ export function AddTagsCard() {
             </TagGroup.List>
           </TagGroup>
         )}
+        {/* Dupe rejections and additions announced without visual noise. */}
+        <span aria-live="polite" className="sr-only">
+          {liveNote}
+        </span>
         <span className="w-full text-left text-xs font-medium text-muted">Tag Settings</span>
         <div className="flex w-full items-center gap-2">
           <Checkbox defaultSelected id="display-on-profile">
