@@ -742,3 +742,28 @@ code {
     background-color: #2d2d2d !important;
   }
 }
+
+/* Homepage hero rough-notation annotations. No `color` option is passed to
+   rough-notation, so its paths render with stroke="currentColor"; the injected
+   svg.rough-annotation is a sibling of the annotated span, so the `color` set
+   here resolves live with no JS re-draw needed. The underline is pinned to the
+   Pro library's mouve purple (packages/react/src/themes/mouve in blakeui-pro)
+   and intentionally does NOT track the design-theme presets; the highlight
+   stays on the accent wash and does. */
+.home-hero {
+  --hero-underline: #8b5fbf;
+  --hero-highlight: color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.dark .home-hero,
+[data-theme="dark"] .home-hero {
+  --hero-underline: #b288e0;
+}
+
+.home-hero [data-annotate="underline"] + svg.rough-annotation {
+  color: var(--hero-underline);
+}
+
+.home-hero svg.rough-annotation:has(+ [data-annotate="highlight"]) {
+  color: var(--hero-highlight);
+}

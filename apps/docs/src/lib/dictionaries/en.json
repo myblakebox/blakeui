@@ -1,8 +1,9 @@
 {
   "home": {
-    "titleMain": "Less config.",
-    "titleMuted": "More shipping.",
-    "description": "blakeUI is a modern UI library for web and mobile, that gets out of your way, so you can focus on building what matters.",
+    "titleUnderline": "Every component",
+    "titleMiddle": "here is real.",
+    "titleHighlight": "Try them.",
+    "description": "Accessible React components built on Aria and Tailwind — styled, animated, ready to drop into your project.",
     "getStarted": "Get started",
     "viewComponents": "View components",
     "githubStarsPrefix": "Open source with",

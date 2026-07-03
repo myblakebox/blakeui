@@ -1,0 +1,156 @@
+/**
+ * MacWindow — decorative macOS-style window chrome for the homepage showcase,
+ * AlignUI-flat: one continuous surface behind a hairline outline (no titlebar
+ * band), bottom edge dissolved into the page. Docs-app local; every rule is
+ * scoped under `.mac-window`.
+ */
+
+.mac-window {
+  background: var(--background);
+  border-radius: var(--radius-2xl);
+  position: relative;
+  width: 100%;
+}
+
+/* The frame lives on its own layer so the dissolve touches ONLY the
+ * outline: the rails run full-ink past the titlebar (first stop), thin
+ * out on the way down, and are fully gone ~7/8 of the way — no bottom
+ * edge ever draws. Percentage stops so the fade scales with the window's
+ * height at every breakpoint. Cards, text, controls — everything inside —
+ * stay 100% opaque at all times (the invariant; content paints above
+ * this pseudo, see .mw-titlebar / .mw-content position rules). */
+.mac-window::before {
+  border: 1px solid var(--border);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  -webkit-mask-image: linear-gradient(to bottom, black 12%, transparent 88%);
+  mask-image: linear-gradient(to bottom, black 12%, transparent 88%);
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Flat bar region: no band, no separator — the chrome floats in the window's
+ * top padding on the shared background. */
+.mac-window .mw-titlebar {
+  align-items: center;
+  display: flex;
+  height: 56px;
+  padding-inline: 20px;
+  position: relative;
+}
+
+.mac-window .mw-dots {
+  display: flex;
+  gap: 8px;
+}
+
+/* Classic traffic-light trio — hardcoded like the gradient avatar discs (the
+ * dots ARE the identifying content of the frame, not theme chrome); the soft
+ * inset ring keeps them crisp on both light and dark backgrounds. */
+.mac-window .mw-dot {
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+  display: inline-flex;
+  height: 12px;
+  justify-content: center;
+  width: 12px;
+}
+
+/* Hovering the dot cluster fades in the ×/−/+ glyphs (the authentic macOS
+ * detail) — text glyphs at 9px/600 stand in for the ~1px strokes, inked in
+ * the dot's own color pulled well toward black. Decorative only; the dots
+ * stay aria-hidden and non-interactive. */
+.mac-window .mw-dot::before {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+.mac-window .mw-dots:hover .mw-dot::before {
+  opacity: 1;
+}
+
+.mac-window .mw-close {
+  background: #ff5f57;
+}
+
+.mac-window .mw-close::before {
+  color: color-mix(in oklab, #ff5f57 40%, black);
+  content: "×";
+}
+
+.mac-window .mw-min {
+  background: #febc2e;
+}
+
+.mac-window .mw-min::before {
+  color: color-mix(in oklab, #febc2e 40%, black);
+  content: "−";
+}
+
+.mac-window .mw-zoom {
+  background: #28c840;
+}
+
+.mac-window .mw-zoom::before {
+  color: color-mix(in oklab, #28c840 40%, black);
+  content: "+";
+}
+
+/* Address pill — absolutely positioned so it centers on the bar itself
+ * rather than the space left over after the dots. */
+.mac-window .mw-pill {
+  align-items: center;
+  background: color-mix(in oklab, var(--muted) 12%, transparent);
+  border-radius: 9999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 6px;
+  height: 24px;
+  left: 50%;
+  padding-inline: 12px;
+  position: absolute;
+  top: 50%;
+  translate: -50% -50%;
+  white-space: nowrap;
+}
+
+/* Ghost icon group — muted, decorative, optically balancing the dots; the
+ * only hover affordance is a subtle opacity nudge. */
+.mac-window .mw-icons {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 15px;
+  gap: 14px;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: opacity 120ms ease-out;
+}
+
+.mac-window .mw-icons:hover {
+  opacity: 1;
+}
+
+/* Calm space below the last row so the rails dissolve across empty canvas.
+ * position:relative lifts the content above the ::before frame layer —
+ * positioned siblings paint in DOM order (pseudo first, content after), so
+ * no content pixel is ever touched by the fading frame. */
+.mac-window .mw-content {
+  padding-bottom: 48px;
+  position: relative;
+}
+
+/* Reduced motion: chrome transitions collapse to instant states. */
+@media (prefers-reduced-motion: reduce) {
+  .mac-window .mw-dot::before,
+  .mac-window .mw-icons {
+    transition: none;
+  }
+}
