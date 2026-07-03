@@ -1,8 +1,9 @@
 /**
- * MacWindow — decorative macOS-style window chrome for the homepage showcase,
- * AlignUI-flat: one continuous surface behind a hairline outline (no titlebar
- * band), bottom edge dissolved into the page. Docs-app local; every rule is
- * scoped under `.mac-window`.
+ * MacWindow — macOS-style window chrome for the homepage showcase, AlignUI-
+ * flat: one continuous surface behind a hairline outline (no titlebar band),
+ * bottom edge dissolved into the page. Dots and pill are decorative; the
+ * right cluster (accent swatches + theme-builder link) is interactive.
+ * Docs-app local; every rule is scoped under `.mac-window`.
  */
 
 .mac-window {
@@ -121,21 +122,15 @@
   white-space: nowrap;
 }
 
-/* Ghost icon group — muted, decorative, optically balancing the dots; the
- * only hover affordance is a subtle opacity nudge. */
-.mac-window .mw-icons {
+/* Interactive right cluster — accent swatches + theme-builder link — sits
+ * where the ghost icons sat: right-aligned, centered in the bar. Unlike the
+ * old icons it is real UI, so no opacity dimming; like them it stays visible
+ * at every breakpoint (the icons had no responsive rules). */
+.mac-window .mw-cluster {
   align-items: center;
-  color: var(--muted);
   display: flex;
-  font-size: 15px;
-  gap: 14px;
+  gap: 10px;
   margin-left: auto;
-  opacity: 0.7;
-  transition: opacity 120ms ease-out;
-}
-
-.mac-window .mw-icons:hover {
-  opacity: 1;
 }
 
 /* Calm space below the last row so the rails dissolve across empty canvas.
@@ -147,10 +142,65 @@
   position: relative;
 }
 
+/* The interactive cluster keeps priority at every width (mirroring the old
+ * always-visible icons); the decorative centered pill yields once it would
+ * paint under the swatches. Measured: cluster is 308px at default gaps, so
+ * the pill's right edge (viewport/2 + 61px incl. buffer) crosses the
+ * cluster's left edge (viewport − 328px) below ~778px. */
+@media (max-width: 780px) {
+  .mac-window .mw-pill {
+    display: none;
+  }
+}
+
+/* Narrow screens: tighten the row so dots + cluster share the bar. */
+@media (max-width: 560px) {
+  .mac-window .mw-titlebar {
+    padding-inline: 16px;
+  }
+
+  .mac-window .mw-cluster {
+    gap: 4px;
+  }
+
+  .mac-window .mw-cluster [data-slot="color-swatch-picker"] {
+    flex-wrap: nowrap;
+    gap: 2px;
+  }
+}
+
+/* Smallest screens: everything shrinks one notch — swatches 24→20px (2px
+ * ring inset preserved, 20→16px discs), the two icon buttons 36→28px, bar
+ * padding 16→12px — so the row stays single-line at 320 with ~2px slack. */
+@media (max-width: 360px) {
+  .mac-window .mw-titlebar {
+    padding-inline: 12px;
+  }
+
+  .mac-window .mw-cluster .button {
+    height: 28px;
+    min-width: 28px;
+    width: 28px;
+  }
+
+  .mac-window .mw-cluster [data-slot="color-swatch-picker"] {
+    gap: 1px;
+  }
+
+  .mac-window .mw-cluster [data-slot="color-swatch-picker-item"] {
+    height: 20px;
+    width: 20px;
+  }
+
+  .mac-window .mw-cluster [data-slot="color-swatch-picker-swatch"] {
+    height: 16px;
+    width: 16px;
+  }
+}
+
 /* Reduced motion: chrome transitions collapse to instant states. */
 @media (prefers-reduced-motion: reduce) {
-  .mac-window .mw-dot::before,
-  .mac-window .mw-icons {
+  .mac-window .mw-dot::before {
     transition: none;
   }
 }
