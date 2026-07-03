@@ -1,0 +1,266 @@
+/**
+ * Component Showcase — homepage-scoped polish layer. Every rule is scoped
+ * under `.component-showcase`; packages/** stay untouched. Ported from the
+ * working-wall technique (field strokes, spring easing, docs-chip reveal).
+ */
+
+.component-showcase {
+  /**
+   * Field surfaces (Input, Select trigger, InputGroup) get a visible stroke —
+   * the default theme ships borderless fields (--field-border: transparent /
+   * --field-border-width: 0px). The hover/focus mixes are re-declared because
+   * the theme computes them at :root from the transparent value; re-declaring
+   * here re-derives them from the new border.
+   */
+  --field-border-width: 1px;
+  /* The components consume the @theme alias (--border-width-field), which the
+   * theme resolves at :root where --field-border-width is still 0px — so the
+   * alias must be re-pointed here too. */
+  --border-width-field: var(--field-border-width);
+  --field-border: var(--border);
+  --field-border-hover: color-mix(
+    in oklab,
+    var(--field-border) 88%,
+    var(--field-foreground, var(--foreground)) 10%
+  );
+  --field-border-focus: color-mix(
+    in oklab,
+    var(--field-border) 74%,
+    var(--field-foreground, var(--foreground)) 22%
+  );
+
+  /* Springy easing shared by the docs chip and pop-in chips.
+   * linear() approximation of spring(mass:1 stiffness:100 damping:10). */
+  --sc-spring: linear(
+    0,
+    0.008 1.1%,
+    0.031 2.2%,
+    0.129 4.8%,
+    0.257 7.2%,
+    0.671 14.2%,
+    0.789 16.5%,
+    0.881 18.6%,
+    0.957 20.7%,
+    1.019 22.9%,
+    1.063 25.1%,
+    1.094 27.4%,
+    1.109 30%,
+    1.107 32.8%,
+    1.084 38.4%,
+    1.032 47.9%,
+    0.997 59%,
+    0.986 76.9%,
+    1
+  );
+}
+
+/* Elevated surface treatment for every card in the grid. The shadow bloom
+ * matches the hover lift's 280ms soft ease (cubic-bezier(0.33,1,0.68,1)). */
+.component-showcase .card {
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  transition: box-shadow 280ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Shadow bloom paired with the hover lift (the lift itself is motion-driven). */
+.component-showcase [data-tile]:hover .card {
+  box-shadow: var(--overlay-shadow);
+}
+
+/* At the 12px rhythm the bloom reaches under the next tile — lift the hovered
+ * tile's stacking so neighbors never clip its shadow. */
+.component-showcase [data-tile]:hover {
+  z-index: 5;
+}
+
+/* Docs chip springs in on hover / keyboard focus; opacity + pointer-events
+ * live in the component's Tailwind classes. Reveal keys off :has(:focus-visible)
+ * rather than :focus-within so mouse clicks inside a card can't latch the chip
+ * open (the stuck-chip bug) while Tab still reveals it.
+ * Bounce: scale 0.8 → overshoot ~1.06 → 1 (curve peak 1.3 over the 0.2 delta),
+ * one visible bounce, ~450ms — spring-equivalent stiffness ≈ 400, damping ≈ 20. */
+.component-showcase [data-docs-chip] {
+  scale: 0.8;
+  transition: scale 450ms
+    linear(0, 0.19 6%, 0.7 18%, 1.12 32%, 1.3 45%, 1.22 60%, 1.05 75%, 0.98 87%, 1);
+}
+
+.component-showcase [data-tile]:hover [data-docs-chip],
+.component-showcase [data-tile]:has(:focus-visible) [data-docs-chip] {
+  scale: 1;
+}
+
+/* C2 — hand-rolled Tabs pill (visual only; structure/keyboard stay on the
+ * real Tabs). RAC's SelectionIndicator remounts per selection under
+ * Next 16 / React 19.2 so it can't transition — this persistent element
+ * carries the identical `.tabs__indicator` visual recipe instead. Positioned
+ * from JS via ref + ResizeObserver; translate/width/height are inline. */
+.component-showcase .sc-tab-pill {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-3xl);
+  background: var(--segment);
+  box-shadow: var(--shadow-surface);
+  transition-duration: 250ms;
+  transition-property: translate, width, height;
+  transition-timing-function: var(--ease-out-fluid);
+}
+
+/* Tabs ride above the pill (the stock z:-1 trick only works tab-locally). */
+.component-showcase .sc-tabs .tabs__tab {
+  position: relative;
+  z-index: 1;
+}
+
+/* C6 — permission Select embedded in the invite InputGroup's Suffix slot:
+ * the group carries the field chrome, so the nested trigger sheds its own
+ * border/background and reads as part of one visual field. The end padding
+ * keeps the component's own `pe-7` indicator reserve (select.css positions
+ * the caret absolute at end-2 with a size-4 glyph) — the earlier uniform
+ * 6px override clobbered that reserve and clipped the caret. */
+.component-showcase .sc-embedded-select .select__trigger {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  height: auto;
+  min-height: 0;
+  padding-block: 0;
+  padding-inline-start: calc(var(--spacing) * 1.5);
+  padding-inline-end: calc(var(--spacing) * 7);
+}
+
+/* C6 — the embedded select's popover: the stock `min-w-(--trigger-width)`
+ * inherits the tiny embedded trigger's width (~90px), cramping options
+ * against the selection indicator. A comfortable floor fixes it; RAC's
+ * collision handling keeps it on-screen at small viewports. */
+.sc-embedded-pop {
+  min-width: 10rem;
+}
+
+/* C7 — the action menu sizes to its longest item: the stock dropdown popover
+ * forces md:min-w-55 (220px), far wider than Follow/Message/Profile need. */
+.sc-menu-pop {
+  min-width: 0;
+  width: max-content;
+}
+
+/* C6 — popovers portal out of .component-showcase, so the motion guard rides
+ * on a class passed to Select.Popover instead. The open/close scale+fade is
+ * the stock RAC data-entering/data-exiting animation from popover.css. */
+@media (prefers-reduced-motion: reduce) {
+  .sc-pop[data-entering="true"],
+  .sc-pop[data-exiting="true"] {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* C8 — stage crossfade (~200ms, keep in sync with STAGE_FADE_MS): the
+ * outgoing stage's inert copy fades out while the keyed-in new stage fades
+ * in over it. CSS animations rather than motion enter/exit — AnimatePresence
+ * never starts its tweens under this Next/React 19.2 setup. */
+.component-showcase .sc-stage-in {
+  animation: sc-stage-in 200ms ease-out both;
+}
+
+.component-showcase .sc-stage-out {
+  animation: sc-stage-out 200ms ease-out both;
+}
+
+@keyframes sc-stage-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sc-stage-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* C9 — one seamless tag field: input-group.css draws 1px slot dividers
+ * (prefix border-right, suffix border-left) from the same --field-border the
+ * showcase turns on for field strokes. Inside the group they're redundant
+ * with the outer stroke, so this field drops them. */
+.component-showcase .sc-seamless-field .input-group__prefix {
+  border-right: none;
+}
+
+.component-showcase .sc-seamless-field .input-group__suffix {
+  border-left: none;
+}
+
+/* C4/C9 — freshly minted chips pop in on the shared spring. The class is
+ * set only on tags added after mount, so the initial set renders quietly.
+ * (A class, not a data-attribute — RAC collection items drop custom data-*.) */
+.component-showcase .sc-chip-pop {
+  animation: sc-chip-pop 350ms var(--sc-spring);
+}
+
+@keyframes sc-chip-pop {
+  from {
+    scale: 0.5;
+    opacity: 0;
+  }
+
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* C9 — quiet shake when a duplicate tag is rejected. */
+.component-showcase .sc-dupe-shake {
+  animation: sc-dupe-shake 300ms var(--ease-out);
+}
+
+@keyframes sc-dupe-shake {
+  0%,
+  100% {
+    translate: 0;
+  }
+
+  25% {
+    translate: -4px;
+  }
+
+  50% {
+    translate: 4px;
+  }
+
+  75% {
+    translate: -2px;
+  }
+}
+
+/* Reduced motion: every scoped transition collapses to instant states. */
+@media (prefers-reduced-motion: reduce) {
+  .component-showcase .card,
+  .component-showcase [data-docs-chip],
+  .component-showcase .sc-tab-pill {
+    transition: none;
+  }
+
+  .component-showcase [data-docs-chip] {
+    scale: 1;
+  }
+
+  .component-showcase .sc-chip-pop,
+  .component-showcase .sc-dupe-shake,
+  .component-showcase .sc-stage-in,
+  .component-showcase .sc-stage-out {
+    animation: none;
+  }
+}
