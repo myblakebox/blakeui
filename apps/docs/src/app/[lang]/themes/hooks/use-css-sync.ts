@@ -300,16 +300,16 @@ export function useCssSync() {
         fontVariable = customFontInfo.variable;
         fontFamilyName = customFontInfo.fontFamily;
       } else {
-        // Fallback to Inter if we can't parse the URL
-        const interFont = fontMap.inter;
+        // Fall back to the default font (Figtree) if we can't parse the URL
+        const fallbackFont = fontMap.figtree;
 
-        injectFontLink(interFont.variable, interFont.cdnUrl);
-        fontVariable = interFont.variable;
-        fontFamilyName = interFont.label;
+        injectFontLink(fallbackFont.variable, fallbackFont.cdnUrl);
+        fontVariable = fallbackFont.variable;
+        fontFamilyName = fallbackFont.label;
       }
     } else {
       // Predefined font by ID - load on-demand via CDN
-      const predefinedFont = fontMap[fontFamily as keyof typeof fontMap] ?? fontMap.inter;
+      const predefinedFont = fontMap[fontFamily as keyof typeof fontMap] ?? fontMap.figtree;
 
       // Inject the font stylesheet from CDN
       injectFontLink(predefinedFont.variable, predefinedFont.cdnUrl);

@@ -10,11 +10,14 @@
  * Default Theme Values (from packages/styles/themes/default/variables.css)
  * -----------------------------------------------------------------------------------------------*/
 
-// Default accent values from variables.css: oklch(0.6204 0.195 253.83)
+// Default accent values from variables.css: oklch(0.4863 0.0647 250.76) /* #436283 */
+// Also the semantic-hue blend anchor (calculateSemanticHue): keeping it equal
+// to the Default preset's hue gives Default a zero hue offset, so its
+// generated semantics match the shipped theme exactly.
 export const DEFAULT_ACCENT = {
-  chroma: 0.195,
-  hue: 253.83,
-  lightness: 0.6204,
+  chroma: 0.0647,
+  hue: 250.76,
+  lightness: 0.4863,
 };
 
 const SEMANTIC_HUE_BLEND_FACTOR = 0.12; // 12% influence from base hue

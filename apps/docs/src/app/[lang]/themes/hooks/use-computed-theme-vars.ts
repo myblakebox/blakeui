@@ -74,13 +74,17 @@ export function computeThemeVars(variables: ThemeValues): ComputedThemeVars {
         variable: customFontInfo.variable,
       };
     } else {
-      const interFont = fontMap.inter;
+      const fallbackFont = fontMap.figtree;
 
-      fontVariable = interFont.variable;
-      fontMeta = {cdnUrl: interFont.cdnUrl, family: interFont.label, variable: interFont.variable};
+      fontVariable = fallbackFont.variable;
+      fontMeta = {
+        cdnUrl: fallbackFont.cdnUrl,
+        family: fallbackFont.label,
+        variable: fallbackFont.variable,
+      };
     }
   } else {
-    const predefinedFont = fontMap[fontFamily as keyof typeof fontMap] ?? fontMap.inter;
+    const predefinedFont = fontMap[fontFamily as keyof typeof fontMap] ?? fontMap.figtree;
 
     fontVariable = predefinedFont.variable;
     fontMeta = {

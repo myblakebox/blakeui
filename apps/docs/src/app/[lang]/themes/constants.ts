@@ -254,13 +254,16 @@ export const themeVariableKeys = [
 /** Theme variable keys that can be locked (excludes booleans like `vibrantPalette`). */
 export type LockableThemeVariableKey = (typeof themeVariableKeys)[number];
 
+// Mirrors defaultThemeValues (theme-values.ts) = BlakeUI's shipped theme:
+// accent oklch(0.4863 0.0647 250.76) /* #436283 */, Figtree. Keeping the two
+// in sync makes a fresh arrival read as "Default" rather than "Custom".
 export const defaultThemeVariables: ThemeVariables = {
   base: DEFAULT_BASE,
-  chroma: 0.195,
-  fontFamily: "inter",
+  chroma: 0.0647,
+  fontFamily: "figtree",
   formRadius: "large",
-  hue: 253.83,
-  lightness: 0.6204,
+  hue: 250.76,
+  lightness: 0.4863,
   radius: "medium",
 } as const;
 

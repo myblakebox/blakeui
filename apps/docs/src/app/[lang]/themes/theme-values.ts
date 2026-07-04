@@ -1,5 +1,8 @@
 // Base constants for theme values
-export const DEFAULT_BASE = 0.0015 as const;
+// 0.0041 mirrors the shipped light background's chroma (variables.css:
+// oklch(0.982 0.0041 91.45)) — the generator pins background L at 0.9702 and
+// ties its hue to the accent hue, so chroma is the only base-matchable axis.
+export const DEFAULT_BASE = 0.0041 as const;
 const BASE_FULL_LEFT = 0 as const;
 const BASE_10P_LEFT = 0.002 as const;
 const BASE_50P = 0.01 as const;
@@ -61,13 +64,15 @@ export type ThemeValues = {
   vibrantPalette?: boolean;
 };
 
+// BlakeUI's shipped default accent: variables.css --accent
+// oklch(0.4863 0.0647 250.76) /* #436283 */
 export const defaultThemeValues: ThemeValues = {
   base: DEFAULT_BASE,
-  chroma: 0.195,
+  chroma: 0.0647,
   fontFamily: "figtree",
   formRadius: "large",
-  hue: 253.83,
-  lightness: 0.6204,
+  hue: 250.76,
+  lightness: 0.4863,
   radius: "medium",
 } as const;
 

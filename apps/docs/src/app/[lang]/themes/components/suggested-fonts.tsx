@@ -68,7 +68,7 @@ export function SuggestedFonts({customFonts, goToCustom}: SuggestedFontsProps) {
     if (font) {
       removeCustomFont(font.id);
     }
-    // If the deleted font was selected, switch to Inter
+    // If the deleted font was selected, switch back to the default font
     if (variables.fontFamily === fontUrl) {
       setVariable("fontFamily", defaultThemeVariables.fontFamily);
     }
