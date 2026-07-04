@@ -28,6 +28,17 @@ export function useKeyPress(
 
       if (isEditableElement) return;
 
+      // Ignore key presses inside composite widgets (tabs, listboxes, sliders...)
+      // where arrow keys drive the widget's own navigation — a shortcut firing
+      // there would double-handle the same keystroke
+      const isCompositeWidget = Boolean(
+        target.closest?.(
+          '[role="tab"], [role="tablist"], [role="listbox"], [role="option"], [role="slider"], [role="radiogroup"], [role="grid"], [role="row"], [role="gridcell"], [role="menu"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]',
+        ),
+      );
+
+      if (isCompositeWidget) return;
+
       const isTargetKey = event.key.toLowerCase() === key.toLowerCase();
 
       // Check if modifiers match EXACTLY

@@ -1,0 +1,27 @@
+/* Hand-rolled replacement for Tabs.Indicator: under Next 16 / React 19.2,
+ * RAC's SelectionIndicator remounts a fresh node in the newly selected tab,
+ * so its CSS transition never gets a start value and the pill snaps instead
+ * of sliding. One persistent element positioned via ref + ResizeObserver,
+ * styled identically to `.tabs__indicator` in @blakeui/styles — except
+ * z-index 0 (not the stock -1): it lives at list level, where -1 would drop
+ * it behind the list background. `.tabs__tab` is already relative z-1.
+ */
+.builder-tabs-pill {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-3xl);
+  background: var(--segment);
+  box-shadow: var(--shadow-surface);
+  transition-duration: 250ms;
+  transition-property: translate, width, height;
+  transition-timing-function: var(--ease-out-fluid);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .builder-tabs-pill {
+    transition: none;
+  }
+}

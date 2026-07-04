@@ -1,0 +1,9 @@
+/**
+ * The MacWindow around the builder canvas is page furniture, not themed
+ * content: the builder overrides --radius-2xl on #theme-builder-content for
+ * the tiles, and the frame's chrome must not follow it. Pin the frame to the
+ * site's stock 2xl radius (calc(0.5rem * 2) = 1rem, themes/shared/theme.css).
+ */
+#theme-builder-content .mac-window {
+  border-radius: 1rem;
+}

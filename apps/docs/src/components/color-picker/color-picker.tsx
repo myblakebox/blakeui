@@ -23,6 +23,7 @@ export default function ColorPicker({
   children,
   defaultValue = DEFAULT_COLOR,
   onChange,
+  placement = "bottom",
   popoverClassName,
   showAlpha = false,
   showColorField = true,
@@ -119,7 +120,7 @@ export default function ColorPicker({
           <Popover.Trigger>{trigger}</Popover.Trigger>
           <Popover.Content
             className={cn("w-[248px] rounded-[20px]", popoverClassName)}
-            placement="top"
+            placement={placement}
           >
             <Popover.Dialog className="flex flex-col gap-2 px-2 pt-4 pb-2">
               {children ?? (

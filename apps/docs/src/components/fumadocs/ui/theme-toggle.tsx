@@ -3,11 +3,14 @@
 import type {ComponentProps} from "react";
 
 import {useTheme} from "next-themes";
+import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {tv} from "tailwind-variants";
 
 import {Airplay, Moon, Sun} from "@/components/fumadocs/ui/icons";
 import {useIsMounted} from "@/hooks/use-is-mounted";
 import {cn} from "@/utils/cn";
+
+import "./theme-toggle-pill.css";
 
 const itemVariants = tv({
   base: "text-fd-muted-foreground size-6.5 rounded-full p-1.5",
@@ -19,7 +22,29 @@ const itemVariants = tv({
   },
 });
 
+// Three-state segments: the sliding pill paints the active background, so the
+// active segment only changes text color. Segments sit above the pill (z-1).
+const segmentVariants = tv({
+  base: "text-fd-muted-foreground relative z-1 size-6.5 rounded-full p-1.5",
+  variants: {
+    active: {
+      false: "text-fd-muted-foreground",
+      true: "text-fd-accent-foreground",
+    },
+  },
+});
+
 const full = [["light", Sun] as const, ["dark", Moon] as const, ["system", Airplay] as const];
+
+/**
+ * Slot-compatible three-state toggle for layouts that render fumadocs'
+ * `slots.themeSwitch` (HomeLayout). The slot is invoked without a `mode`
+ * prop, and ThemeToggle defaults to the two-state variant — this pins the
+ * light/dark/system control the shared nav uses everywhere else.
+ */
+export function NavThemeToggle(props: ComponentProps<"div">) {
+  return <ThemeToggle {...props} mode="light-dark-system" />;
+}
 
 export function ThemeToggle({
   className,
@@ -30,6 +55,57 @@ export function ThemeToggle({
 }) {
   const {resolvedTheme, setTheme, theme} = useTheme();
   const mounted = useIsMounted();
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const [animated, setAnimated] = useState(false);
+
+  const selected = mode === "light-dark-system" && mounted ? theme : null;
+
+  // Position the pill over the selected segment. Purely visual: selection
+  // state, focus, and keyboard behavior live on the buttons, untouched.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const pill = pillRef.current;
+
+    if (!list || !pill) return;
+
+    const position = () => {
+      const active = selected
+        ? list.querySelector<HTMLButtonElement>(`button[data-theme-item="${selected}"]`)
+        : null;
+
+      if (!active) {
+        pill.style.opacity = "0";
+
+        return;
+      }
+
+      pill.style.opacity = "1";
+      pill.style.width = `${active.offsetWidth}px`;
+      pill.style.height = `${active.offsetHeight}px`;
+      pill.style.translate = `${active.offsetLeft}px ${active.offsetTop}px`;
+    };
+
+    position();
+
+    // Track segment geometry changes (font swap, zoom, container reflow) —
+    // a one-shot measurement would leave the pill stranded.
+    const observer = new ResizeObserver(position);
+
+    observer.observe(list);
+    list.querySelectorAll("button").forEach((button) => observer.observe(button));
+
+    return () => observer.disconnect();
+  }, [selected]);
+
+  // Arm the slide one frame after first paint so a hard load (whatever the
+  // stored theme) renders the pill in place instead of replaying a slide.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setAnimated(true));
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const container = cn(
     "inline-flex cursor-(--cursor-interactive) items-center rounded-full border p-1",
@@ -61,15 +137,22 @@ export function ThemeToggle({
     );
   }
 
-  const value = mounted ? theme : null;
-
   return (
-    <div className={container} data-theme-toggle="" {...props}>
+    <div ref={listRef} className={cn(container, "relative")} data-theme-toggle="" {...props}>
+      <span
+        ref={pillRef}
+        aria-hidden
+        className={cn(
+          "theme-toggle-pill bg-fd-accent rounded-full",
+          animated && "theme-toggle-pill--animated",
+        )}
+      />
       {full.map(([key, Icon]) => (
         <button
           key={key}
           aria-label={key}
-          className={cn(itemVariants({active: value === key}))}
+          className={cn(segmentVariants({active: selected === key}))}
+          data-theme-item={key}
           onClick={() => setTheme(key)}
         >
           <Icon className="size-full" fill="currentColor" />

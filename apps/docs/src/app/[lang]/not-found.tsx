@@ -14,14 +14,7 @@ export default async function NotFound() {
   const {notFound} = dict;
 
   return (
-    <HomeLayout
-      {...baseOptions}
-      i18n
-      links={getHomeLayoutLinks(dict, locale)}
-      themeSwitch={{
-        mode: "light-dark-system",
-      }}
-    >
+    <HomeLayout {...baseOptions} i18n links={getHomeLayoutLinks(dict, locale)}>
       <div className="mt-12 flex h-full flex-col items-center justify-center text-center md:mt-24">
         <div className="relative h-[275px] w-full max-w-[658px]">
           <Image

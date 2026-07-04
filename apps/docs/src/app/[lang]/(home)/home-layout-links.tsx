@@ -15,6 +15,11 @@ export function getHomeLayoutLinks(dict: Dictionary, _lang: string = "en"): Link
           url: "/docs/react/getting-started",
         },
         {
+          icon: <Iconify icon="palette" />,
+          text: nav.themes,
+          url: "/themes",
+        },
+        {
           icon: <Iconify icon="circles-4-diamond" />,
           text: nav.components,
           url: "/docs/react/components",
@@ -29,6 +34,12 @@ export function getHomeLayoutLinks(dict: Dictionary, _lang: string = "en"): Link
       on: "nav",
       text: nav.docs,
       url: "/docs/react/getting-started",
+    },
+    {
+      active: "nested-url",
+      on: "nav",
+      text: nav.themes,
+      url: "/themes",
     },
     {
       active: "nested-url",

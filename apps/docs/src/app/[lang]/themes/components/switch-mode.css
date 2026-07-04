@@ -1,0 +1,49 @@
+/**
+ * Sun/moon mode toggle — both icons share one grid cell so the button never
+ * changes size; the outgoing icon quarter-turns away as it fades while the
+ * incoming one turns in. Transitions arm only after first paint (--animated)
+ * so a dark-mode visitor doesn't watch the swap replay on every load.
+ */
+.switch-mode-icon {
+  display: grid;
+  place-items: center;
+}
+
+.switch-mode-icon > svg {
+  grid-area: 1 / 1;
+  height: 16px;
+  width: 16px;
+}
+
+.switch-mode-icon--animated > svg {
+  transition:
+    opacity 250ms ease,
+    rotate 250ms ease;
+}
+
+.switch-mode-icon .switch-mode-icon__sun {
+  opacity: 1;
+  rotate: 0deg;
+}
+
+.switch-mode-icon .switch-mode-icon__moon {
+  opacity: 0;
+  rotate: 90deg;
+}
+
+.switch-mode-icon[data-mode="dark"] .switch-mode-icon__sun {
+  opacity: 0;
+  rotate: -90deg;
+}
+
+.switch-mode-icon[data-mode="dark"] .switch-mode-icon__moon {
+  opacity: 1;
+  rotate: 0deg;
+}
+
+/* Reduced motion: the swap is instant. */
+@media (prefers-reduced-motion: reduce) {
+  .switch-mode-icon--animated > svg {
+    transition: none;
+  }
+}
