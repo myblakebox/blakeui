@@ -33,7 +33,7 @@ export function useKeyPress(
       // there would double-handle the same keystroke
       const isCompositeWidget = Boolean(
         target.closest?.(
-          '[role="tab"], [role="tablist"], [role="listbox"], [role="option"], [role="slider"], [role="radiogroup"]',
+          '[role="tab"], [role="tablist"], [role="listbox"], [role="option"], [role="slider"], [role="radiogroup"], [role="grid"], [role="row"], [role="gridcell"], [role="menu"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]',
         ),
       );
 

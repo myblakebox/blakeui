@@ -68,6 +68,7 @@ export function AccentColorSelector() {
         />
         <ColorPicker
           showSwatches
+          placement="bottom"
           showAlpha={false}
           value={value}
           trigger={

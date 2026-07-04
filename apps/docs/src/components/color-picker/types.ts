@@ -3,6 +3,7 @@ import type {
   ColorSliderProps as AriaColorSliderProps,
   Color,
   ColorSpace,
+  Placement,
 } from "react-aria-components";
 
 /* -------------------------------------------------------------------------------------------------
@@ -53,6 +54,8 @@ export interface ColorPickerProps extends Omit<AriaColorPickerProps, "children" 
   trigger?: React.ReactNode;
   /** Class name for popover content */
   popoverClassName?: string;
+  /** Popover placement relative to the trigger; React Aria auto-flips when out of room */
+  placement?: Placement;
   /** Onchange callback */
   onChange?: (color: Color) => void;
 }

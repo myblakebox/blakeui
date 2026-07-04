@@ -5,7 +5,7 @@ import {UNSAFE_PortalProvider} from "@react-aria/overlays";
 import {useTheme} from "next-themes";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
-import {DemoComponents} from "@/components/demo";
+import {ComponentShowcase} from "@/app/[lang]/(home)/components/showcase/component-showcase";
 import {cn} from "@/utils/cn";
 
 import {THEME_BUILDER_CONTENT_ID, iframeTabs} from "../constants";
@@ -97,21 +97,17 @@ export function PreviewContainer() {
           isComponentsTab ? "min-h-full px-4 py-8" : "h-full items-center p-0",
         )}
       >
-        {/* Mobile: always show DemoComponents */}
-        <div className="flex w-full justify-center lg:hidden">
-          {isMounted ? <DemoComponents /> : null}
-        </div>
-        {/* Desktop: respect tab selection */}
+        {/* Single instance — the showcase handles its own breakpoints via matchMedia */}
         <div
           className={cn(
-            "hidden lg:flex lg:w-full lg:flex-1",
-            isComponentsTab ? "lg:flex-col" : "lg:h-full lg:min-h-0 lg:items-center",
+            "flex w-full flex-1",
+            isComponentsTab ? "flex-col" : "h-full min-h-0 items-center",
           )}
         >
           {isComponentsTab ? (
             isMounted ? (
               <div className="my-auto flex justify-center">
-                <DemoComponents />
+                <ComponentShowcase />
               </div>
             ) : null
           ) : iframeSrc ? (

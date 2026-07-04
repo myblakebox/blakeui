@@ -28,12 +28,11 @@ export default async function ThemeBuilderPage({params}: {params: Promise<{lang:
       <CodePanelProvider>
         <Suspense>
           <div
-            className="grid h-dvh grid-rows-[auto_1fr_auto] bg-background px-4 sm:overflow-hidden sm:px-6"
+            className="grid h-dvh grid-rows-[auto_1fr_auto] bg-background px-4 sm:grid-rows-[auto_auto_1fr] sm:overflow-hidden sm:px-6"
             id={THEME_BUILDER_PAGE_ID}
           >
             <BuilderHeader />
-            <ThemeBuilderContent />
-            <div className="mx-auto hidden items-center justify-between gap-4 py-6 max-[1200px]:flex-col sm:flex">
+            <div className="mx-auto hidden items-center justify-between gap-4 pt-0 pb-6 max-[1200px]:flex-col sm:flex">
               <div className="flex items-center gap-4">
                 <AccentColorSelector />
                 <BaseColorSlider />
@@ -55,6 +54,7 @@ export default async function ThemeBuilderPage({params}: {params: Promise<{lang:
                 <ThemePopover />
               </div>
             </div>
+            <ThemeBuilderContent />
             <div className="h-20 w-full sm:hidden" />
             <MobileFooter />
           </div>

@@ -67,7 +67,7 @@ export function ThemePopover() {
           </InputGroup>
         </Popover.Trigger>
       </div>
-      <Popover.Content className="w-[228px] rounded-3xl" placement="top">
+      <Popover.Content className="w-[228px] rounded-3xl" placement="bottom">
         <Popover.Dialog className="p-4">
           <ListBox
             aria-label={dict.theme}
