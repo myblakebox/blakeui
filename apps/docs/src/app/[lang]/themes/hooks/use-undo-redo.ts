@@ -3,6 +3,18 @@
 import {useSearchParams} from "next/navigation";
 import {useCallback, useEffect, useRef, useState} from "react";
 
+// ?template= is not undoable state: the template tabs are hidden and
+// use-preview-tab scrubs stale values with a replaceState write, which adds
+// no browser history entry — mirroring it would desync the stack from
+// window.history and arm a phantom undo.
+function stripTemplateParam(params: string): string {
+  const searchParams = new URLSearchParams(params);
+
+  searchParams.delete("template");
+
+  return searchParams.toString();
+}
+
 export function useUndoRedo() {
   const searchParams = useSearchParams();
   const [canUndo, setCanUndo] = useState(false);
@@ -16,7 +28,7 @@ export function useUndoRedo() {
 
   // Handle URL changes from nuqs or browser navigation
   useEffect(() => {
-    const currentParams = searchParams.toString();
+    const currentParams = stripTemplateParam(searchParams.toString());
 
     // Skip if params haven't actually changed
     if (currentParams === lastSearchParams.current) {
@@ -45,7 +57,7 @@ export function useUndoRedo() {
   // Listen for browser back/forward buttons
   useEffect(() => {
     const handlePopState = () => {
-      const currentParams = window.location.search.slice(1); // Remove leading '?'
+      const currentParams = stripTemplateParam(window.location.search.slice(1));
       const newIndex = historyStack.current.indexOf(currentParams);
 
       if (newIndex !== -1 && newIndex !== currentIndex.current) {

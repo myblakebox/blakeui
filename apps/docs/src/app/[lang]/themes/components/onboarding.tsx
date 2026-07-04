@@ -8,6 +8,8 @@ import {useEffect} from "react";
 
 import {useDictionary} from "@/hooks/use-dictionary";
 
+import {LOCAL_STORAGE_KEYS} from "../constants";
+
 // Keyframe values for each property (loops back to first value)
 const RADIUS_KEYFRAMES = [24, 8, 0, 12, 24];
 const BUTTON_BG_KEYFRAMES = ["#3b82f6", "#6366f1", "#10b981", "#f97316", "#3b82f6"];
@@ -25,16 +27,29 @@ export function Onboarding() {
   const dict = useDictionary().themeBuilder.onboarding;
 
   useEffect(() => {
-    const onboarding = localStorage.getItem("onboarding");
+    const onboarding = localStorage.getItem(LOCAL_STORAGE_KEYS.ONBOARDING);
 
     if (!onboarding) {
       open();
-      localStorage.setItem("onboarding", "true");
     }
   }, []);
 
+  // Mark as seen on dismiss (Continue, backdrop, Escape) rather than on open,
+  // so an abandoned visit re-shows the modal next time.
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+
+    if (!nextOpen) {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.ONBOARDING, "true");
+      } catch {
+        // Storage unavailable (private mode/quota) — the modal re-shows next visit.
+      }
+    }
+  };
+
   return (
-    <Modal isOpen={isOpen} onOpenChange={setOpen}>
+    <Modal isOpen={isOpen} onOpenChange={handleOpenChange}>
       <Modal.Backdrop>
         <Modal.Container size="lg">
           <Modal.Dialog className="max-w-[480px]">

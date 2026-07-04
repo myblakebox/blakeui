@@ -33,7 +33,7 @@ export {
   themeValuesById,
 } from "./theme-values";
 
-export const tabLabels = ["components", "dashboard", "mail", "chat", "finances"] as const;
+export const tabLabels = ["components"] as const;
 
 export type TabLabel = (typeof tabLabels)[number];
 
@@ -265,6 +265,7 @@ export const defaultThemeVariables: ThemeVariables = {
 } as const;
 
 export const LOCAL_STORAGE_KEYS = {
+  ONBOARDING: "onboarding",
   SHUFFLE_WARNING_SHOWN: "shuffle-warning-shown",
 } as const;
 
