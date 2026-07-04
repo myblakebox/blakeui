@@ -33,13 +33,13 @@ export default async function Layout({
         },
       }}
       slots={{
+        // Keep the shared slots (vendored ThemeToggle with the sliding
+        // pill) — a bare object here would clobber baseOptions.slots.
+        ...baseOptions.slots,
         languageSelect: {
           root: LanguageToggleSlot,
           text: LanguageToggleText,
         },
-      }}
-      themeSwitch={{
-        mode: "light-dark-system",
       }}
     >
       {children}

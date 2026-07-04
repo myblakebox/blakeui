@@ -1,0 +1,29 @@
+/* Sliding selection pill for the three-state theme switcher.
+ * Hand-rolled like builder-tabs-pill: library indicators (RAC
+ * SelectionIndicator, Tabs.Indicator) remount a fresh node per selection
+ * under Next 16 / React 19.2, so their transitions never get a start value.
+ * One persistent element, positioned from the selected segment's offsets.
+ * Paint (background, radius) comes from utility classes on the element;
+ * this file only owns mechanics: positioning, transition, reduced motion.
+ */
+.theme-toggle-pill {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  opacity: 0;
+}
+
+/* Armed one frame after first paint so the initial position never slides. */
+.theme-toggle-pill--animated {
+  transition-duration: 250ms;
+  transition-property: translate, width, height;
+  transition-timing-function: var(--ease-out-fluid, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-pill--animated {
+    transition: none;
+  }
+}

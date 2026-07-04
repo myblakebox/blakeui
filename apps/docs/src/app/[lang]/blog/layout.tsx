@@ -17,13 +17,7 @@ export default async function BlogLayout({
   const dict = hasLocale(lang) ? await getDictionary(lang) : await getDictionary("en");
 
   return (
-    <HomeLayout
-      {...baseOptions}
-      links={getHomeLayoutLinks(dict, lang)}
-      themeSwitch={{
-        mode: "light-dark-system",
-      }}
-    >
+    <HomeLayout {...baseOptions} links={getHomeLayoutLinks(dict, lang)}>
       {children}
     </HomeLayout>
   );
