@@ -46,8 +46,11 @@ export function BuilderHeader() {
   useKeyPress("ArrowRight", () => redo(), {enabled: canRedo});
 
   return (
-    <div className="sticky top-0 z-50 mb-3 flex h-14 w-full items-center justify-center bg-background px-2 min-[1200px]:mb-4 min-[1200px]:px-0">
-      <div className="flex h-14 w-full max-w-[1400px] items-center justify-between min-[1200px]:h-14">
+    // Escapes the page grid's px-4/px-6 (-mx) so the max-w-[1400px] wrapper
+    // centers on the viewport with a flat 24px gutter — the same geometry as
+    // the homepage nav, keeping the logo x-position identical across routes.
+    <div className="sticky top-0 z-50 -mx-4 mb-3 flex h-14 items-center justify-center bg-background min-[1200px]:mb-4 sm:-mx-6">
+      <div className="flex h-14 w-full max-w-[1400px] items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Link href={`/${lang}`}>
             <BlakeUILogo />

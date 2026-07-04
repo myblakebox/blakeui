@@ -1,18 +1,32 @@
 "use client";
 
-import {Kbd, Label, Tooltip, cn} from "@blakeui/react";
+import {Button, Kbd, Label, Tooltip, cn} from "@blakeui/react";
 import {useTheme} from "next-themes";
+import {useEffect, useState} from "react";
 
-import {ThemeToggle} from "@/components/fumadocs/ui/theme-toggle";
+import {Moon, Sun} from "@/components/fumadocs/ui/icons";
 import {useDictionary} from "@/hooks/use-dictionary";
+import {useIsMounted} from "@/hooks/use-is-mounted";
 import {useKeyPress} from "@/hooks/use-key-press";
 
+import "./switch-mode.css";
+
 export function SwitchMode({label}: {label?: string}) {
-  const {setTheme, theme} = useTheme();
+  const {resolvedTheme, setTheme} = useTheme();
   const dict = useDictionary().themeBuilder.header;
+  const mounted = useIsMounted();
+  const [animated, setAnimated] = useState(false);
+
+  // Arm the crossfade one frame after mount, once the resolved theme has
+  // painted — otherwise a dark-mode visitor sees the icons swap on load.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setAnimated(true));
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const handleModeSwitch = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+    setTheme(resolvedTheme === "light" ? "dark" : "light");
   };
 
   useKeyPress("s", handleModeSwitch);
@@ -22,7 +36,24 @@ export function SwitchMode({label}: {label?: string}) {
       {label ? <Label>{label}</Label> : null}
       <Tooltip>
         <Tooltip.Trigger>
-          <ThemeToggle className="h-9" mode="light-dark" tabIndex={0} />
+          <Button
+            isIconOnly
+            aria-label={dict.switchMode}
+            size="md"
+            variant="tertiary"
+            onPress={handleModeSwitch}
+          >
+            {/* data-mode gates on mounted so SSR (resolvedTheme undefined) and the
+                hydration render agree — React never patches mismatched attributes,
+                and an unguarded read left dark visitors stuck on the sun icon. */}
+            <span
+              className={cn("switch-mode-icon", animated && "switch-mode-icon--animated")}
+              data-mode={mounted && resolvedTheme === "dark" ? "dark" : "light"}
+            >
+              <Sun className="switch-mode-icon__sun" fill="currentColor" />
+              <Moon className="switch-mode-icon__moon" fill="currentColor" />
+            </span>
+          </Button>
         </Tooltip.Trigger>
         <Tooltip.Content>
           <p>

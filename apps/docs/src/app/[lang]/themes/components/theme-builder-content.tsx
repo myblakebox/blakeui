@@ -49,7 +49,7 @@ export const ThemeBuilderContent = () => {
         hideScrollBar
         visibility="none"
         className={cn(
-          "flex min-h-0 w-full flex-1 flex-col rounded-2xl border border-border/50",
+          "flex min-h-0 w-full flex-1 flex-col",
           isComponentsTab ? "overflow-scroll" : "overflow-hidden",
         )}
       >

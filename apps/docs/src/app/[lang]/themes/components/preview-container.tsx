@@ -6,10 +6,13 @@ import {useTheme} from "next-themes";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 import {ComponentShowcase} from "@/app/[lang]/(home)/components/showcase/component-showcase";
+import {MacWindow} from "@/app/[lang]/(home)/components/showcase/mac-window";
 import {cn} from "@/utils/cn";
 
 import {THEME_BUILDER_CONTENT_ID, iframeTabs} from "../constants";
 import {useComputedThemeVars, useCssSync, usePreviewTab} from "../hooks";
+
+import "./mac-window-frame.css";
 
 const LOADER_DURATION_MS = 250;
 
@@ -94,7 +97,7 @@ export function PreviewContainer() {
         id={THEME_BUILDER_CONTENT_ID}
         className={cn(
           "flex w-full flex-1 bg-background font-sans",
-          isComponentsTab ? "min-h-full px-4 py-8" : "h-full items-center p-0",
+          isComponentsTab ? "min-h-full px-4 pt-8 pb-8 sm:pt-0" : "h-full items-center p-0",
         )}
       >
         {/* Single instance — the showcase handles its own breakpoints via matchMedia */}
@@ -106,8 +109,12 @@ export function PreviewContainer() {
         >
           {isComponentsTab ? (
             isMounted ? (
-              <div className="my-auto flex justify-center">
-                <ComponentShowcase />
+              <div className="my-auto w-full max-w-[1200px] self-center">
+                <MacWindow showCluster={false} title="theme editor">
+                  <div className="flex w-full justify-center pt-8">
+                    <ComponentShowcase />
+                  </div>
+                </MacWindow>
               </div>
             ) : null
           ) : iframeSrc ? (

@@ -32,7 +32,7 @@ export default async function ThemeBuilderPage({params}: {params: Promise<{lang:
             id={THEME_BUILDER_PAGE_ID}
           >
             <BuilderHeader />
-            <div className="mx-auto hidden items-center justify-between gap-4 pt-0 pb-6 max-[1200px]:flex-col sm:flex">
+            <div className="mx-auto hidden items-center justify-between gap-4 pt-0 pb-2 max-[1200px]:flex-col sm:flex">
               <div className="flex items-center gap-4">
                 <AccentColorSelector />
                 <BaseColorSlider />

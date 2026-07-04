@@ -83,6 +83,12 @@ function getAccentStyleVars(color: Color, theme: "light" | "dark"): Record<strin
 
 interface MacWindowProps {
   children: ReactNode;
+  /**
+   * Renders the interactive right cluster (reset + accent swatches + theme
+   * builder link). Off, the frame is pure decoration: the whole titlebar is
+   * aria-hidden and nothing inside it is interactive.
+   */
+  showCluster?: boolean;
   /** Address-pill text centered in the bar; pass an empty string to hide it. */
   title?: string;
 }
@@ -96,7 +102,7 @@ interface MacWindowProps {
  * the framed content via inline vars on mw-content, and a link into the
  * theme builder.
  */
-export function MacWindow({children, title = "blakeui.com"}: MacWindowProps) {
+export function MacWindow({children, showCluster = true, title = "blakeui.com"}: MacWindowProps) {
   const dict = useDictionary();
   const [selectedColor, setSelectedColor] = useState<Color | null>(null);
   const {resolvedTheme} = useTheme();
@@ -109,7 +115,7 @@ export function MacWindow({children, title = "blakeui.com"}: MacWindowProps) {
 
   return (
     <figure className="mac-window" role="presentation">
-      <div className="mw-titlebar">
+      <div aria-hidden={showCluster ? undefined : true} className="mw-titlebar">
         <span aria-hidden="true" className="mw-dots">
           <span className="mw-dot mw-close" />
           <span className="mw-dot mw-min" />
@@ -121,55 +127,57 @@ export function MacWindow({children, title = "blakeui.com"}: MacWindowProps) {
             {title}
           </span>
         ) : null}
-        <div className="mw-cluster">
-          <Tooltip delay={0}>
-            <Tooltip.Trigger>
-              <Button
-                isIconOnly
-                aria-label={dict.themeBuilder.resetButton.tooltip}
-                className="text-muted"
-                size="sm"
-                variant="ghost"
-                onPress={() => setSelectedColor(null)}
-              >
-                <Iconify icon="arrow-rotate-left" />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content className="py-0">
-              {dict.themeBuilder.resetButton.tooltip}
-            </Tooltip.Content>
-          </Tooltip>
-          <ColorSwatchPicker
-            aria-label={dict.themeBuilder.accentColor.label}
-            size="sm"
-            value={selectedColor ?? NO_SELECTION}
-            onChange={setSelectedColor}
-          >
-            {ACCENT_SWATCHES.map((color) => (
-              <ColorSwatchPicker.Item key={color} color={color}>
-                <ColorSwatchPicker.Swatch />
-                <ColorSwatchPicker.Indicator />
-              </ColorSwatchPicker.Item>
-            ))}
-          </ColorSwatchPicker>
-          <Tooltip delay={0}>
-            <Tooltip.Trigger>
-              <LocaleLink
-                aria-label={dict.nav.themes}
-                href="/themes"
-                className={buttonVariants({
-                  className: "text-muted",
-                  isIconOnly: true,
-                  size: "sm",
-                  variant: "ghost",
-                })}
-              >
-                <Iconify icon="palette" />
-              </LocaleLink>
-            </Tooltip.Trigger>
-            <Tooltip.Content className="py-0">{dict.nav.themes}</Tooltip.Content>
-          </Tooltip>
-        </div>
+        {showCluster ? (
+          <div className="mw-cluster">
+            <Tooltip delay={0}>
+              <Tooltip.Trigger>
+                <Button
+                  isIconOnly
+                  aria-label={dict.themeBuilder.resetButton.tooltip}
+                  className="text-muted"
+                  size="sm"
+                  variant="ghost"
+                  onPress={() => setSelectedColor(null)}
+                >
+                  <Iconify icon="arrow-rotate-left" />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content className="py-0">
+                {dict.themeBuilder.resetButton.tooltip}
+              </Tooltip.Content>
+            </Tooltip>
+            <ColorSwatchPicker
+              aria-label={dict.themeBuilder.accentColor.label}
+              size="sm"
+              value={selectedColor ?? NO_SELECTION}
+              onChange={setSelectedColor}
+            >
+              {ACCENT_SWATCHES.map((color) => (
+                <ColorSwatchPicker.Item key={color} color={color}>
+                  <ColorSwatchPicker.Swatch />
+                  <ColorSwatchPicker.Indicator />
+                </ColorSwatchPicker.Item>
+              ))}
+            </ColorSwatchPicker>
+            <Tooltip delay={0}>
+              <Tooltip.Trigger>
+                <LocaleLink
+                  aria-label={dict.nav.themes}
+                  href="/themes"
+                  className={buttonVariants({
+                    className: "text-muted",
+                    isIconOnly: true,
+                    size: "sm",
+                    variant: "ghost",
+                  })}
+                >
+                  <Iconify icon="palette" />
+                </LocaleLink>
+              </Tooltip.Trigger>
+              <Tooltip.Content className="py-0">{dict.nav.themes}</Tooltip.Content>
+            </Tooltip>
+          </div>
+        ) : null}
       </div>
       <div className="mw-content" style={accentVars as CSSProperties}>
         {children}
