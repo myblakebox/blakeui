@@ -22,7 +22,11 @@ export const DEFAULT_ACCENT = {
 
 const SEMANTIC_HUE_BLEND_FACTOR = 0.12; // 12% influence from base hue
 
-// Default theme values from variables.css - these are the baseline that will be adjusted
+// Baseline neutral tables for generated themes (presets and custom). Only the
+// `l` column reaches output — hue and chroma are recomputed per token from the
+// user's accent hue and base (grayChroma). The Default preset does not flow
+// through these tables: it emits the shipped theme verbatim
+// (see ../shipped-default-vars.ts).
 const DEFAULT_THEME_VALUES = {
   dark: {
     background: {c: 0.005, h: 285.823, l: 0.12},
@@ -66,15 +70,21 @@ const DEFAULT_THEME_VALUES = {
   },
 };
 
-// Semantic color defaults (from variables.css)
+// Semantic color defaults for generated themes. Danger mirrors the shipped
+// brick red; success and warning remain generator-tuned.
 const SEMANTIC_COLORS = {
+  // Shipped brick danger (variables.css: oklch(0.4877 0.1944 30.2), both
+  // modes). Chroma is pre-divided by the Default-base chromaBoost
+  // (0.1944 / (1 + 2 * 0.0041) = 0.19282) so themes at the Default base
+  // render the shipped 0.1944 exactly after the boost. L 0.4877 sits below
+  // the 0.67 foreground threshold, so danger foreground stays snow —
+  // matching shipped var(--snow).
   danger: {
-    chromaDark: 0.1967,
-    chromaLight: 0.2328,
-    hue: 25.74,
-    hueDark: 24.63,
-    lightnessDark: 0.594,
-    lightnessLight: 0.6532,
+    chromaDark: 0.19282,
+    chromaLight: 0.19282,
+    hue: 30.2,
+    lightnessDark: 0.4877,
+    lightnessLight: 0.4877,
   },
   success: {
     chromaDark: 0.1935,
