@@ -1,5 +1,6 @@
 "use client";
 
+import type {ThemeId} from "../constants";
 import type {SemanticOverrides} from "../utils/generate-theme-colors";
 
 import {useEffect} from "react";
@@ -14,6 +15,7 @@ import {
   radiusCssMap,
   themeValuesById,
 } from "../constants";
+import {getShippedThemeVariables} from "../shipped-default-vars";
 import {getCustomFontInfoFromUrl, injectFontLink, isCustomFontUrl} from "../utils/font-utils";
 import {
   calculateAccentForeground,
@@ -197,13 +199,26 @@ function getThemeColorsCSS(
   lightness: number,
   grayChroma: number,
   commonVars: Record<string, string>,
+  matchingThemeId: ThemeId | undefined,
   semanticOverrides?: SemanticOverrides,
   vibrant?: boolean,
 ): string {
-  const colors = generateThemeColors({chroma, grayChroma, hue, lightness, semanticOverrides});
+  // At Default, emit the shipped theme verbatim instead of generator output
+  // (see shipped-default-vars.ts).
+  const shipped = getShippedThemeVariables(matchingThemeId);
 
-  const lightVars = getColorVariablesForElement(colors, "light");
-  const darkVars = getColorVariablesForElement(colors, "dark");
+  let lightVars: Record<string, string>;
+  let darkVars: Record<string, string>;
+
+  if (shipped) {
+    lightVars = shipped.light;
+    darkVars = shipped.dark;
+  } else {
+    const colors = generateThemeColors({chroma, grayChroma, hue, lightness, semanticOverrides});
+
+    lightVars = getColorVariablesForElement(colors, "light");
+    darkVars = getColorVariablesForElement(colors, "dark");
+  }
 
   const derivedOpts = {vibrant};
   const colorLightVars = {...lightVars, ...getDerivedColorFormulas("light", derivedOpts)};
@@ -372,6 +387,7 @@ export function useCssSync() {
         lightness,
         base,
         commonVars,
+        matchingThemeId,
         semanticOverrides,
         vibrant,
       );

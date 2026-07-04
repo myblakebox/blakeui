@@ -11,6 +11,7 @@ import {
   radiusCssMap,
   themeValuesById,
 } from "../constants";
+import {getShippedThemeVariables} from "../shipped-default-vars";
 import {getCustomFontInfoFromUrl, isCustomFontUrl} from "../utils/font-utils";
 import {
   calculateAccentForeground,
@@ -149,16 +150,28 @@ export function computeThemeVars(variables: ThemeValues): ComputedThemeVars {
     };
   }
 
-  // Standard (non-adaptive) colors
-  const colors = generateThemeColors({
-    chroma,
-    grayChroma: base,
-    hue,
-    lightness,
-    semanticOverrides,
-  });
-  const lightVars = getColorVariablesForElement(colors, "light");
-  const darkVars = getColorVariablesForElement(colors, "dark");
+  // Standard (non-adaptive) colors. At Default, emit the shipped theme
+  // verbatim instead of generator output (see shipped-default-vars.ts).
+  const shipped = getShippedThemeVariables(matchingThemeId);
+
+  let lightVars: Record<string, string>;
+  let darkVars: Record<string, string>;
+
+  if (shipped) {
+    lightVars = shipped.light;
+    darkVars = shipped.dark;
+  } else {
+    const colors = generateThemeColors({
+      chroma,
+      grayChroma: base,
+      hue,
+      lightness,
+      semanticOverrides,
+    });
+
+    lightVars = getColorVariablesForElement(colors, "light");
+    darkVars = getColorVariablesForElement(colors, "dark");
+  }
 
   const colorLightVars = {...lightVars, ...getDerivedColorFormulas("light", derivedOpts)};
   const colorDarkVars = {...darkVars, ...getDerivedColorFormulas("dark", derivedOpts)};

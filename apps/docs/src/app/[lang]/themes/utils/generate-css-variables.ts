@@ -8,6 +8,7 @@ import {
   radiusCssMap,
   themeValuesById,
 } from "../constants";
+import {getShippedThemeVariables} from "../shipped-default-vars";
 
 /**
  * Custom font info for generating CSS variables
@@ -92,12 +93,30 @@ export function generateMinimalCssVariables(
     ? themeValuesById[matchingThemeId].semanticOverrides
     : undefined;
 
-  // Generate theme colors
-  const colors = generateThemeColors({chroma, grayChroma: base, hue, lightness, semanticOverrides});
+  // At Default, export the shipped theme verbatim instead of generator
+  // output (see shipped-default-vars.ts).
+  const shipped = getShippedThemeVariables(matchingThemeId);
 
-  // Get base variables for both themes
-  const lightVars = getBaseColorVariables(colors, "light");
-  const darkVars = getBaseColorVariables(colors, "dark");
+  let lightVars: Record<string, string>;
+  let darkVars: Record<string, string>;
+
+  if (shipped) {
+    lightVars = shipped.light;
+    darkVars = shipped.dark;
+  } else {
+    // Generate theme colors
+    const colors = generateThemeColors({
+      chroma,
+      grayChroma: base,
+      hue,
+      lightness,
+      semanticOverrides,
+    });
+
+    // Get base variables for both themes
+    lightVars = getBaseColorVariables(colors, "light");
+    darkVars = getBaseColorVariables(colors, "dark");
+  }
 
   // Override accent for adaptive colors (like black/white)
   if (adaptiveConfig) {
