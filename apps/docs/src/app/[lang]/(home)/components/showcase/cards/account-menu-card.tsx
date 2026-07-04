@@ -15,7 +15,7 @@ import {prefersReducedMotion} from "../use-replay";
 const THUMB_SLIDE_MS = 320;
 
 export function AccountMenuCard() {
-  const {resolvedTheme, setTheme} = useTheme();
+  const {resolvedTheme, setTheme, theme} = useTheme();
   const isMounted = useIsMounted();
   const themeIsDark = isMounted && resolvedTheme === "dark";
 
@@ -32,14 +32,22 @@ export function AccountMenuCard() {
 
   useEffect(() => () => clearTimeout(pendingThemeRef.current), []);
 
-  // Sync from external changes (the header toggle drives the same next-themes
-  // state). Delayed a tick so the slide starts after next-themes has removed
-  // its transition-kill style — the thumb animates in this direction too.
+  // Sync from external changes (any control driving the same next-themes
+  // state) and drop a still-pending deferred write — the user's most recent
+  // action wins, and a cancelled press must not leave the thumb stranded.
+  // Watching `theme` as well catches switches to "system" that leave
+  // resolvedTheme unchanged. The card's own deferred write also lands here,
+  // but its timer has already fired, so the clear is a no-op and the sync
+  // confirms the state it just set. The sync is delayed a tick so the slide
+  // starts after next-themes has removed its transition-kill style — the
+  // thumb animates in this direction too.
   useEffect(() => {
+    clearTimeout(pendingThemeRef.current);
+
     const timeout = setTimeout(() => setIsDark(themeIsDark), 60);
 
     return () => clearTimeout(timeout);
-  }, [themeIsDark]);
+  }, [theme, themeIsDark]);
 
   const toggleTheme = (selected: boolean) => {
     setIsDark(selected);
