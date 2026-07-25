@@ -91,3 +91,6 @@ apps/docs/public/skills
 
 # SEO analysis output
 .seo-output
+
+# Machine-local Claude Code preview launch config (absolute paths; not shared)
+.claude/launch.json
