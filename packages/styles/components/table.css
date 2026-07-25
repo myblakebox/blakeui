@@ -77,9 +77,9 @@
    gray column children (h=40) end 2px above the rounded clip edge and their bottom
    corners read as square. Putting bg-default here makes the rounded clip box itself
    the pill. Scoped to :not(thead) so the real <thead> keeps its column-carried pill.
-   mb-1.5 = 6px gap below, matching the tbody spacer. */
+   The 6px gap below is carried by the tbody::before spacer row, not a header margin. */
 .table-root--primary .table__header:not(thead) {
-  @apply mb-1.5 overflow-clip bg-default;
+  @apply overflow-clip bg-default;
   border-radius: min(32px, var(--radius-2xl));
 }
 /* The header div above is the pill (bg + radius + clip on one element). Its column
