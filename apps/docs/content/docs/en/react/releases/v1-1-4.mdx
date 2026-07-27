@@ -1,0 +1,77 @@
+---
+title: v1.1.4
+description: Light-theme border and separator tokens warmed so hairlines sit in the same family as the page background and control surfaces. Lightness, contrast, and the dark theme are unchanged.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">July 27, 2026</span>
+</div>
+
+A single temperature correction to the light theme. Hairlines now sit in the same warm family as the page background and control surfaces instead of leaning cool against them.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Fixes
+
+### Theme — warmer light-theme hairlines
+
+In the light theme, `--border` and `--separator` sat at hue 286°, while the two chrome tokens that carry real hue are warm: `--background` at 91° and `--default` at 97°. Borders and separators drawn over the page read as belonging to a different system than the surfaces around them.
+
+Both tokens now sit at hue 97.36 to match `--default`, with chroma raised from 0.004 to 0.008:
+
+```css
+:root {
+  --border: oklch(90% 0.008 97.36);
+  --separator: oklch(92% 0.008 97.36);
+}
+```
+
+The chroma increase is deliberate. A pure hue rotation at the old chroma of 0.004 would have moved the rendered color by only a few values out of 255 — a correction too small to read. At 0.008 the shift is visible while still staying inside `--default`'s own chroma range, so chrome never becomes the most saturated thing in the palette.
+
+Lightness is unchanged at 90% and 92%. This is a temperature change, not a contrast change: measured contrast against `--surface`, `--background`, and `--surface-secondary` moves by less than 0.007 in every pairing.
+
+The dark theme is untouched. Its surfaces are genuinely cool and its background is achromatic, so cool hairlines are correct there.
+
+If you override `--border` or `--separator` in your own theme, nothing changes for you.
+
+## Links
+
+- [Theming](/docs/react/getting-started/theming)
+- [Colors](/docs/react/getting-started/colors)
+- [Dark mode](/docs/react/getting-started/dark-mode)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)

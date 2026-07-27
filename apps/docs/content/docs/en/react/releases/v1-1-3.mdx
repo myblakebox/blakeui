@@ -1,0 +1,70 @@
+---
+title: v1.1.3
+description: Overlay entrance and exit easing corrected across eight components, reduced-motion guards added to overlay keyframes, and a stray margin removed from the virtualized table header.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">July 27, 2026</span>
+</div>
+
+A motion-focused fix release. Overlay entrances and exits now ease out instead of running through a symmetric curve, readers who ask for reduced motion get the keyframe animations suppressed rather than only the transitions, and an inert margin is gone from the virtualized table header.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Fixes
+
+### Overlays — entrance and exit easing
+
+Eight overlay components drove their enter and exit keyframes through `--ease-smooth`, which the theme defines as plain `ease` — a symmetric curve that accelerates into the entrance and decelerates out of it, making overlays feel like they hesitate before settling. Entrances now use `--ease-out-quint` and exits `--ease-out-quad`, so both start fast and settle.
+
+This affects ColorPicker, ComboBox, DatePicker, DateRangePicker, Dropdown, Popover, Select, and Tooltip.
+
+### Overlays — reduced motion
+
+Nine overlays guarded their transitions against `prefers-reduced-motion` but not their keyframe animations, so a reader who had opted out still got the full zoom-and-fade entrance. Those keyframes are now suppressed too. This covers the eight components above plus Autocomplete.
+
+### Table — virtualized header spacing
+
+The virtualized table header carried an inert margin that served no layout purpose. It has been removed.
+
+## Links
+
+- [Animation](/docs/react/getting-started/animation)
+- [Popover component](/docs/react/components/popover)
+- [Table component](/docs/react/components/table)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
