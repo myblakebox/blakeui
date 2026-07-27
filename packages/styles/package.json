@@ -41,8 +41,10 @@
     "fonts"
   ],
   "scripts": {
+    "prebuild": "node scripts/sync-readme-theme-vars.mjs --check",
     "build": "node scripts/build.mjs --tsc",
     "dev": "rollup -c rollup.config.mjs --watch",
+    "sync:readme": "node scripts/sync-readme-theme-vars.mjs",
     "measure-size": "node scripts/measure-bundle-size.mjs",
     "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo",
     "prepack": "clean-package",
