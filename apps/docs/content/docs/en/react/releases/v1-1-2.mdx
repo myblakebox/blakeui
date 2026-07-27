@@ -1,0 +1,72 @@
+---
+title: v1.1.2
+description: Table header and row pills normalized to the secondary variant's radius, and ListBox focus rings no longer clipped at the first and last items.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">June 18, 2026</span>
+</div>
+
+A small follow-up to the v1.1.1 Table redesign. Two visual fixes: the primary Table's rounding now matches the secondary variant, and edge items in any ListBox keep their full focus ring.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Fixes
+
+### Table — consistent pill radius
+
+The primary variant's header pill and row pills were rounded to `lg` while the secondary variant used `2xl`, so the two variants did not line up side by side. Both now round to `min(32px, var(--radius-2xl))`, applied consistently across the standard, paginated, async-loading, and virtualized tables.
+
+Because the radius is expressed against `--radius-2xl`, it still tracks a custom `--radius` scale, and the `min()` keeps the pill from over-rounding at large scales.
+
+### ListBox — focus rings no longer clipped
+
+`.list-box` combined `overflow-clip` with 4px of padding, but an item's focus ring extends about 4px (`ring-2` plus a 2px offset). The first and last items therefore had their rounded rings grazed by the clip boundary. Base padding is now 6px so the ring clears the edge.
+
+This affected every ListBox usage, including Select and Autocomplete dropdowns. Both had carried local overrides for the same reason; those are gone now that the base provides the clearance.
+
+## Documentation
+
+A **With Filters** example was added to the Table page, showing filter controls driving the table's own state.
+
+## Links
+
+- [Table component](/docs/react/components/table)
+- [ListBox component](/docs/react/components/list-box)
+- [Select component](/docs/react/components/select)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
