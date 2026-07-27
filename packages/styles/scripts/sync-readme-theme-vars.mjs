@@ -260,6 +260,37 @@ function replaceRegion(readme, id, content) {
   return readme.replace(region, `$1${content}$2`);
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Naming what drifted
+ * -----------------------------------------------------------------------------------------------*/
+
+// Keyed by token, valued by every declaration of it in document order, so a
+// token declared in both the light and dark blocks is compared as a pair rather
+// than collapsing to whichever came last.
+function declarationsByToken(text) {
+  const byToken = new Map();
+
+  for (const line of text.split("\n")) {
+    const match = line.match(/^\s*(--[a-z0-9-]+)\s*:/i);
+
+    if (!match) continue;
+    byToken.set(match[1], [...(byToken.get(match[1]) ?? []), line.trim()]);
+  }
+
+  return byToken;
+}
+
+function driftedTokens(current, next) {
+  const before = declarationsByToken(current);
+  const after = declarationsByToken(next);
+
+  return [...new Set([...before.keys(), ...after.keys()])]
+    .sort()
+    .filter(
+      (token) => (before.get(token) ?? []).join("\n") !== (after.get(token) ?? []).join("\n"),
+    );
+}
+
 const blocks = parseShippedCss();
 const current = fs.readFileSync(README_PATH, "utf8");
 
@@ -275,9 +306,14 @@ if (next === current) {
 }
 
 if (CHECK_ONLY) {
+  const drifted = driftedTokens(current, next);
+
   console.error(
     `✗ README.md theme snippets are out of sync with the shipped default theme\n` +
       `  (${path.relative(rootDir, CSS_PATH)})\n\n` +
+      // Empty when the difference is structural (a group reordered, a heading
+      // renamed) rather than a changed declaration.
+      (drifted.length ? `  Drifted: ${drifted.join(", ")}\n\n` : "") +
       `  Run: pnpm --filter @blakeui/styles sync:readme`,
   );
   process.exit(1);
