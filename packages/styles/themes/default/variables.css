@@ -90,8 +90,8 @@
     --segment-foreground: var(--eclipse);
 
     /* Misc Colors */
-    --border: oklch(90% 0.004 286.32);
-    --separator: oklch(92% 0.004 286.32);
+    --border: oklch(90% 0.008 97.36);
+    --separator: oklch(92% 0.008 97.36);
     --focus: var(--accent);
     --link: var(--foreground);
 
