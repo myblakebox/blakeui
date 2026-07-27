@@ -132,19 +132,17 @@ The package provides a comprehensive set of CSS variables for customization:
 
 #### Layout Tokens
 
+<!-- theme-vars:layout -->
+
 ```css
 :root {
   /* Spacing */
   --spacing: 0.25rem;
 
   /* Border */
-  --border-width: 0px; /* no border by default */
-  --field-border-width: var(--border-width);
+  --border-width: 1px;
+  --field-border-width: 0px;
   --disabled-opacity: 0.5;
-
-  /* Radius */
-  --radius: 0.5rem;
-  --field-radius: calc(var(--radius) * 1.5);
 
   /* Ring offset - Used for focus ring */
   --ring-offset-width: 2px;
@@ -152,10 +150,18 @@ The package provides a comprehensive set of CSS variables for customization:
   /* Cursor */
   --cursor-interactive: pointer;
   --cursor-disabled: not-allowed;
+
+  /* Radius */
+  --radius: 0.5rem;
+  --field-radius: calc(var(--radius) * 1.5);
 }
 ```
 
+<!-- /theme-vars:layout -->
+
 #### Theme Colors
+
+<!-- theme-vars:colors -->
 
 ```css
 :root {
@@ -166,59 +172,121 @@ The package provides a comprehensive set of CSS variables for customization:
   --eclipse: oklch(0.2103 0.0059 285.89);
 
   /* Base Colors */
-  --background: oklch(0.9702 0 0);
-  --foreground: var(--eclipse);
+  --background: oklch(0.982 0.0041 91.45); /* #FAF9F6 */
+  --foreground: oklch(0.3172 0.0214 281.35); /* #30313D */
 
   /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */
   --surface: var(--white);
   --surface-foreground: var(--foreground);
+  --surface-secondary: oklch(0.9524 0.0013 286.37);
+  --surface-secondary-foreground: var(--foreground);
+  --surface-tertiary: oklch(0.9373 0.0013 286.37);
+  --surface-tertiary-foreground: var(--foreground);
 
   /* Overlay: Used for floating/overlay components (tooltips, popovers, modals, menus) */
   --overlay: var(--white);
   --overlay-foreground: var(--foreground);
 
+  /* Muted & Scrollbar */
   --muted: oklch(0.5517 0.0138 285.94);
-  --scrollbar: oklch(87.1% 0.006 286.286);
-
-  --default: oklch(94% 0.001 286.375);
-  --default-foreground: var(--eclipse);
+  --scrollbar: var(--scrollbar-thumb);
+  --scrollbar-thumb: color-mix(in oklch, var(--foreground) 15%, transparent);
+  --scrollbar-track: transparent;
 
   /* Interactive Colors */
-  --accent: oklch(0.6204 0.195 253.83);
+  --default: oklch(91.82% 0.0068 97.36); /* #E5E4DF */
+  --default-foreground: var(--eclipse);
+  --accent: oklch(0.4863 0.0647 250.76); /* #436283 */
   --accent-foreground: var(--snow);
 
   /* Status Colors */
   --success: oklch(0.7329 0.1935 150.81);
   --success-foreground: var(--eclipse);
-
   --warning: oklch(0.7819 0.1585 72.33);
   --warning-foreground: var(--eclipse);
-
-  --danger: oklch(0.6532 0.2328 25.74);
+  --danger: oklch(0.4877 0.1944 30.2); /* #B40E00 */
   --danger-foreground: var(--snow);
 
   /* Component Colors */
   --segment: var(--white);
   --segment-foreground: var(--eclipse);
 
-  /* UI Colors */
-  --border: oklch(0 0 0 / 0%);
-  --separator: oklch(92% 0.004 286.32);
+  /* Misc Colors */
+  --border: oklch(90% 0.008 97.36);
+  --separator: oklch(92% 0.008 97.36);
   --focus: var(--accent);
   --link: var(--foreground);
+  --backdrop: rgba(0, 0, 0, 0.5);
 
   /* Shadows */
   --surface-shadow:
-    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(0, 0, 0, 0.06);
-  --overlay-shadow: 0 4px 16px 0 rgba(24, 24, 27, 0.08), 0 8px 24px 0 rgba(24, 24, 27, 0.09);
+    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    0 0 1px 0 rgba(0, 0, 0, 0.06);
+  --overlay-shadow:
+    0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 -6px 12px 0 rgba(0, 0, 0, 0.03),
+    0 14px 28px 0 rgba(0, 0, 0, 0.08);
   --field-shadow:
-    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06), 0 0 1px 0 rgba(0, 0, 0, 0.06);
+    0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    0 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.dark,
+[data-theme="dark"] {
+  /* Base Colors */
+  --background: oklch(0.3092 0 0); /* #303030 */
+  --foreground: var(--snow);
+
+  /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */
+  --surface: oklch(0.2103 0.0059 285.89);
+  --surface-foreground: var(--foreground);
+  --surface-secondary: oklch(0.257 0.0037 286.14);
+  --surface-tertiary: oklch(0.2721 0.0024 247.91);
+
+  /* Overlay: Used for floating/overlay components (tooltips, popovers, modals, menus) */
+  --overlay: oklch(0.2103 0.0059 285.89);
+  --overlay-foreground: var(--foreground);
+
+  /* Muted & Scrollbar */
+  --muted: oklch(70.5% 0.015 286.067);
+  --scrollbar: var(--scrollbar-thumb);
+  --scrollbar-thumb: color-mix(in oklch, var(--foreground) 15%, transparent);
+  --scrollbar-track: transparent;
+
+  /* Interactive Colors */
+  --default: oklch(27.4% 0.006 286.033);
+  --default-foreground: var(--snow);
+
+  /* Status Colors */
+  --warning: oklch(0.8203 0.1388 76.34);
+  --warning-foreground: var(--eclipse);
+  --danger: oklch(0.4877 0.1944 30.2); /* #B40E00 */
+  --danger-foreground: var(--snow);
+
+  /* Component Colors */
+  --segment: oklch(0.3964 0.01 285.93);
+  --segment-foreground: var(--foreground);
+
+  /* Misc Colors */
+  --border: oklch(28% 0.006 286.033);
+  --separator: oklch(25% 0.006 286.033);
+  --focus: var(--accent);
+  --link: var(--foreground);
+  --backdrop: rgba(0, 0, 0, 0.6);
+
+  /* Shadows */
+  --surface-shadow: 0 0 0 0 transparent inset; /* No shadow on dark mode */
+  --overlay-shadow: 0 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+  --field-shadow: 0 0 0 0 transparent inset; /* Transparent shadow to allow ring utilities to work */
 }
 ```
 
-**Note**: Dark mode overrides specific variables (like `--background`, `--surface`, `--overlay`, `--muted`, `--scrollbar`, `--default`, `--warning`, `--danger`, `--segment`, `--separator`, and shadow values) when `.dark` class or `[data-theme="dark"]` attribute is applied.
+<!-- /theme-vars:colors -->
+
+**Note**: The `.dark` block redeclares only the tokens shown above; every other token inherits its `:root` value. Tokens listed once (`--accent`, `--success`, the primitives) are therefore shared by both modes.
 
 #### Field Tokens
+
+<!-- theme-vars:field -->
 
 ```css
 :root {
@@ -227,10 +295,19 @@ The package provides a comprehensive set of CSS variables for customization:
   --field-foreground: oklch(0.2103 0.0059 285.89);
   --field-placeholder: var(--muted);
   --field-border: transparent; /* no border by default on form fields */
-  --field-border-width: var(--border-width);
+  --field-border-width: 0px;
   --field-radius: calc(var(--radius) * 1.5);
 }
+
+.dark,
+[data-theme="dark"] {
+  /* Form field defaults */
+  --field-background: oklch(0.2103 0.0059 285.89);
+  --field-foreground: var(--foreground);
+}
 ```
+
+<!-- /theme-vars:field -->
 
 Providing any of these knobs automatically updates the generated utilities (`bg-field`, `placeholder:text-field-placeholder`, `rounded-field`, etc.) along with the calculated hover/focus variants.
 
