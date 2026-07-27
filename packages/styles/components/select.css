@@ -172,6 +172,7 @@
   &[data-exiting="true"],
   &[data-entering="true"] {
     @apply transition-[opacity,transform] will-change-[opacity,transform];
+    @apply motion-reduce:animate-none;
   }
 
   /* Arrow styling */
