@@ -1,0 +1,296 @@
+{
+  "default": {
+    "lightness": 0.4863,
+    "chroma": 0.0647,
+    "hue": 250.76,
+    "base": 0.0041,
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "large"
+  },
+  "sky": {
+    "lightness": 0.78,
+    "chroma": 0.16,
+    "hue": 225,
+    "base": 0.0041,
+    "focusLightness": {
+      "light": 0.59
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "large"
+  },
+  "lavender": {
+    "lightness": 0.77,
+    "chroma": 0.13,
+    "hue": 305,
+    "base": 0.0041,
+    "focusLightness": {
+      "light": 0.63
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "large"
+  },
+  "mint": {
+    "lightness": 0.82,
+    "chroma": 0.12,
+    "hue": 155,
+    "base": 0.0041,
+    "focusLightness": {
+      "light": 0.6
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "large"
+  },
+  "netflix": {
+    "lightness": 0.5814,
+    "chroma": 0.2349,
+    "hue": 27.99,
+    "base": 0,
+    "fontFamily": "figtree",
+    "radius": "extra-small",
+    "formRadius": "extra-small",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.4964 0.1994 28.56)"
+        },
+        "success": {
+          "color": "oklch(0.7677 0.1899 148.1)"
+        },
+        "warning": {
+          "color": "oklch(0.8239 0.153 74.6)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.4823 0.1938 27.64)"
+        },
+        "success": {
+          "color": "oklch(0.5148 0.1337 146.82)"
+        },
+        "warning": {
+          "color": "oklch(0.561 0.116571 78.9352)"
+        }
+      }
+    }
+  },
+  "uber": {
+    "lightness": 0,
+    "chroma": 0,
+    "hue": 0,
+    "base": 0,
+    "darkAccent": {
+      "chroma": 0,
+      "hue": 0,
+      "lightness": 0.9848
+    },
+    "fontFamily": "figtree",
+    "radius": "small",
+    "formRadius": "small",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.7044 0.1872 23.19)"
+        },
+        "success": {
+          "color": "oklch(0.6514 0.1321 156.22)"
+        },
+        "warning": {
+          "color": "oklch(0.8803 0.1348 86.06)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.573 0.2249 21.97)"
+        },
+        "success": {
+          "color": "oklch(0.6277 0.1604 153.06)"
+        },
+        "warning": {
+          "color": "oklch(0.8446 0.1525 80.6)"
+        }
+      }
+    }
+  },
+  "spotify": {
+    "lightness": 0.7697,
+    "chroma": 0.2124,
+    "hue": 148.67,
+    "base": 0.002,
+    "focusLightness": {
+      "light": 0.58
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "extra-small",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.5931 0.2338 25.42)"
+        },
+        "success": {
+          "color": "oklch(0.7697 0.2124 148.67)"
+        },
+        "warning": {
+          "color": "oklch(0.7921 0.1626 67.42)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.5509 0.2166 25.29)"
+        },
+        "success": {
+          "color": "oklch(0.6072 0.1647 149.02)"
+        },
+        "warning": {
+          "color": "oklch(0.6972 0.1687 54.22)"
+        }
+      }
+    }
+  },
+  "coinbase": {
+    "lightness": 0.5282,
+    "chroma": 0.2628,
+    "hue": 262.87,
+    "base": 0.002,
+    "focusLightness": {
+      "dark": 0.58
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "extra-small",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.6545 0.2145 22.31)"
+        },
+        "success": {
+          "color": "oklch(0.7574 0.180554 156.931)"
+        },
+        "warning": {
+          "color": "oklch(0.8095 0.1119 61.69)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.5507 0.2062 24)"
+        },
+        "success": {
+          "color": "oklch(0.5438 0.1268 157.17)"
+        },
+        "warning": {
+          "color": "oklch(0.8095 0.1119 61.69)"
+        }
+      }
+    }
+  },
+  "airbnb": {
+    "lightness": 0.6579,
+    "chroma": 0.2309,
+    "hue": 17.07,
+    "base": 0,
+    "focusLightness": {
+      "light": 0.64
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "large",
+    "semanticOverrides": {
+      "dark": {
+        "accentForeground": "oklch(0.9911 0 0)",
+        "danger": {
+          "color": "oklch(0.5392 0.1816 33.72)",
+          "foreground": "oklch(0.9911 0 0)"
+        },
+        "success": {
+          "color": "oklch(0.652 0.114864 185.0749)",
+          "foreground": "oklch(0.9911 0 0)"
+        },
+        "warning": {
+          "color": "oklch(0.8197 0.170602 78.4658)"
+        }
+      },
+      "light": {
+        "accentForeground": "oklch(0.9911 0 0)",
+        "danger": {
+          "color": "oklch(0.5392 0.1816 33.72)",
+          "foreground": "oklch(0.9911 0 0)"
+        },
+        "success": {
+          "color": "oklch(0.5573 0.0947 199.48)",
+          "foreground": "oklch(0.9911 0 0)"
+        },
+        "warning": {
+          "color": "oklch(0.6904 0.1972 38.75)",
+          "foreground": "oklch(0.9911 0 0)"
+        }
+      }
+    }
+  },
+  "discord": {
+    "lightness": 0.5774,
+    "chroma": 0.2091,
+    "hue": 273.85,
+    "base": 0.01,
+    "fontFamily": "figtree",
+    "radius": "small",
+    "formRadius": "large",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.6318 0.2075 24.57)"
+        },
+        "success": {
+          "color": "oklch(0.8548 0.1967 150.16)"
+        },
+        "warning": {
+          "color": "oklch(0.9218 0.1571 99.87)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.5884 0.1993 24.39)"
+        },
+        "success": {
+          "color": "oklch(0.532 0.1238 151.57)"
+        },
+        "warning": {
+          "color": "oklch(0.9218 0.1571 99.87)"
+        }
+      }
+    }
+  },
+  "rabbit": {
+    "lightness": 0.6678,
+    "chroma": 0.2232,
+    "hue": 36.66,
+    "base": 0.01,
+    "focusLightness": {
+      "light": 0.64
+    },
+    "fontFamily": "figtree",
+    "radius": "medium",
+    "formRadius": "extra-large",
+    "semanticOverrides": {
+      "dark": {
+        "danger": {
+          "color": "oklch(0.6291 0.2565 29.09)"
+        },
+        "success": {
+          "color": "oklch(0.7113 0.2043 140.81)"
+        }
+      },
+      "light": {
+        "danger": {
+          "color": "oklch(0.6291 0.2565 29.09)"
+        },
+        "success": {
+          "color": "oklch(0.7113 0.2043 140.81)"
+        }
+      }
+    }
+  }
+}

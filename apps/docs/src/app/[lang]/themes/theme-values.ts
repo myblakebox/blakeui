@@ -1,11 +1,15 @@
-// Base constants for theme values
+import presetData from "./theme-presets.data.json";
+
+// The 11 preset definitions live in theme-presets.data.json, the single source
+// both consumers read: this module (the theme builder, at runtime) and
+// apps/docs/scripts/build-theme-presets.mjs (which emits theme-presets.css).
+// Editing a preset means editing that JSON — nothing else carries these numbers.
+
 // 0.0041 mirrors the shipped light background's chroma (variables.css:
 // oklch(0.982 0.0041 91.45)) — the generator pins background L at 0.9702 and
 // ties its hue to the accent hue, so chroma is the only base-matchable axis.
-export const DEFAULT_BASE = 0.0041 as const;
-const BASE_FULL_LEFT = 0 as const;
-const BASE_10P_LEFT = 0.002 as const;
-const BASE_50P = 0.01 as const;
+// Read off the Default preset so the slider default cannot drift from it.
+export const DEFAULT_BASE: number = presetData.default.base;
 
 // Radius options - defined here to avoid circular dependency
 export const radiusIds = [
@@ -54,6 +58,12 @@ export type ThemeValues = {
   base: number;
   chroma: number;
   /**
+   * Accent for dark mode, when it differs from the light accent. Only Uber uses
+   * this (black in light, near-white in dark). The theme builder reaches the
+   * same value through adaptiveColors; the stylesheet generator reads it here.
+   */
+  darkAccent?: {lightness: number; chroma: number; hue: number};
+  /**
    * Per-mode --focus lightness, overriding the accent lightness. Chroma and hue
    * still follow the accent, so the ring keeps the brand colour. Set only where
    * the accent itself cannot reach 3:1 against that mode's surfaces.
@@ -69,209 +79,6 @@ export type ThemeValues = {
   /** Use vibrant (more saturated) soft foreground colors instead of accessible defaults */
   vibrantPalette?: boolean;
 };
-
-// BlakeUI's shipped default accent: variables.css --accent
-// oklch(0.4863 0.0647 250.76) /* #436283 */
-export const defaultThemeValues: ThemeValues = {
-  base: DEFAULT_BASE,
-  chroma: 0.0647,
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 250.76,
-  lightness: 0.4863,
-  radius: "medium",
-} as const;
-
-export const skyThemeValues: ThemeValues = {
-  base: DEFAULT_BASE,
-  chroma: 0.16,
-  focusLightness: {light: 0.59},
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 225,
-  lightness: 0.78,
-  radius: "medium",
-} as const;
-
-export const lavenderThemeValues: ThemeValues = {
-  base: DEFAULT_BASE,
-  chroma: 0.13,
-  focusLightness: {light: 0.63},
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 305,
-  lightness: 0.77,
-  radius: "medium",
-} as const;
-
-export const mintThemeValues: ThemeValues = {
-  base: DEFAULT_BASE,
-  chroma: 0.12,
-  focusLightness: {light: 0.6},
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 155,
-  lightness: 0.82,
-  radius: "medium",
-} as const;
-
-export const netflixThemeValues: ThemeValues = {
-  base: BASE_FULL_LEFT,
-  chroma: 0.2349,
-  fontFamily: "figtree",
-  formRadius: "extra-small",
-  hue: 27.99,
-  lightness: 0.5814,
-  radius: "extra-small",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.4964 0.1994 28.56)"}, // #B9090B
-      success: {color: "oklch(0.7677 0.1899 148.1)"}, // #46D369
-      warning: {color: "oklch(0.8239 0.153 74.6)"}, // #FFB53F
-    },
-    light: {
-      danger: {color: "oklch(0.4823 0.1938 27.64)"}, // #B20710
-      success: {color: "oklch(0.5148 0.1337 146.82)"}, // #237b35
-      warning: {color: "oklch(0.561 0.116571 78.9352)"}, // #996b00
-    },
-  },
-} as const;
-
-export const uberThemeValues: ThemeValues = {
-  base: BASE_FULL_LEFT,
-  chroma: 0,
-  fontFamily: "figtree",
-  formRadius: "small",
-  hue: 0,
-  lightness: 0,
-  radius: "small",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.7044 0.1872 23.19)"}, // #FF6666
-      success: {color: "oklch(0.6514 0.1321 156.22)"}, // #3AA76D
-      warning: {color: "oklch(0.8803 0.1348 86.06)"}, // #FFD166
-    },
-    light: {
-      danger: {color: "oklch(0.573 0.2249 21.97)"}, // #DE1135
-      success: {color: "oklch(0.6277 0.1604 153.06)"}, // #05A357
-      warning: {color: "oklch(0.8446 0.1525 80.6)"}, // #FFC043
-    },
-  },
-} as const;
-
-export const spotifyThemeValues: ThemeValues = {
-  base: BASE_10P_LEFT,
-  chroma: 0.2124,
-  focusLightness: {light: 0.58},
-  fontFamily: "figtree",
-  formRadius: "extra-small",
-  hue: 148.67,
-  lightness: 0.7697,
-  radius: "medium",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.5931 0.2338 25.42)"}, // #E91429
-      success: {color: "oklch(0.7697 0.2124 148.67)"}, // #1ED760
-      warning: {color: "oklch(0.7921 0.1626 67.42)"}, // #FFA42B
-    },
-    light: {
-      danger: {color: "oklch(0.5509 0.2166 25.29)"}, // #D31225
-      success: {color: "oklch(0.6072 0.1647 149.02)"}, // #169C46
-      warning: {color: "oklch(0.6972 0.1687 54.22)"}, // #EB7B15
-    },
-  },
-} as const;
-
-export const coinbaseThemeValues: ThemeValues = {
-  base: BASE_10P_LEFT,
-  chroma: 0.2628,
-  focusLightness: {dark: 0.58},
-  fontFamily: "figtree",
-  formRadius: "extra-small",
-  hue: 262.87,
-  lightness: 0.5282,
-  radius: "medium",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.6545 0.2145 22.31)"}, // #F84550
-      success: {color: "oklch(0.7574 0.180554 156.931)"}, // #00D180
-      warning: {color: "oklch(0.8095 0.1119 61.69)"}, // #F5B073
-    },
-    light: {
-      danger: {color: "oklch(0.5507 0.2062 24)"}, // #CF202F
-      success: {color: "oklch(0.5438 0.1268 157.17)"}, // #098551
-      warning: {color: "oklch(0.8095 0.1119 61.69)"}, // #F5B073
-    },
-  },
-} as const;
-
-export const airbnbThemeValues: ThemeValues = {
-  base: BASE_FULL_LEFT,
-  chroma: 0.2309,
-  focusLightness: {light: 0.64},
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 17.07,
-  lightness: 0.6579,
-  radius: "medium",
-  semanticOverrides: {
-    dark: {
-      accentForeground: "oklch(0.9911 0 0)", // white
-      danger: {color: "oklch(0.5392 0.1816 33.72)", foreground: "oklch(0.9911 0 0)"}, // #C13515, white fg
-      success: {color: "oklch(0.652 0.114864 185.0749)", foreground: "oklch(0.9911 0 0)"}, // #00A699, white fg
-      warning: {color: "oklch(0.8197 0.170602 78.4658)"}, // #FFB400
-    },
-    light: {
-      accentForeground: "oklch(0.9911 0 0)", // white
-      danger: {color: "oklch(0.5392 0.1816 33.72)", foreground: "oklch(0.9911 0 0)"}, // #C13515, white fg
-      success: {color: "oklch(0.5573 0.0947 199.48)", foreground: "oklch(0.9911 0 0)"}, // #008489, white fg
-      warning: {color: "oklch(0.6904 0.1972 38.75)", foreground: "oklch(0.9911 0 0)"}, // #FC642D, white fg
-    },
-  },
-} as const;
-
-export const discordThemeValues: ThemeValues = {
-  base: BASE_50P,
-  chroma: 0.2091,
-  fontFamily: "figtree",
-  formRadius: "large",
-  hue: 273.85,
-  lightness: 0.5774,
-  radius: "small",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.6318 0.2075 24.57)"}, // #ED4245
-      success: {color: "oklch(0.8548 0.1967 150.16)"}, // #57F287
-      warning: {color: "oklch(0.9218 0.1571 99.87)"}, // #FEE75C
-    },
-    light: {
-      danger: {color: "oklch(0.5884 0.1993 24.39)"}, // #DA373C
-      success: {color: "oklch(0.532 0.1238 151.57)"}, // #248046
-      warning: {color: "oklch(0.9218 0.1571 99.87)"}, // #FEE75C
-    },
-  },
-} as const;
-
-export const rabbitThemeValues: ThemeValues = {
-  base: BASE_50P,
-  chroma: 0.2232,
-  focusLightness: {light: 0.64},
-  fontFamily: "figtree",
-  formRadius: "extra-large",
-  hue: 36.66,
-  lightness: 0.6678,
-  radius: "medium",
-  semanticOverrides: {
-    dark: {
-      danger: {color: "oklch(0.6291 0.2565 29.09)"}, // #FF0606
-      success: {color: "oklch(0.7113 0.2043 140.81)"}, // #4ABF34
-    },
-    light: {
-      danger: {color: "oklch(0.6291 0.2565 29.09)"}, // #FF0606
-      success: {color: "oklch(0.7113 0.2043 140.81)"}, // #4ABF34
-    },
-  },
-} as const;
 
 export const themeIds = [
   "default",
@@ -289,19 +96,10 @@ export const themeIds = [
 
 export type ThemeId = (typeof themeIds)[number];
 
-export const themeValuesById: Record<ThemeId, ThemeValues> = {
-  airbnb: airbnbThemeValues,
-  coinbase: coinbaseThemeValues,
-  default: defaultThemeValues,
-  discord: discordThemeValues,
-  lavender: lavenderThemeValues,
-  mint: mintThemeValues,
-  netflix: netflixThemeValues,
-  rabbit: rabbitThemeValues,
-  sky: skyThemeValues,
-  spotify: spotifyThemeValues,
-  uber: uberThemeValues,
-} as const;
+// JSON widens "medium" to string and loses the optional-field narrowing, so the
+// shape is asserted once here. check-preset-sources.mjs validates the data
+// against this contract on every docs predev/prebuild.
+export const themeValuesById = presetData as unknown as Record<ThemeId, ThemeValues>;
 
 /**
  * Keys that define a theme's appearance.
