@@ -81,3 +81,25 @@
   scrollbar-gutter: auto;
   -ms-overflow-style: none;
 }
+
+/* === Reduced motion === */
+
+/*
+ * Flattens a tw-animate-css enter/exit animation to its opacity keyframe by
+ * neutralising the transform variables the generated keyframes read. The
+ * animation keeps running, so the element still fades - and React Aria still
+ * gets the animationend it waits on before unmounting.
+ *
+ * Paired with `motion-reduce:` this is the gentler alternative to
+ * `animate-none`, which removes the fade along with the movement.
+ */
+@utility animate-flat {
+  --tw-enter-scale: 1;
+  --tw-enter-translate-x: 0;
+  --tw-enter-translate-y: 0;
+  --tw-enter-rotate: 0;
+  --tw-exit-scale: 1;
+  --tw-exit-translate-x: 0;
+  --tw-exit-translate-y: 0;
+  --tw-exit-rotate: 0;
+}

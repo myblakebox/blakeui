@@ -66,11 +66,14 @@
 
   /**
    * Animations
-   * CRITICAL: motion-reduce must be AFTER animation for correct override specificity
    */
   animation: slot-value-in 250ms var(--ease-smooth) both;
   transform-origin: bottom center;
-  @apply motion-reduce:animate-none;
+  /*
+   * Reduced motion: the slot still fades its value in, it just stops rising
+   * and growing. Both ends of the keyframe collapse to the same transform.
+   */
+  @apply motion-reduce:[--input-otp-slot-enter-y:0px] motion-reduce:[--input-otp-slot-enter-scale:1];
 }
 
 /* Caret */
@@ -113,7 +116,8 @@
 @keyframes slot-value-in {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.8);
+    transform: translateY(var(--input-otp-slot-enter-y, 8px))
+      scale(var(--input-otp-slot-enter-scale, 0.8));
   }
   100% {
     opacity: 1;

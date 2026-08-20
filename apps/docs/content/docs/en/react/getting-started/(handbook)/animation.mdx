@@ -198,6 +198,23 @@ Do not reach for `motion-reduce:transition-none` unless the declaration transiti
   Keep `transform` and `scale` in separate declaration blocks. Lightning CSS folds a sibling `scale` into `transform`, which silently neutralises any opt-out that targets `scale`.
 </Callout>
 
+The same rule applies to keyframe animations. `motion-reduce:animate-none` removes the fade along with the movement, and stops the `animationend` that React Aria waits on before unmounting an exiting overlay. Use `animate-flat` instead - it neutralises the enter/exit transform variables so the animation keeps running as a pure opacity fade:
+
+```css
+.popover {
+  &[data-entering="true"] {
+    @apply animate-in duration-150 fade-in zoom-in-95 slide-in-from-top-1;
+  }
+
+  /* Still fades; no longer zooms or slides */
+  @apply motion-reduce:animate-flat;
+}
+```
+
+For a hand-written keyframe, route its transform through custom properties and neutralise those instead, so both ends of the keyframe collapse to the same transform.
+
+Continuous indicators are the exception. A spinner or indeterminate bar still uses `animate-none`, because a looping motion has no gentler form - and a frozen indicator is a separate design problem worth solving deliberately rather than by sweep.
+
 With Framer Motion:
 
 ```tsx
