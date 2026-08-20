@@ -134,8 +134,15 @@
    * Transitions
    */
   transition:
-    margin 300ms var(--ease-out-fluid),
+    margin var(--switch-thumb-travel-duration, 300ms) var(--ease-out-fluid),
     background-color 200ms var(--ease-out);
+
+  /*
+   * Reduced motion: the thumb still recolours, it just stops travelling -
+   * the margin change snaps so the on/off state stays readable without
+   * sliding the thumb across the track.
+   */
+  @apply motion-reduce:[--switch-thumb-travel-duration:0s];
 
   /* Selected/checked state - use margin instead of translate */
   .switch[aria-checked="true"] &,
