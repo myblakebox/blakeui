@@ -88,12 +88,21 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 150ms var(--ease-smooth),
     border-color 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
+
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes.
+   * Neutralising the press scale
+   * through --number-field-stepper-press-scale keeps the affordance from moving.
+   */
+  @apply motion-reduce:[--number-field-stepper-press-scale:1];
+
+  /* Press scale (neutralised under reduced motion) */
+  --number-field-stepper-press-scale: 0.97;
 
   /* Cursor */
   cursor: var(--cursor-interactive);
@@ -112,7 +121,7 @@
   &:active,
   &[data-pressed="true"] {
     @apply bg-field-foreground/10;
-    transform: scale(0.97);
+    transform: scale(var(--number-field-stepper-press-scale));
   }
 
   /* Disabled state */
