@@ -269,7 +269,7 @@ The package provides a comprehensive set of CSS variables for customization:
   /* Misc Colors */
   --border: oklch(28% 0.006 286.033);
   --separator: oklch(25% 0.006 286.033);
-  --focus: var(--accent);
+  --focus: oklch(0.7 0.09 250.76); /* lightened accent: --accent is 2.08:1 on dark --background */
   --link: var(--foreground);
   --backdrop: rgba(0, 0, 0, 0.6);
 

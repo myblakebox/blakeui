@@ -39,7 +39,7 @@ export const SHIPPED_DEFAULT_VARS: Record<"dark" | "light", Record<string, strin
     "--field-border": "transparent",
     "--field-foreground": "oklch(0.9911 0 0)",
     "--field-placeholder": "oklch(70.5% 0.015 286.067)",
-    "--focus": "oklch(0.4863 0.0647 250.76)",
+    "--focus": "oklch(0.7 0.09 250.76)",
     "--foreground": "oklch(0.9911 0 0)",
     "--muted": "oklch(70.5% 0.015 286.067)",
     "--overlay": "oklch(0.2103 0.0059 285.89)",
