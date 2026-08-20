@@ -9,6 +9,7 @@ import {useTheme} from "next-themes";
 import {useMemo, useState} from "react";
 import {parseColor} from "react-aria-components";
 
+import {ADAPTIVE_DARK_FLIP_LIGHTNESS} from "@/app/[lang]/themes/theme-values";
 import {
   calculateAccentForeground,
   getDerivedColorFormulas,
@@ -42,13 +43,13 @@ const NO_SELECTION = parseColor("#0000");
 
 /**
  * Near-black accents disappear against dark-mode surfaces, so below this
- * lightness they flip to the light value the theme builder's adaptiveColors
- * map assigns pure black in dark mode (0.9848), keeping their own
- * chroma/hue cast. Only ink (l ≈ 0.23) sits under the threshold; the next
- * darkest swatch (indigo, l ≈ 0.51) passes through untouched.
+ * lightness they flip to the value the theme builder's adaptiveColors map
+ * assigns pure black in dark mode, keeping their own chroma/hue cast. That
+ * figure is imported rather than restated. Only ink (l ≈ 0.23) sits under the
+ * threshold; the next darkest swatch (indigo, l ≈ 0.51) passes through
+ * untouched.
  */
 const DARK_FLIP_MAX_LIGHTNESS = 0.3;
-const DARK_FLIP_LIGHTNESS = 0.9848;
 
 /**
  * Same recipe the pre-rebrand DemoShowcase used for its swatch row: the
@@ -67,7 +68,7 @@ function getAccentStyleVars(color: Color, theme: "light" | "dark"): Record<strin
   const h = oklch.h ?? 0;
 
   if (theme === "dark" && l < DARK_FLIP_MAX_LIGHTNESS) {
-    l = DARK_FLIP_LIGHTNESS;
+    l = ADAPTIVE_DARK_FLIP_LIGHTNESS;
   }
 
   const accent = `oklch(${(l * 100).toFixed(2)}% ${c.toFixed(4)} ${h.toFixed(2)})`;

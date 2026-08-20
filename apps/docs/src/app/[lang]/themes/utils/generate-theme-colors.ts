@@ -203,6 +203,8 @@ export interface ColorGenerationParams {
   grayChroma?: number;
   /** Optional semantic color overrides for light/dark modes */
   semanticOverrides?: SemanticOverrides;
+  /** Per-mode --focus lightness override; chroma and hue still follow the accent */
+  focusLightness?: {light?: number; dark?: number};
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -378,6 +380,7 @@ export function generateThemeColors(params: ColorGenerationParams): GeneratedThe
     hue,
     grayChroma = Math.min(chroma * 0.05, 0.015),
     semanticOverrides,
+    focusLightness,
   } = params;
 
   // Get defaults
@@ -405,11 +408,20 @@ export function generateThemeColors(params: ColorGenerationParams): GeneratedThe
       calculateAccentForeground(lightness, chroma, hue),
   };
 
-  // --focus: Same as accent
+  // --focus: the accent, unless the preset pins a different lightness. Presets
+  // whose accent sits too close to their own surfaces (pale accents in light
+  // mode, dark accents in dark mode) pin a lightness that clears 3:1; chroma and
+  // hue are still the accent's, so the ring stays the brand colour.
   const focus: ThemeColor = {
     name: "--focus",
-    oklchDark: accentDark,
-    oklchLight: accentLight,
+    oklchDark:
+      focusLightness?.dark === undefined
+        ? accentDark
+        : formatOklch({c: chroma, h: hue, l: focusLightness.dark}),
+    oklchLight:
+      focusLightness?.light === undefined
+        ? accentLight
+        : formatOklch({c: chroma, h: hue, l: focusLightness.light}),
   };
 
   // --background: Apply hue and gray chroma adjustments
