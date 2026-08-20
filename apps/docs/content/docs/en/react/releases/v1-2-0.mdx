@@ -1,0 +1,139 @@
+---
+title: v1.2.0
+description: The dark-theme focus ring now clears WCAG 1.4.11 on every surface, and reduced motion is gentler rather than harsher — movement is suppressed while colour and opacity transitions keep running across 50 component stylesheets.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">August 20, 2026</span>
+</div>
+
+An accessibility and motion-correctness release. The dark theme's focus ring was drawing at 2.08:1 against its own background and is now visible on every surface it lands on, and the library's reduced-motion opt-outs no longer strip colour along with movement.
+
+Rendered values change, so this is a minor rather than a patch.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warn">
+  **This is a visual change.** Upgrading from 1.1.4 alters what renders, without any change on your side. The dark-theme focus ring becomes a lighter blue, and every component that transitions colour under reduced motion now keeps that transition instead of dropping it. No component API changes, and no token you are likely to have overridden changes its meaning.
+</Callout>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Fixes
+
+### Theme — dark focus ring no longer aliases the accent
+
+`--focus` was defined as `var(--accent)` in both theme blocks, and the dark block never redeclares `--accent`. The focus ring therefore shipped in dark mode at the light accent's value, where it was close enough to the surfaces beneath it to be effectively invisible.
+
+Measured by canvas rasterisation against every surface the ring lands on, dark failed WCAG 1.4.11 on all of them: 2.08:1 against `--background`, and 2.36–2.80:1 against the card, field, popover, secondary and tertiary surfaces. Light already passed, with a 4.98:1 floor.
+
+Dark now takes an explicit value — the accent hue lightened until it clears `--background`, the binding surface in that mode:
+
+```css
+.dark {
+  --focus: oklch(0.7 0.09 250.76);
+}
+```
+
+The dark floor moves from 2.08:1 to 4.98:1, matching light's own margin. Light is left as `var(--accent)`, so the ring still follows a user's brand colour there. `--accent` itself is untouched in both modes.
+
+If you already override `--focus`, nothing changes for you.
+
+### Reduced motion — colour and opacity now survive
+
+Across the library, `motion-reduce:transition-none` was applied to declarations that transitioned more than movement. On a mixed declaration it removes the colour and shadow transitions too, and leaves any press scale to snap rather than suppressing it — so a reader who asked for reduced motion got a *harsher* interface than the default, which is the opposite of what the preference asks for.
+
+Corrected across **50 component stylesheets**. Eighty blanket `motion-reduce:transition-none` opt-outs were removed, along with 16 `animate-none`, 4 `transform-none` and 1 `scale-100`. Movement now opts out through a custom property, so colour keeps its own timing and the transform stays alone in its block:
+
+```css
+.button {
+  transition:
+    transform 250ms var(--ease-smooth),
+    background-color 100ms var(--ease-out);
+
+  --button-press-scale: 0.97;
+  @apply motion-reduce:[--button-press-scale:1];
+
+  &:active {
+    transform: scale(var(--button-press-scale));
+  }
+}
+```
+
+In practice: a button under reduced motion still tints on hover, it just stops shrinking on press.
+
+### Reduced motion — overlay exits keep their fade
+
+`motion-reduce:animate-none` removed the fade along with the movement, and stopped the `animationend` that React Aria waits on before unmounting an exiting overlay.
+
+A new `animate-flat` utility neutralises the enter and exit transform variables so the animation keeps running as a pure opacity fade. Eleven sites moved onto it.
+
+```css
+@apply motion-reduce:animate-flat;
+```
+
+### Reduced motion — the variants now reach pseudo-element rules
+
+The `motion-reduce` and `motion-safe` variants qualified the element with `&:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)`. Where `&` already ends in a pseudo-element that composes to `.thumb::after:is([data-reduce-motion="true"] *)`, which cannot match — a pseudo-element carries no attributes. Lightning CSS reduced it to an empty `:is()` and the rule shipped inert, so any `motion-reduce:` utility written inside a `::before` or `::after` block did nothing under the data attribute. The media-query branch survived only by accident, because `:not(:is())` matches everything.
+
+Both variants now also carry a descendant form, which puts the attribute on an ancestor rather than on the pseudo-element itself. Empty `:is()` selectors in the built stylesheet drop from 12 to 0.
+
+This affects you directly if you write `motion-reduce:` or `motion-safe:` utilities inside pseudo-element rules in your own CSS — those rules were silently inert under `[data-reduce-motion]` and now apply.
+
+### Theme builder — preset focus rings
+
+Seven preset × mode combinations in the documentation's theme builder drew a focus ring below 3:1 against their own surfaces, worst of all Mint in light mode at 1.39:1. Every preset derived `--focus` from `--accent`, so pale accents in light mode — and Coinbase's dark accent in dark mode — landed too close to the surface the ring is drawn on.
+
+Presets can now pin a per-mode `--focus` lightness. Chroma and hue still follow the accent, so the ring keeps the brand colour and only lightness moves. `--accent` is untouched everywhere. All 22 theme × mode rows now clear 3:1.
+
+<Callout type="info">
+  This one is documentation-side. The presets are part of the theme builder, not the published `@blakeui/styles` package, so upgrading does not change how your app renders. It changes the values you get when you copy a preset out of the theme builder.
+</Callout>
+
+## Upgrading
+
+No API changes and no migration steps. Two things will look different:
+
+- **Focus rings in dark mode** are a lighter blue than they were. If you have screenshot tests covering focused controls in dark mode, expect them to need new baselines.
+- **Components under reduced motion** now transition colour and opacity where they previously snapped. If you test with `prefers-reduced-motion: reduce` or `[data-reduce-motion="true"]`, transitions that used to complete instantly now take their stated duration.
+
+## Links
+
+- [Animation](/docs/react/getting-started/animation)
+- [Theming](/docs/react/getting-started/theming)
+- [Colors](/docs/react/getting-started/colors)
+- [Dark mode](/docs/react/getting-started/dark-mode)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
