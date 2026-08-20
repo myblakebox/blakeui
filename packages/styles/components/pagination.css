@@ -30,13 +30,22 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     transform 250ms var(--ease-smooth),
     background-color 100ms var(--ease-out),
     box-shadow 100ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
+
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes. Neutralising the press scale
+   * through --pagination-press-scale opts every size out from one place.
+   */
+  @apply motion-reduce:[--pagination-press-scale:1];
+
+  /* Press scale (per size; neutralised under reduced motion) */
+  --pagination-press-scale: 0.97;
 
   /* Ghost button tokens */
   --pagination-link-bg: transparent;
@@ -71,7 +80,7 @@
   &:active,
   &[data-pressed="true"] {
     background-color: var(--pagination-link-bg-pressed);
-    transform: scale(0.97);
+    transform: scale(var(--pagination-press-scale));
   }
 
   /* Active page - tertiary button style */
@@ -100,10 +109,7 @@
   .pagination__link {
     @apply size-8 text-xs md:size-7;
 
-    &:active,
-    &[data-pressed="true"] {
-      transform: scale(0.98);
-    }
+    --pagination-press-scale: 0.98;
   }
 
   .pagination__link--nav {
@@ -127,10 +133,7 @@
   .pagination__link {
     @apply size-10 text-base md:size-9;
 
-    &:active,
-    &[data-pressed="true"] {
-      transform: scale(0.96);
-    }
+    --pagination-press-scale: 0.96;
   }
 
   .pagination__link--nav {

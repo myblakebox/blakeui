@@ -38,14 +38,24 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     transform 250ms var(--ease-out),
     background-color 100ms var(--ease-out),
     box-shadow 100ms var(--ease-out),
     opacity 150ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
+
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes.
+   * Neutralising the press scale
+   * through --calendar-nav-button-press-scale keeps the affordance from moving.
+   */
+  @apply motion-reduce:[--calendar-nav-button-press-scale:1];
+
+  /* Press scale (neutralised under reduced motion) */
+  --calendar-nav-button-press-scale: 0.95;
 
   cursor: var(--cursor-interactive);
 
@@ -60,7 +70,7 @@
   /* Pressed state */
   &:active,
   &[data-pressed="true"] {
-    transform: scale(0.95);
+    transform: scale(var(--calendar-nav-button-press-scale));
   }
 
   /* Focus state */
@@ -140,12 +150,22 @@
   will-change: scale;
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     transform 250ms var(--ease-out),
     box-shadow 100ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
+
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes.
+   * Neutralising the press scale
+   * through --calendar-cell-press-scale keeps the affordance from moving.
+   */
+  @apply motion-reduce:[--calendar-cell-press-scale:1];
+
+  /* Press scale (neutralised under reduced motion) */
+  --calendar-cell-press-scale: 0.95;
 
   cursor: var(--cursor-interactive);
 
@@ -176,7 +196,7 @@
   &:active,
   &[data-pressed="true"] {
     @apply bg-default;
-    transform: scale(0.95);
+    transform: scale(var(--calendar-cell-press-scale));
 
     &[data-selected="true"] {
       @apply bg-accent-hover;

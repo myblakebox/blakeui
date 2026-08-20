@@ -6,13 +6,22 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     transform 250ms var(--ease-smooth),
     background-color 100ms var(--ease-out),
     box-shadow 100ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
+
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes. Neutralising the press scale
+   * through --button-press-scale opts every size out from one place.
+   */
+  @apply motion-reduce:[--button-press-scale:1];
+
+  /* Press scale (per size; neutralised under reduced motion) */
+  --button-press-scale: 0.97;
 
   /* Cursor */
   cursor: var(--cursor-interactive);
@@ -85,7 +94,7 @@
   &:active,
   &[data-pressed="true"] {
     background-color: var(--button-bg-pressed);
-    transform: scale(0.97);
+    transform: scale(var(--button-press-scale));
   }
 
   /* Hover */
@@ -110,13 +119,10 @@
 .button--sm {
   @apply h-9 px-3 md:h-8;
 
+  --button-press-scale: 0.98;
+
   & svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg) {
     @apply size-4;
-  }
-
-  &:active,
-  &[data-pressed="true"] {
-    transform: scale(0.98);
   }
 }
 
@@ -127,10 +133,7 @@
 .button--lg {
   @apply h-11 text-base md:h-10;
 
-  &:active,
-  &[data-pressed="true"] {
-    transform: scale(0.96);
-  }
+  --button-press-scale: 0.96;
 }
 
 /* Color variants - only set custom property values */
