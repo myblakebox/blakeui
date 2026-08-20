@@ -47,7 +47,7 @@
     /**
      * Transitions
      */
-    @apply transition-all duration-200 motion-reduce:transition-none;
+    @apply transition-all duration-200 motion-reduce:transition-[stroke-dashoffset,opacity,color];
   }
 
   &[data-selected="true"] [data-slot="checkbox-default-indicator--checkmark"] {
@@ -87,13 +87,16 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 200ms var(--ease-out),
-    border-color 200ms var(--ease-out),
-    transform 100ms var(--ease-out);
-  @apply motion-reduce:transition-none;
+    border-color 200ms var(--ease-out);
+
+  /*
+   * Reduced motion: the indicator still fades and tints, it just stops
+   * growing. Set on the control, not the ::before, so the variant matches.
+   */
+  @apply motion-reduce:[--checkbox-indicator-scale-duration:0s];
 
   cursor: var(--cursor-interactive);
 
@@ -108,13 +111,11 @@
 
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition:
-      scale 100ms var(--ease-linear),
+      scale var(--checkbox-indicator-scale-duration, 100ms) var(--ease-linear),
       opacity 200ms var(--ease-linear),
       background-color 200ms var(--ease-out);
-    @apply motion-reduce:transition-none;
   }
 
   /* Interactive states */

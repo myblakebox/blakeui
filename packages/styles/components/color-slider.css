@@ -78,12 +78,9 @@
 
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition:
-      transform 250ms var(--ease-out),
       box-shadow 150ms var(--ease-out);
-    @apply motion-reduce:transition-none;
 
     /* Dragging state - cursor changes and thumb scales down */
     &[data-dragging="true"] {

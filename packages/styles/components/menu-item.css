@@ -7,13 +7,20 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     transform 250ms var(--ease-out-quart),
     box-shadow 150ms var(--ease-out);
 
-  @apply motion-reduce:transition-none;
+  /*
+   * Reduced motion: gentler, never zero. Colour and shadow keep their
+   * transition; only the movement goes. Neutralising the press scale
+   * through --menu-item-press-scale keeps the affordance from moving.
+   */
+  @apply motion-reduce:[--menu-item-press-scale:1];
+
+  /* Press scale (neutralised under reduced motion) */
+  --menu-item-press-scale: 0.98;
 
   /* Cursor */
   cursor: var(--cursor-interactive);
@@ -54,7 +61,7 @@
   /* Pressed state */
   &:active,
   &[data-pressed="true"] {
-    transform: scale(0.98);
+    transform: scale(var(--menu-item-press-scale));
   }
 
   /* Hover state */
@@ -100,7 +107,7 @@
   /**
    * Transitions
    */
-  @apply transition duration-250 motion-reduce:transition-none;
+  @apply transition duration-250 motion-reduce:transition-[color,background-color,opacity];
 
   /* Position on the inline-end when menu item has submenu */
   .menu-item[data-has-submenu="true"] & {
@@ -115,7 +122,7 @@
       /**
        * Transitions
        */
-      @apply transition-all duration-300 motion-reduce:transition-none;
+      @apply transition-all duration-300 motion-reduce:transition-[stroke-dashoffset,opacity,color];
     }
   }
 
@@ -127,7 +134,7 @@
       /**
      * Transitions
      */
-      @apply transition-all duration-250 motion-reduce:transition-none;
+      @apply transition-all duration-250 motion-reduce:transition-[opacity,background-color];
     }
     /**
      * Default state: hidden and scaled down

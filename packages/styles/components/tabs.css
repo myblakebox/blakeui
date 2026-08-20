@@ -158,12 +158,11 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition-duration: 250ms;
   transition-property: translate, width, height;
   transition-timing-function: var(--ease-out-fluid);
-  @apply motion-reduce:transition-none;
+  @apply motion-reduce:transition-[width,height] motion-reduce:duration-250 motion-reduce:ease-[var(--ease-out-fluid)];
 }
 
 /* ==========================================================================

@@ -36,13 +36,19 @@
 
     /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
     transition:
       background-color 250ms var(--ease-smooth),
-      transform 250ms var(--ease-out),
       box-shadow 150ms var(--ease-out);
-    @apply motion-reduce:transition-none;
+
+    /*
+     * Reduced motion: the thumb still tints while dragging, it just stops
+     * shrinking. Set on the thumb, not the ::after, so the variant matches.
+     */
+    @apply motion-reduce:[--slider-thumb-drag-scale:1];
+
+    /* Drag scale (neutralised under reduced motion) */
+    --slider-thumb-drag-scale: 0.9;
 
     /* after: Visible thumb element */
     &::after {
@@ -52,7 +58,7 @@
       /**
        * Transitions
        */
-      @apply origin-center transition-all motion-reduce:transition-none;
+      @apply origin-center transition-all;
     }
 
     /* Dragging state - cursor changes and thumb scales down */
@@ -60,7 +66,7 @@
       @apply cursor-grabbing;
 
       &::after {
-        @apply scale-[0.9] motion-reduce:scale-100;
+        scale: var(--slider-thumb-drag-scale);
       }
     }
 

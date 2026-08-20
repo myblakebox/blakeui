@@ -28,17 +28,21 @@
    ========================================================================== */
 
 .radio__control {
+  /*
+   * Reduced motion: the control still tints, it just stops shrinking on press.
+   */
+  @apply motion-reduce:[--radio-control-press-scale:1];
+
+  /* Press scale (neutralised under reduced motion) */
+  --radio-control-press-scale: 0.95;
   @apply relative mt-[3px] inline-flex size-4 shrink-0 items-center justify-center rounded-lg border [border-width:var(--border-width-field)] border-field-border bg-field shadow-field outline-none no-highlight;
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 200ms var(--ease-out),
-    border-color 200ms var(--ease-out),
-    transform 100ms var(--ease-out);
-  @apply motion-reduce:transition-none;
+    border-color 200ms var(--ease-out);
 
   cursor: var(--cursor-interactive);
 
@@ -66,7 +70,7 @@
   /* Pressed */
   .radio:active &,
   .radio[data-pressed="true"] & {
-    @apply scale-95;
+    scale: var(--radio-control-press-scale);
   }
 
   /* Selection states */
@@ -105,6 +109,12 @@
 .radio__indicator {
   @apply absolute inset-0 flex items-center justify-center;
 
+  /*
+   * Reduced motion: the dot still tints, it just stops growing. Set on the
+   * indicator, not the ::before, so the variant matches.
+   */
+  @apply motion-reduce:[--radio-indicator-scale-duration:0s];
+
   pointer-events: none;
 }
 
@@ -120,12 +130,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
-    scale 200ms var(--ease-out),
+    scale var(--radio-indicator-scale-duration, 200ms) var(--ease-out),
     background-color 200ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 }
 
 /* Selected state */
