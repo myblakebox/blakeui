@@ -92,5 +92,11 @@ apps/docs/public/skills
 # SEO analysis output
 .seo-output
 
+# Temporary tsconfig written by packages/react/scripts/generate-types.mjs.
+# It is removed when the build finishes, but an interrupted build leaves it
+# behind. Scoped deliberately - apps/native-mcp, apps/react-mcp and
+# packages/native each commit a real tsconfig.build.json.
+packages/react/tsconfig.build.json
+
 # Machine-local Claude Code preview launch config (absolute paths; not shared)
 .claude/launch.json
