@@ -159,27 +159,44 @@ Apply dynamic animations based on component state:
 
 ## Accessibility
 
-**Respecting motion preferences:** blakeUI automatically respects user motion preferences using Tailwind's `motion-reduce:` utility. All built-in transitions and animations are disabled when users enable "reduce motion" in their system settings.
+**Respecting motion preferences:** blakeUI respects user motion preferences using Tailwind's `motion-reduce:` utility. Reduced motion is gentler, not zero: movement is suppressed, while colour and opacity transitions keep running. A button under reduced motion still tints on hover, it just stops shrinking on press.
 
 blakeUI extends Tailwind's `motion-reduce:` variant to support both the native `prefers-reduced-motion` media query and the `data-reduce-motion` attribute.
 
+Do not reach for `motion-reduce:transition-none` unless the declaration transitions *only* movement. On a mixed declaration it removes the colour transition too, which is the opposite of what reduced motion asks for.
+
 ```css
-/* BlakeUI pattern - uses Tailwind's motion-reduce: */
-.button {
-  @apply transition-colors motion-reduce:transition-none;
+/* Movement only - transition-none suppresses exactly the movement */
+.chevron {
+  transition: transform 150ms var(--ease-out);
+  @apply motion-reduce:transition-none;
 }
 
-/* Expands to support both approaches: */
-@media (prefers-reduced-motion: reduce) {
-  .button {
-    transition: none;
+/* Mixed - route the movement through a custom property instead, so
+   colour keeps its own timing and `transform` stays alone in its block */
+.button {
+  transition:
+    transform 250ms var(--ease-smooth),
+    background-color 100ms var(--ease-out);
+
+  --button-press-scale: 0.97;
+  @apply motion-reduce:[--button-press-scale:1];
+
+  &:active {
+    transform: scale(var(--button-press-scale));
   }
 }
 
-[data-reduce-motion="true"] .button {
-  transition: none;
+/* Blanket `transition` / `transition-all` covers transform, translate,
+   scale and rotate - narrow the list rather than dropping it */
+.indicator {
+  @apply transition duration-250 motion-reduce:transition-[color,background-color,opacity];
 }
 ```
+
+<Callout type="warn">
+  Keep `transform` and `scale` in separate declaration blocks. Lightning CSS folds a sibling `scale` into `transform`, which silently neutralises any opt-out that targets `scale`.
+</Callout>
 
 With Framer Motion:
 
@@ -205,11 +222,11 @@ function AnimatedCard() {
 
 ```html
 <html data-reduce-motion="true">
-  <!-- All BlakeUI animations will be disabled -->
+  <!-- Movement is suppressed; colour and opacity transitions still run -->
 </html>
 ```
 
-blakeUI automatically detects the user's `prefers-reduced-motion: reduce` setting and disables animations accordingly.
+blakeUI automatically detects the user's `prefers-reduced-motion: reduce` setting; the attribute overrides it in either direction.
 
 ## Performance Tips
 
