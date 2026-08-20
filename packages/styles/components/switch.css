@@ -81,7 +81,6 @@
   .switch:active &,
   .switch[data-pressed="true"] & {
     background-color: var(--switch-control-bg-pressed);
-    @apply motion-reduce:transform-none;
   }
 
   /* Checked states */

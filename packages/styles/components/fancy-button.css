@@ -91,7 +91,6 @@
   &[data-pressed="true"] {
     background-color: var(--fancy-button-bg-pressed);
     transform: scale(var(--fancy-button-press-scale));
-    @apply motion-reduce:transform-none;
   }
 
   /* Hover */
