@@ -122,14 +122,18 @@ function accentForeground(l, c, h) {
   return "oklch(99.11% 0 0)";
 }
 
-function genAccent(l, c, h, fgOverride) {
+// --focus is the accent unless the preset pins a lightness for this mode.
+// Pale accents in light mode (and dark accents in dark mode) land too close to
+// their own surfaces to make a visible ring; pinning lightness clears 3:1 while
+// chroma and hue stay the accent's, so the ring still reads as the brand.
+function genAccent(l, c, h, fgOverride, focusL) {
   const accent = fmt({c, h, l});
   const fg = fgOverride ?? accentForeground(l, c, h);
 
   return {
     "--accent": accent,
     "--accent-foreground": fg,
-    "--focus": accent,
+    "--focus": focusL === undefined ? accent : fmt({c, h, l: focusL}),
   };
 }
 
@@ -245,6 +249,7 @@ const PRESETS = [
   {
     accentHex: "#7DD3FC",
     base: 0.015,
+    focusLightness: {light: 0.61},
     formRadius: "large",
     id: "sky",
     radius: "medium",
@@ -252,6 +257,7 @@ const PRESETS = [
   {
     accentHex: "#C084FC",
     base: 0.015,
+    focusLightness: {light: 0.63},
     formRadius: "large",
     id: "lavender",
     radius: "medium",
@@ -259,6 +265,7 @@ const PRESETS = [
   {
     accentHex: "#86EFAC",
     base: 0.015,
+    focusLightness: {light: 0.6},
     formRadius: "large",
     id: "mint",
     radius: "medium",
@@ -306,6 +313,7 @@ const PRESETS = [
   {
     accentHex: "#1ED760",
     base: 0.002,
+    focusLightness: {light: 0.58},
     formRadius: "extra-small",
     id: "spotify",
     radius: "medium",
@@ -325,6 +333,7 @@ const PRESETS = [
   {
     accentHex: "#4F44E0",
     base: 0.002,
+    focusLightness: {dark: 0.57},
     formRadius: "extra-small",
     id: "coinbase",
     radius: "medium",
@@ -344,6 +353,7 @@ const PRESETS = [
   {
     accentHex: "#FF5A5F",
     base: 0,
+    focusLightness: {light: 0.64},
     formRadius: "large",
     id: "airbnb",
     radius: "medium",
@@ -384,6 +394,7 @@ const PRESETS = [
   {
     accentHex: "#FF6600",
     base: 0.01,
+    focusLightness: {light: 0.63},
     formRadius: "extra-large",
     id: "rabbit",
     radius: "medium",
@@ -419,6 +430,7 @@ function generatePresetCss(preset) {
       modeAccent.c,
       modeAccent.h,
       so?.[mode]?.accentForeground,
+      preset.focusLightness?.[mode],
     );
     const neutrals = genNeutrals(hue, grayChroma, mode);
 

@@ -92,6 +92,9 @@ export function generateMinimalCssVariables(
   const semanticOverrides: SemanticOverrides | undefined = matchingThemeId
     ? themeValuesById[matchingThemeId].semanticOverrides
     : undefined;
+  const focusLightness = matchingThemeId
+    ? themeValuesById[matchingThemeId].focusLightness
+    : undefined;
 
   // At Default, export the shipped theme verbatim instead of generator
   // output (see shipped-default-vars.ts).
@@ -107,6 +110,7 @@ export function generateMinimalCssVariables(
     // Generate theme colors
     const colors = generateThemeColors({
       chroma,
+      focusLightness,
       grayChroma: base,
       hue,
       lightness,

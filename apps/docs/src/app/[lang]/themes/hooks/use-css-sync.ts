@@ -201,6 +201,7 @@ function getThemeColorsCSS(
   commonVars: Record<string, string>,
   matchingThemeId: ThemeId | undefined,
   semanticOverrides?: SemanticOverrides,
+  focusLightness?: {light?: number; dark?: number},
   vibrant?: boolean,
 ): string {
   // At Default, emit the shipped theme verbatim instead of generator output
@@ -214,7 +215,14 @@ function getThemeColorsCSS(
     lightVars = shipped.light;
     darkVars = shipped.dark;
   } else {
-    const colors = generateThemeColors({chroma, grayChroma, hue, lightness, semanticOverrides});
+    const colors = generateThemeColors({
+      chroma,
+      focusLightness,
+      grayChroma,
+      hue,
+      lightness,
+      semanticOverrides,
+    });
 
     lightVars = getColorVariablesForElement(colors, "light");
     darkVars = getColorVariablesForElement(colors, "dark");
@@ -297,6 +305,9 @@ export function useCssSync() {
     const matchingThemeId = findMatchingTheme(variables);
     const semanticOverrides = matchingThemeId
       ? themeValuesById[matchingThemeId].semanticOverrides
+      : undefined;
+    const focusLightness = matchingThemeId
+      ? themeValuesById[matchingThemeId].focusLightness
       : undefined;
 
     // Determine font variable - handle predefined fonts and URL-based custom fonts
@@ -389,6 +400,7 @@ export function useCssSync() {
         commonVars,
         matchingThemeId,
         semanticOverrides,
+        focusLightness,
         vibrant,
       );
 

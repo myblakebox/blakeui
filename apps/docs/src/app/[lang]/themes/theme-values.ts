@@ -53,6 +53,12 @@ export interface ThemeSemanticOverrides {
 export type ThemeValues = {
   base: number;
   chroma: number;
+  /**
+   * Per-mode --focus lightness, overriding the accent lightness. Chroma and hue
+   * still follow the accent, so the ring keeps the brand colour. Set only where
+   * the accent itself cannot reach 3:1 against that mode's surfaces.
+   */
+  focusLightness?: {light?: number; dark?: number};
   fontFamily: string;
   formRadius: RadiusId;
   hue: number;
@@ -79,6 +85,7 @@ export const defaultThemeValues: ThemeValues = {
 export const skyThemeValues: ThemeValues = {
   base: DEFAULT_BASE,
   chroma: 0.16,
+  focusLightness: {light: 0.59},
   fontFamily: "figtree",
   formRadius: "large",
   hue: 225,
@@ -89,6 +96,7 @@ export const skyThemeValues: ThemeValues = {
 export const lavenderThemeValues: ThemeValues = {
   base: DEFAULT_BASE,
   chroma: 0.13,
+  focusLightness: {light: 0.63},
   fontFamily: "figtree",
   formRadius: "large",
   hue: 305,
@@ -99,6 +107,7 @@ export const lavenderThemeValues: ThemeValues = {
 export const mintThemeValues: ThemeValues = {
   base: DEFAULT_BASE,
   chroma: 0.12,
+  focusLightness: {light: 0.6},
   fontFamily: "figtree",
   formRadius: "large",
   hue: 155,
@@ -153,6 +162,7 @@ export const uberThemeValues: ThemeValues = {
 export const spotifyThemeValues: ThemeValues = {
   base: BASE_10P_LEFT,
   chroma: 0.2124,
+  focusLightness: {light: 0.58},
   fontFamily: "figtree",
   formRadius: "extra-small",
   hue: 148.67,
@@ -175,6 +185,7 @@ export const spotifyThemeValues: ThemeValues = {
 export const coinbaseThemeValues: ThemeValues = {
   base: BASE_10P_LEFT,
   chroma: 0.2628,
+  focusLightness: {dark: 0.58},
   fontFamily: "figtree",
   formRadius: "extra-small",
   hue: 262.87,
@@ -197,6 +208,7 @@ export const coinbaseThemeValues: ThemeValues = {
 export const airbnbThemeValues: ThemeValues = {
   base: BASE_FULL_LEFT,
   chroma: 0.2309,
+  focusLightness: {light: 0.64},
   fontFamily: "figtree",
   formRadius: "large",
   hue: 17.07,
@@ -243,6 +255,7 @@ export const discordThemeValues: ThemeValues = {
 export const rabbitThemeValues: ThemeValues = {
   base: BASE_50P,
   chroma: 0.2232,
+  focusLightness: {light: 0.64},
   fontFamily: "figtree",
   formRadius: "extra-large",
   hue: 36.66,

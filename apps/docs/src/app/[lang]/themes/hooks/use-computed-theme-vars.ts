@@ -58,6 +58,9 @@ export function computeThemeVars(variables: ThemeValues): ComputedThemeVars {
   const semanticOverrides = matchingThemeId
     ? themeValuesById[matchingThemeId].semanticOverrides
     : undefined;
+  const focusLightness = matchingThemeId
+    ? themeValuesById[matchingThemeId].focusLightness
+    : undefined;
 
   // Resolve font variable and metadata
   const fontFamily = variables.fontFamily;
@@ -163,6 +166,7 @@ export function computeThemeVars(variables: ThemeValues): ComputedThemeVars {
   } else {
     const colors = generateThemeColors({
       chroma,
+      focusLightness,
       grayChroma: base,
       hue,
       lightness,
