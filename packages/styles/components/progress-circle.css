@@ -24,7 +24,6 @@
 
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition: stroke-dashoffset 300ms var(--ease-out);
   }
@@ -34,7 +33,12 @@
     .progress-circle__track {
       animation: progress-circle-spin 1s linear infinite;
 
-      @apply motion-reduce:animate-none;
+      /*
+       * Reduced motion: the arc stops spinning and pulses its opacity
+       * instead, so the component still reads as working rather than as
+       * a spinner frozen mid-cycle.
+       */
+      @apply motion-reduce:animate-pulse;
     }
   }
 

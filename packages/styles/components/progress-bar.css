@@ -41,7 +41,6 @@
 
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition: width 300ms var(--ease-out);
   }
@@ -53,7 +52,13 @@
 
       animation: progress-bar-indeterminate 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 
-      @apply motion-reduce:animate-none;
+      /*
+       * Reduced motion: a looping travel has no gentler form, so the bar
+       * stops travelling and pulses its opacity instead. It also goes
+       * full width - frozen at w-2/5 it reads as a stalled 40%, which is
+       * worse than no indicator at all.
+       */
+      @apply motion-reduce:w-full motion-reduce:animate-pulse;
     }
   }
 
