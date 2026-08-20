@@ -25,6 +25,7 @@ export type {
   ThemeValues,
 } from "./theme-values";
 export {
+  adaptiveColors,
   DEFAULT_BASE,
   findMatchingTheme,
   radiusIds,
@@ -46,17 +47,6 @@ export const iframeTabs: Record<string, string> = {
   dashboard: `${BLAKEUI_PRO_URL}/templates/dashboard`,
   finances: `${BLAKEUI_PRO_URL}/templates/finances`,
   mail: `${BLAKEUI_PRO_URL}/templates/email`,
-};
-
-/**
- * Adaptive colors that need different values in light vs dark modes.
- * Maps a color ID to its light and dark mode variants.
- */
-export const adaptiveColors: Record<string, {light: string; dark: string}> = {
-  "oklch(0 0 0)": {
-    dark: "oklch(0.9848 0 0)",
-    light: "oklch(0 0 0)",
-  },
 };
 
 export const fontIds = [
