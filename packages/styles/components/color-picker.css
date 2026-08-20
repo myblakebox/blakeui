@@ -19,12 +19,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 150ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   [data-slot="label"] {
     cursor: var(--cursor-interactive);

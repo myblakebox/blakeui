@@ -131,7 +131,6 @@
   @apply absolute top-2.5 right-2.5 size-5 border-border bg-default opacity-100 sm:pointer-events-none sm:-top-1 sm:-right-1 sm:border sm:bg-overlay sm:opacity-0;
 
   transition: opacity 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
   /* Overrides close button default icon size from 16px to 12px */
   [data-slot="close-button-icon"] {
     @apply size-3.5 sm:size-3;

@@ -37,7 +37,6 @@
   transition:
     opacity 150ms var(--ease-out),
     visibility 0ms linear;
-  @apply motion-reduce:transition-none;
 }
 
 /* Day grid – hidden when year picker is open (fade + blur out) */
@@ -49,7 +48,6 @@
   transition:
     opacity 150ms var(--ease-out),
     visibility 0ms linear 150ms;
-  @apply motion-reduce:transition-none;
 }
 
 /* -----------------------------------------------------------------------------
@@ -71,7 +69,6 @@
   @apply text-sm font-medium;
 
   transition: color 150ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 }
 
 .calendar-year-picker__trigger-indicator {
@@ -109,7 +106,6 @@
 
   /* When opening: slight delay so the day grid starts fading out first */
   transition: opacity 200ms var(--ease-out) 50ms;
-  @apply motion-reduce:transition-none;
 }
 
 /* -----------------------------------------------------------------------------

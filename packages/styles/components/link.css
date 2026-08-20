@@ -4,14 +4,12 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     color 100ms var(--ease-smooth),
     background-color 150ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out),
     opacity 100ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   /* Cursor */
   cursor: var(--cursor-interactive);
@@ -58,10 +56,8 @@
 
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition: opacity 150ms var(--ease-out);
-    @apply motion-reduce:transition-none;
 
     & svg {
       @apply transform-gpu;

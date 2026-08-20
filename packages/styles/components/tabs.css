@@ -48,14 +48,12 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     color 150ms var(--ease-smooth),
     background-color 150ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out),
     opacity 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
 
   /* Selected state */
   &[data-selected="true"] {
@@ -102,10 +100,8 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition: opacity 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
 
   /* Horizontal tabs - vertical separator */
   .tabs__list[data-orientation="horizontal"] & {

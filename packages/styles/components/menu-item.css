@@ -72,10 +72,8 @@
     [data-slot="menu-item-indicator--checkmark"] {
       /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
       transition: stroke-dashoffset 100ms linear;
-      @apply motion-reduce:transition-none;
     }
 
     [data-slot="menu-item-indicator--dot"] {

@@ -44,7 +44,6 @@
      * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition: width 300ms var(--ease-out);
-    @apply motion-reduce:transition-none;
   }
 
   /* Indeterminate state - when no aria-valuenow is set */

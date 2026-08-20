@@ -93,10 +93,8 @@
   .list-box-item[data-selected="true"] [data-slot="list-box-item-indicator--checkmark"] {
     /**
      * Transitions
-     * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
      */
     transition: stroke-dashoffset 250ms linear;
-    @apply motion-reduce:transition-none;
   }
 }
 
