@@ -19,12 +19,11 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     border-color 100ms var(--ease-out),
     box-shadow 100ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
 
   /* Focus state */
   &:focus-visible,
@@ -59,7 +58,6 @@
   border-radius: inherit;
   /**
   * Transitions
-  * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
   */
   transition: transform 100ms var(--ease-out);
   @apply transform-gpu motion-reduce:transition-none;

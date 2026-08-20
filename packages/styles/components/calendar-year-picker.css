@@ -117,15 +117,13 @@
 
   /**
    * Transitions – same as .tag
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     color 100ms var(--ease-smooth),
-    scale 100ms var(--ease-smooth),
     opacity 100ms var(--ease-smooth),
     background-color 100ms var(--ease-smooth),
     box-shadow 100ms var(--ease-out);
-  @apply origin-center transform-gpu motion-reduce:transition-none;
+  @apply origin-center transform-gpu;
 
   cursor: var(--cursor-interactive);
 

@@ -25,7 +25,7 @@
   /**
    * Transitions
    */
-  @apply transition duration-250 motion-reduce:transition-none;
+  @apply transition duration-250 motion-reduce:transition-[color,background-color,opacity];
 
   /* Expanded state for indicator rotation */
   &[data-expanded="true"] {
