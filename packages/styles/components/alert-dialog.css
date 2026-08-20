@@ -67,12 +67,10 @@
 
   /**
    * Reduce Animation
-   * CRITICAL: motion-reduce must be AFTER animate for correct override specificity
    */
   &[data-exiting="true"],
   &[data-entering="true"] {
     @apply will-change-[opacity];
-    @apply motion-reduce:animate-none;
   }
 }
 
@@ -141,7 +139,7 @@
   &[data-exiting="true"],
   &[data-entering="true"] {
     @apply will-change-[opacity,transform];
-    @apply motion-reduce:animate-none;
+    @apply motion-reduce:animate-flat;
   }
 }
 
