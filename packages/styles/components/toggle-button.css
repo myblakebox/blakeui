@@ -14,10 +14,21 @@
     transform 250ms var(--ease-smooth),
     background-color 100ms var(--ease-out),
     box-shadow 100ms var(--ease-out);
-  @apply transform-gpu motion-reduce:transition-none;
+  @apply transform-gpu;
+
+  /*
+   * Reduced motion: gentler, never zero. The colour and shadow keep their
+   * transition; only the movement goes. Neutralising the press scale through
+   * --toggle-button-press-scale opts every size out from one place.
+   */
+  @apply motion-reduce:transition-[background-color,box-shadow] motion-reduce:duration-100 motion-reduce:ease-out;
+  @apply motion-reduce:[--toggle-button-press-scale:1];
 
   /* Cursor */
   cursor: var(--cursor-interactive);
+
+  /* Press scale (per size; neutralised under reduced motion) */
+  --toggle-button-press-scale: 0.97;
 
   /* Default tokens (unselected state) */
   --toggle-button-bg: var(--default);
@@ -58,7 +69,7 @@
   &:active,
   &[data-pressed="true"] {
     background-color: var(--toggle-button-bg-pressed);
-    transform: scale(0.97);
+    transform: scale(var(--toggle-button-press-scale));
   }
 
   /* Selected state */
@@ -92,13 +103,10 @@
 .toggle-button--sm {
   @apply h-9 px-3 md:h-8;
 
+  --toggle-button-press-scale: 0.98;
+
   & svg {
     @apply size-4;
-  }
-
-  &:active,
-  &[data-pressed="true"] {
-    transform: scale(0.98);
   }
 }
 
@@ -109,10 +117,7 @@
 .toggle-button--lg {
   @apply h-11 text-base md:h-10;
 
-  &:active,
-  &[data-pressed="true"] {
-    transform: scale(0.96);
-  }
+  --toggle-button-press-scale: 0.96;
 }
 
 /* ==========================================================================
