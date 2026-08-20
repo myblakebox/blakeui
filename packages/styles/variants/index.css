@@ -29,6 +29,17 @@
     }
   }
 
+  /*
+   * The same rule as a descendant of the flagged element.
+   * `&:is(...)` cannot match when `&` already ends in a pseudo-element -
+   * `.thumb::after:is([data-reduce-motion="true"] *)` matches nothing, so a
+   * `motion-reduce:` utility written inside a `::before`/`::after` rule was
+   * silently inert under the data attribute. This form carries those rules.
+   */
+  [data-reduce-motion="true"] & {
+    @slot;
+  }
+
   /* Fallback: system prefers-reduced-motion setting */
   @media (prefers-reduced-motion: reduce) {
     &:not(:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)) {
@@ -55,6 +66,11 @@
     &::after {
       @slot;
     }
+  }
+
+  /* Descendant form - see the note in motion-reduce above. */
+  [data-reduce-motion="false"] & {
+    @slot;
   }
 
   /* Fallback: system has no motion preference set */
