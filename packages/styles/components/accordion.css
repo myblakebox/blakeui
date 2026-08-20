@@ -61,12 +61,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     opacity 150ms var(--ease-out),
     box-shadow 150ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   /* Hover state */
   @media (hover: hover) {
@@ -100,12 +98,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     height 200ms var(--ease-out-quad),
     opacity 200ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   &[data-expanded="true"] {
     will-change: height, opacity;

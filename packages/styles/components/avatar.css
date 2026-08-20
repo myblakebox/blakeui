@@ -15,7 +15,7 @@
   /**
    * Transitions
    */
-  @apply transition-opacity duration-250 motion-reduce:transition-none;
+  @apply transition-opacity duration-250;
 }
 
 /* Size modifiers */

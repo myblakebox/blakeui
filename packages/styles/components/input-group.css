@@ -12,13 +12,11 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 150ms var(--ease-smooth),
     border-color 150ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   /* Hover state */
   @media (hover: hover) {
@@ -95,12 +93,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 150ms var(--ease-smooth),
     border-color 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
 }
 
 .input-group__suffix {
@@ -121,12 +117,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 150ms var(--ease-smooth),
     border-color 150ms var(--ease-smooth);
-  @apply motion-reduce:transition-none;
 }
 
 /* Variant property definitions */

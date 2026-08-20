@@ -60,12 +60,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     background-color 250ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   /* Focus states */
   .switch:focus-visible &,
@@ -134,12 +132,10 @@
 
   /**
    * Transitions
-   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
    */
   transition:
     margin 300ms var(--ease-out-fluid),
     background-color 200ms var(--ease-out);
-  @apply motion-reduce:transition-none;
 
   /* Selected/checked state - use margin instead of translate */
   .switch[aria-checked="true"] &,
