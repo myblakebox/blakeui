@@ -4,6 +4,8 @@ import {highlight} from "fumadocs-core/highlight";
 import * as Base from "fumadocs-ui/components/codeblock";
 import * as React from "react";
 
+import {shikiAaTransformer} from "@/lib/shiki-aa";
+
 import {CodeBlock as CodeBlockClient} from "./codeblock-client";
 
 export async function CodeBlock({
@@ -49,6 +51,7 @@ export async function CodeBlock({
             pre: (props) => <Base.Pre {...props} />,
           },
           lang: lang || "text",
+          transformers: [shikiAaTransformer],
         });
       }
 
@@ -57,7 +60,7 @@ export async function CodeBlock({
           pre: (props) => <Base.Pre {...props} />,
         },
         lang: lang || "text",
-        // other Shiki options
+        transformers: [shikiAaTransformer],
       });
     }
   } catch (error) {

@@ -5,6 +5,7 @@ import type {BundledLanguage, BundledTheme, HighlighterGeneric} from "shiki";
 import {useTheme} from "next-themes";
 import {memo, use, useMemo} from "react";
 
+import {shikiAaTransformer} from "@/lib/shiki-aa";
 import {cn} from "@/utils/cn";
 
 type Highlighter = HighlighterGeneric<BundledLanguage, BundledTheme>;
@@ -63,6 +64,7 @@ export const HighlightedCode = memo(function HighlightedCode({
     return highlighter.codeToHtml(trimmedCode, {
       lang: langToUse,
       theme: theme === "dark" ? "github-dark" : "github-light",
+      transformers: [shikiAaTransformer],
     });
   }, [code, lang, theme, highlighter]);
 
