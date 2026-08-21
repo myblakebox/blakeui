@@ -53,7 +53,14 @@
   --spacing-fd-container: 1120px;
   --color-fd-border: oklch(0 0 0 / 10%);
   --color-fd-accent: #f9f9f9;
-  --color-fd-muted-foreground: var(--color-neutral-500);
+  /* Track our own muted token rather than pinning a neutral. As
+     --color-neutral-500 this was declared once here and never redefined in the
+     dark block below, so every muted string in the fumadocs chrome — sidebar
+     links, TOC entries, the search placeholder, the nav links — kept a fixed
+     grey whatever the theme. --muted is already theme-aware in
+     packages/styles, so one substitution covers both bands and cannot drift
+     away from the package the way a pinned neutral did. */
+  --color-fd-muted-foreground: var(--muted);
   --color-backdrop: rgba(255, 255, 255, 0.4);
   /* Fumadocs UI Animations */
   --animate-fd-fade-in: custom-fade-in 200ms ease-out forwards;
