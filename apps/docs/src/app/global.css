@@ -61,6 +61,16 @@
      packages/styles, so one substitution covers both bands and cannot drift
      away from the package the way a pinned neutral did. */
   --color-fd-muted-foreground: var(--muted);
+
+  /* Boundary stroke for the search triggers. A fill cannot carry this: to clear
+     the 3:1 a non-text boundary wants, the field would need luminance <= 0.28
+     against the page, but its placeholder is muted text and needs the fill at
+     >= 0.93 to stay readable on it. The ranges do not overlap, so the edge has
+     to be a stroke. --field-border is transparent by design for inputs that sit
+     on a card; these sit on the page. --separator and --border are far too faint
+     to BE the boundary (1.20 and 1.28); muted at 80% is the lightest mix that
+     clears it, at 3.21:1. Both inputs are theme-aware, so no dark override. */
+  --fd-search-stroke: color-mix(in oklab, var(--muted) 80%, var(--background));
   --color-backdrop: rgba(255, 255, 255, 0.4);
   /* Fumadocs UI Animations */
   --animate-fd-fade-in: custom-fade-in 200ms ease-out forwards;
@@ -160,7 +170,8 @@
   }
 
   [data-search-full] {
-    @apply rounded-field border-none bg-field shadow-field dark:bg-field/80 dark:backdrop-blur-md;
+    @apply rounded-field bg-field shadow-field dark:bg-field/80 dark:backdrop-blur-md;
+    border: 1px solid var(--fd-search-stroke);
 
     kbd {
       @apply border-none bg-surface px-1 font-sans text-xs font-medium text-muted;
@@ -219,7 +230,11 @@
   }
 
   [data-search-full] {
-    @apply rounded-field border-none bg-default/80;
+    /* bg-field, not bg-default/80, matching #nd-nav above — the same control was
+       styled two different ways. The tint sat between the page and a muted
+       placeholder, holding it at 3.98:1 light and 2.97:1 dark. */
+    @apply rounded-field bg-field shadow-field;
+    border: 1px solid var(--fd-search-stroke);
 
     kbd {
       @apply border-none bg-surface px-1 font-sans text-xs font-medium text-muted;
