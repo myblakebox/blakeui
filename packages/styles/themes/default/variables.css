@@ -54,7 +54,13 @@
     --overlay: var(--white);
     --overlay-foreground: var(--foreground);
 
-    --muted: oklch(0.5517 0.0138 285.94);
+    /* Readable on --default, not only on --background. Secondary text lands on
+       both — tab tracks, table header pills, chips — and at 0.5517 it measured
+       4.59:1 on the page but 3.80:1 on --default, so every muted string sitting
+       on a tinted surface was under AA. 0.51 clears by 0.03, which is inside
+       rounding; 0.5 gives 4.74 on --default and 5.73 on the page, still far from
+       --foreground at 12.22. */
+    --muted: oklch(0.5 0.0138 285.94);
 
     --scrollbar: var(--scrollbar-thumb);
     --scrollbar-thumb: color-mix(in oklch, var(--foreground) 15%, transparent);
@@ -266,11 +272,16 @@
     --default-soft-hover: color-mix(in oklab, var(--default) 60%, transparent);
 
     --accent-soft: color-mix(in oklab, var(--accent) 12%, transparent);
-    --accent-soft-foreground: color-mix(in oklab, var(--accent) 80%, var(--foreground) 30%);
+    /* Weighted toward --foreground for dark. --accent does not lighten between
+       bands, so at 80/30 this measured 4.18:1 on --default — the .button--secondary
+       label. 60/40 gives 5.35:1. */
+    --accent-soft-foreground: color-mix(in oklab, var(--accent) 60%, var(--foreground) 40%);
     --accent-soft-hover: color-mix(in oklab, var(--accent) 16%, transparent);
 
     --danger-soft: color-mix(in oklab, var(--danger) 15%, transparent);
-    --danger-soft-foreground: color-mix(in oklab, var(--danger) 80%, var(--foreground) 30%);
+    /* Same for danger, which needs more: at 80/30 it measured 3.40:1 on
+       --danger-soft, and 60/40 still misses at 4.43. 50/50 gives 5.37:1. */
+    --danger-soft-foreground: color-mix(in oklab, var(--danger) 50%, var(--foreground) 50%);
     --danger-soft-hover: color-mix(in oklab, var(--danger) 20%, transparent);
 
     --warning-soft: color-mix(in oklab, var(--warning) 12%, transparent);

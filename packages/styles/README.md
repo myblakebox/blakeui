@@ -188,7 +188,7 @@ The package provides a comprehensive set of CSS variables for customization:
   --overlay-foreground: var(--foreground);
 
   /* Muted & Scrollbar */
-  --muted: oklch(0.5517 0.0138 285.94);
+  --muted: oklch(0.5 0.0138 285.94);
   --scrollbar: var(--scrollbar-thumb);
   --scrollbar-thumb: color-mix(in oklch, var(--foreground) 15%, transparent);
   --scrollbar-track: transparent;
