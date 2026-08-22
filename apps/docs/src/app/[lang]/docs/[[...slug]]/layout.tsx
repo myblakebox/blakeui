@@ -5,7 +5,7 @@ import {Separator} from "@blakeui/react";
 import {HeaderBanner, ProBanner} from "@/app/[lang]/(home)/components/pro-banner";
 import {SHOW_BANNER} from "@/app/[lang]/(home)/components/pro-constants";
 import {baseOptions} from "@/app/[lang]/layout.config";
-import {BlakeUILogo} from "@/components/blakeui-logo";
+import {BlakeUILockup} from "@/components/blakeui-lockup";
 import {FrameworksTabs} from "@/components/frameworks-tabs";
 import {DocsLayout} from "@/components/fumadocs/layouts/notebook";
 import {ThemeToggle} from "@/components/fumadocs/ui/theme-toggle";
@@ -40,7 +40,7 @@ export default async function Layout({
           banner: () => (
             <div className="flex flex-col items-start justify-center gap-4 px-4 pt-4 sm:hidden">
               <div className="flex w-full items-center justify-between gap-4 pl-1">
-                <BlakeUILogo />
+                <BlakeUILockup />
                 <ThemeToggle mode="light-dark-system" />
               </div>
               <Separator />
@@ -81,7 +81,7 @@ export default async function Layout({
         nav={{
           ...baseOptions.nav,
           mode: "top",
-          title: <BlakeUILogo />,
+          title: <BlakeUILockup />,
         }}
       >
         {children}
