@@ -1,0 +1,103 @@
+---
+title: v1.3.0
+description: Body-role text now ships at font-weight 450 instead of the browser default 400 — Figtree's variable axis makes it a real weight, and paragraphs, table cells, captions and form values all render slightly heavier. Headings, buttons and labels are untouched.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">August 22, 2026</span>
+</div>
+
+A typography release. Figtree at 400 reads thin at 14px on light backgrounds, so body-role text now ships at 450 — a real value on the variable font's weight axis (300–900), not a rounded step. Every deliberate weight in the library is untouched.
+
+Rendered values change, so this is a minor rather than a patch.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warn">
+  **This is a visual change.** Upgrading from 1.2.0 makes body text render slightly heavier everywhere, without any change on your side — paragraphs, table cells, captions, descriptions, list items and form values move from 400 to 450. If you keep screenshot baselines, expect them to differ across essentially every page. No component API changes, no sizes, line heights, letter spacing or colour tokens change.
+</Callout>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Features
+
+### Typography — body text moves from 400 to 450
+
+Body weight was previously undeclared: nothing in the library set a `font-weight` for body-role text, so it rendered at the browser default of 400. Figtree's strokes at 400 are light enough that 14px body copy on light backgrounds reads thin — data tables were where it showed most.
+
+The weight is now declared once at the root. A new token in the shared theme:
+
+```css
+@theme {
+  --font-weight-body: 450;
+}
+```
+
+applied in the base layer:
+
+```css
+body {
+  font-weight: var(--font-weight-body, 450);
+}
+```
+
+Everything that inherits its weight — paragraphs, table cells, captions, descriptions, list items, form values, placeholders — moves to 450. Everything that declares its own weight keeps it: headings, buttons, labels, table headers, chips, badges, `kbd` and emphasis stay at their deliberate 500/600.
+
+450 is a real instance, not a snap to the nearest hundred: the shipped Figtree is a variable font with a 300–900 weight axis, and 450 measures exactly midway between 400 and 500 in rendered width.
+
+To restore the previous rendering, or pick your own weight, override the token:
+
+```css
+:root {
+  --font-weight-body: 400;
+}
+```
+
+State distinctions are unaffected: disabled controls dim through opacity and placeholders through `--field-placeholder` colour, so neither relies on weight. Measured contrast is weight-independent — every token that passed WCAG before the change still passes.
+
+## Upgrading
+
+No API changes and no migration steps. One thing will look different:
+
+- **Body text is slightly heavier everywhere.** Screenshot baselines will differ on essentially every page that renders text. Tabular figures widen by about 0.4% at 14px, which is not enough to change column layout, but pixel-diff tests will see it.
+
+If your project overrides `--font-sans` with a static (non-variable) font, 450 will round to whatever your font can serve — typically 400 or 500 depending on the browser's fallback rules. Declare `--font-weight-body: 400` or `500` explicitly if you want a deterministic value there.
+
+## Links
+
+- [Typography](/docs/react/components/typography)
+- [Theming](/docs/react/getting-started/theming)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
