@@ -2,8 +2,8 @@
   <a href="https://blakeui.com">
       <img 
         alt="BlakeUI logo" 
-        width="100%" 
-        src="https://github.com/myblakebox/BlakeUI/blob/main/apps/docs/src/assets/themes/blakeUI-Hero.jpg"
+        width="420" 
+        src="https://raw.githubusercontent.com/myblakebox/BlakeUI/main/apps/docs/public/images/blakeui-blk.svg"
       />
   </a>
 </p>

@@ -1,6 +1,6 @@
 import type {BaseLayoutProps} from "fumadocs-ui/layouts/shared";
 
-import {BlakeUILogo} from "@/components/blakeui-logo";
+import {BlakeUILockup} from "@/components/blakeui-lockup";
 import {NavThemeToggle} from "@/components/fumadocs/ui/theme-toggle";
 
 export {getHomeLayoutLinks} from "./(home)/home-layout-links";
@@ -14,7 +14,7 @@ export {getHomeLayoutLinks} from "./(home)/home-layout-links";
  */
 export const baseOptions: BaseLayoutProps = {
   nav: {
-    title: <BlakeUILogo />,
+    title: <BlakeUILockup />,
     transparentMode: "always",
   },
   // Layouts that render fumadocs' stock theme-switch slot (HomeLayout) get
