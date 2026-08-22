@@ -6,8 +6,17 @@
    * get the BlakeUI font out of the box. Override `--font-sans` to use your own.
    */
   --font-sans:
-    "Figtree", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "Figtree", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+
+  /*
+   * Body text weight. Figtree at 400 reads thin at small sizes on light
+   * backgrounds, so body-role text ships at 450 — a real value on the
+   * variable weight axis, not a rounded step. Applied to `body` in
+   * base/base.css; headings, buttons, labels and other deliberate roles
+   * declare their own weights and are unaffected.
+   */
+  --font-weight-body: 450;
 }
 
 @theme inline {

@@ -29,3 +29,8 @@
 ::view-transition {
   pointer-events: none;
 }
+
+/* Body text weight — token defined in themes/shared/theme.css */
+body {
+  font-weight: var(--font-weight-body, 450);
+}
