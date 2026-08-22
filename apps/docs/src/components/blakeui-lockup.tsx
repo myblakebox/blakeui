@@ -6,16 +6,16 @@ import {cn} from "@blakeui/react";
  * in the files; the badge accent (#436283) stays hardcoded on purpose — a brand mark does not
  * retint with theme presets.
  *
- * SIZING is anchored to the WORDMARK'S CAP HEIGHT, not the SVG box: the badge spans the full
- * 213-unit viewBox height while the wordmark caps span 103.9 units (48.8%), so sizing by SVG
- * height reads small next to nav text. 18px caps put the SVG at 37px tall in the navbar.
+ * SIZING is anchored to the WORDMARK'S CAP HEIGHT, not the SVG box: the delivered 147-unit
+ * viewBox bounds the artwork tightly (no dead space), with the wordmark caps spanning 103.9
+ * units of it (70.7%). 18px caps put the SVG at 25px tall in the navbar.
  *
  * The old inline `BlakeUILogo` stays for the Satori OG route (the badge's filter stack does not
  * render under Satori) and for currentColor-tinted usages (showcase watermark, banners).
  * -----------------------------------------------------------------------------------------------*/
 
-const CAP_RATIO = 103.9 / 213;
-const ASPECT = 603 / 213;
+const CAP_RATIO = 103.9 / 147;
+const ASPECT = 584 / 147;
 const DEFAULT_CAP_HEIGHT = 18;
 
 interface BlakeUILockupProps {
