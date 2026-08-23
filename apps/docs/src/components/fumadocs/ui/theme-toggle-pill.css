@@ -3,8 +3,8 @@
  * SelectionIndicator, Tabs.Indicator) remount a fresh node per selection
  * under Next 16 / React 19.2, so their transitions never get a start value.
  * One persistent element, positioned from the selected segment's offsets.
- * Paint (background, radius) comes from utility classes on the element;
- * this file only owns mechanics: positioning, transition, reduced motion.
+ * This file owns mechanics (positioning, transition, reduced motion) and the
+ * pill/track paint below.
  */
 .theme-toggle-pill {
   pointer-events: none;
@@ -15,6 +15,23 @@
   opacity: 0;
 }
 
+/* Track and pill paint. The pill used to ride bg-fd-accent, which renders
+ * rgb(249,249,249) on a near-white track in light mode: no stroke, no shadow,
+ * no tonal separation, so the selected state was invisible. The track steps
+ * down from the page, the pill carries a hairline border and a soft shadow,
+ * and the border is the WCAG 1.4.11 boundary: it clears 3:1 against the track
+ * in both schemes (light-dark() follows the root color-scheme). In dark the
+ * pill fill itself also clears 3:1 against the track. */
+.theme-toggle-track {
+  background: light-dark(oklch(0.92 0 0), oklch(0.24 0 0));
+}
+
+.theme-toggle-pill {
+  background: light-dark(#ffffff, oklch(0.55 0 0));
+  border: 1px solid light-dark(oklch(0.53 0 0), oklch(0.78 0 0));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+}
+
 /* Armed one frame after first paint so the initial position never slides. */
 .theme-toggle-pill--animated {
   transition-duration: 250ms;
@@ -22,8 +39,17 @@
   transition-timing-function: var(--ease-out-fluid, cubic-bezier(0.32, 0.72, 0, 1));
 }
 
+/* Reduced motion, both opt-outs: the explicit attribute and the media query,
+ * the media half scoped so the two never double-apply. The pill snaps to the
+ * selected segment; selection stays visible. */
+[data-reduce-motion="true"] .theme-toggle-pill--animated {
+  transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .theme-toggle-pill--animated {
+  .theme-toggle-pill--animated:not(
+    :is([data-reduce-motion="true"], [data-reduce-motion="true"] *)
+  ) {
     transition: none;
   }
 }

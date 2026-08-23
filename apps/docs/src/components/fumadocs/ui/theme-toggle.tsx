@@ -36,6 +36,9 @@ const segmentVariants = tv({
 
 const full = [["light", Sun] as const, ["dark", Moon] as const, ["system", Airplay] as const];
 
+/** The pill's 250ms slide plus a settle frame — how long a deferred setTheme waits. */
+const PILL_SLIDE_MS = 270;
+
 /**
  * Slot-compatible three-state toggle for layouts that render fumadocs'
  * `slots.themeSwitch` (HomeLayout). The slot is invoked without a `mode`
@@ -60,7 +63,39 @@ export function ThemeToggle({
   const pillRef = useRef<HTMLSpanElement>(null);
   const [animated, setAnimated] = useState(false);
 
-  const selected = mode === "light-dark-system" && mounted ? theme : null;
+  // The pill slides on LOCAL state and the real setTheme is deferred until the
+  // slide has played — the account-menu-card pattern: RootProvider runs
+  // next-themes with disableTransitionOnChange, which injects
+  // `* { transition: none !important }` for the exact window in which the
+  // theme flips, so a theme-derived pill could never animate.
+  const [localTheme, setLocalTheme] = useState<string | undefined>(undefined);
+  const pendingThemeRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(pendingThemeRef.current), []);
+
+  // Sync from external changes (any control driving the same next-themes
+  // state), delayed a tick so a slide in this direction starts after the
+  // transition-kill style is gone. The toggle's own deferred write also lands
+  // here, where the sync simply confirms the state it just set.
+  useEffect(() => {
+    const timeout = setTimeout(() => setLocalTheme(theme), 60);
+
+    return () => clearTimeout(timeout);
+  }, [theme]);
+
+  function selectTheme(key: string) {
+    setLocalTheme(key);
+    clearTimeout(pendingThemeRef.current);
+
+    // Reduced motion (either opt-out): no slide to wait for — flip immediately.
+    const reduce =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      listRef.current?.closest('[data-reduce-motion="true"]') != null;
+
+    pendingThemeRef.current = setTimeout(() => setTheme(key), reduce ? 0 : PILL_SLIDE_MS);
+  }
+
+  const selected = mode === "light-dark-system" && mounted ? (localTheme ?? theme) : null;
 
   // Position the pill over the selected segment. Purely visual: selection
   // state, focus, and keyboard behavior live on the buttons, untouched.
@@ -108,7 +143,7 @@ export function ThemeToggle({
   }, []);
 
   const container = cn(
-    "inline-flex cursor-(--cursor-interactive) items-center rounded-full border p-1",
+    "theme-toggle-track inline-flex cursor-(--cursor-interactive) items-center rounded-full border p-1",
     className,
   );
 
@@ -142,10 +177,7 @@ export function ThemeToggle({
       <span
         ref={pillRef}
         aria-hidden
-        className={cn(
-          "theme-toggle-pill bg-fd-accent rounded-full",
-          animated && "theme-toggle-pill--animated",
-        )}
+        className={cn("theme-toggle-pill rounded-full", animated && "theme-toggle-pill--animated")}
       />
       {full.map(([key, Icon]) => (
         <button
@@ -153,7 +185,7 @@ export function ThemeToggle({
           aria-label={key}
           className={cn(segmentVariants({active: selected === key}))}
           data-theme-item={key}
-          onClick={() => setTheme(key)}
+          onClick={() => selectTheme(key)}
         >
           <Icon className="size-full" fill="currentColor" />
         </button>
