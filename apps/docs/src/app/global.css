@@ -290,7 +290,10 @@
   }
 
   [data-radix-scroll-area-viewport] {
-    @apply px-1 pt-2;
+    /* Enough horizontal inset that the active pill's surface shadow and a
+       keyboard focus ring paint fully inside the sidebar instead of
+       clipping at its edges. */
+    @apply px-3.5 pt-2;
 
     p {
       @apply font-medium;
