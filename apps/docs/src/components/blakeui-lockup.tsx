@@ -8,7 +8,8 @@ import {cn} from "@blakeui/react";
  *
  * SIZING is anchored to the WORDMARK'S CAP HEIGHT, not the SVG box: the delivered 147-unit
  * viewBox bounds the artwork tightly (no dead space), with the wordmark caps spanning 103.9
- * units of it (70.7%). 18px caps put the SVG at 25px tall in the navbar.
+ * units of it (70.7%). 24px caps put the SVG at 34px tall in the navbar: level with the
+ * tallest other element in the 56px bar and 11px clear top and bottom.
  *
  * The old inline `BlakeUILogo` stays for the Satori OG route (the badge's filter stack does not
  * render under Satori) and for currentColor-tinted usages (showcase watermark, banners).
@@ -16,7 +17,7 @@ import {cn} from "@blakeui/react";
 
 const CAP_RATIO = 103.9 / 147;
 const ASPECT = 584 / 147;
-const DEFAULT_CAP_HEIGHT = 18;
+const DEFAULT_CAP_HEIGHT = 24;
 
 interface BlakeUILockupProps {
   className?: string;
