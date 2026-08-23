@@ -167,7 +167,7 @@ export function HeaderBanner() {
         rel="noopener noreferrer"
         target="_blank"
       >
-        <span className="shrink-0 rounded-[2.2px] bg-black px-2 py-0.5 text-xs leading-tight font-medium text-white">
+        <span className="shrink-0 rounded-[2.2px] bg-black px-2 py-0.5 text-xs leading-tight font-medium text-white dark:bg-white dark:text-black">
           PRO
         </span>
         {hasLiveDiscount ? (
