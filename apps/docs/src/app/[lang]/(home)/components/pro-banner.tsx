@@ -2,14 +2,13 @@
 
 import {Button, CloseButton, buttonVariants} from "@blakeui/react";
 import {Calligraph} from "calligraph";
-import {AnimatePresence, motion} from "motion/react";
+import {AnimatePresence, motion, useReducedMotion} from "motion/react";
 import {useEffect, useState, useSyncExternalStore} from "react";
 
 import {env} from "~env";
 
 import {FloatingStars} from "./floating-stars";
-import {PRO_URL, SHOW_BANNER} from "./pro-constants";
-import {ProTitle} from "./pro-title";
+import {PERSIST_CARD_DISMISSAL, PRO_URL, SHOW_BANNER} from "./pro-constants";
 
 interface DiscountData {
   label: string;
@@ -27,11 +26,11 @@ const getProHref = (medium: string, campaign: string) =>
 
 const DEFAULT_PRO_COPY = {
   cardDescription:
-    "Components, templates, and AI tooling for React and React Native. Made for teams that care about the details.",
-  cardTitle: "Build faster with blakeUI Pro",
+    "Components, templates, and AI tooling for React. Made for teams that care about the details.",
+  cardTitle: "Build faster with BlakeUI Pro",
   cta: "Explore Pro",
-  headerDetail: "Components, templates & AI tooling",
-  headerTitle: "blakeUI Pro is live",
+  headerDetail: "components, templates & AI tooling",
+  headerTitle: "BlakeUI Pro is live",
   heroLabel: "Now available",
 };
 
@@ -122,62 +121,96 @@ function useCountdown(endsAt: string | null) {
   return countdown.time;
 }
 
+const HEADER_BANNER_DISMISSED_KEY = "blakeui-pro-header-banner-dismissed";
+
+const subscribeToBannerDismissed = (callback: () => void) => {
+  window.addEventListener("storage", callback);
+
+  return () => window.removeEventListener("storage", callback);
+};
+const getBannerDismissedSnapshot = () =>
+  localStorage.getItem(HEADER_BANNER_DISMISSED_KEY) === "true";
+const getBannerDismissedServerSnapshot = () => true;
+
 export function HeaderBanner() {
+  const wasPreviouslyDismissed = useSyncExternalStore(
+    subscribeToBannerDismissed,
+    getBannerDismissedSnapshot,
+    getBannerDismissedServerSnapshot,
+  );
+  const [dismissed, setDismissed] = useState(false);
   const discount = useProDiscount();
   const time = useCountdown(discount?.endsAt ?? null);
 
-  if (!SHOW_BANNER) return null;
+  if (!SHOW_BANNER || wasPreviouslyDismissed || dismissed) return null;
 
   const hasLiveDiscount = Boolean(discount && time);
   const campaign = hasLiveDiscount ? DISCOUNT_CAMPAIGN : DEFAULT_CAMPAIGN;
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    localStorage.setItem(HEADER_BANNER_DISMISSED_KEY, "true");
+  };
+
   return (
-    <a
-      className="flex h-8 w-full items-center justify-center gap-1.5 bg-surface-secondary transition-colors hover:bg-surface-secondary/80"
-      href={getProHref("banner", campaign)}
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs leading-tight font-medium text-accent-foreground">
-        Pro
-      </span>
-      {hasLiveDiscount ? (
-        <>
-          <span className="hidden text-xs font-medium text-foreground sm:inline">
-            {DISCOUNT_PRO_COPY.headerTitle}
-          </span>
-          <span className="text-xs font-medium text-foreground">
-            <span className="tabular-nums">{discount?.percent}</span>% off
-            <span className="hidden sm:inline"> ends</span> in
-          </span>
-          <span className="shrink-0 rounded-[5px] border border-accent-soft-hover bg-linear-to-r from-accent/10 to-accent/7 px-1.5 py-0.5 text-xs leading-tight font-medium text-foreground tabular-nums">
-            <Calligraph animation="snappy" variant="number">
-              {time?.days}
-            </Calligraph>
-            d :{" "}
-            <Calligraph animation="snappy" variant="number">
-              {time?.hours}
-            </Calligraph>
-            h :{" "}
-            <Calligraph animation="snappy" variant="number">
-              {time?.minutes}
-            </Calligraph>
-            m :{" "}
-            <Calligraph animation="snappy" variant="number">
-              {time?.seconds}
-            </Calligraph>
-            s
-          </span>
-        </>
-      ) : (
-        <span className="text-xs font-medium text-foreground">
-          <span className="hidden sm:inline">{DEFAULT_PRO_COPY.headerTitle} - </span>
-          {DEFAULT_PRO_COPY.headerDetail}
+    <div className="relative">
+      <a
+        className="flex h-8 w-full items-center justify-center gap-1.5 bg-surface-secondary transition-colors hover:bg-surface-secondary/80"
+        href={getProHref("banner", campaign)}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs leading-tight font-medium text-accent-foreground">
+          Pro
         </span>
-      )}
-    </a>
+        {hasLiveDiscount ? (
+          <>
+            <span className="hidden text-xs font-medium text-foreground sm:inline">
+              {DISCOUNT_PRO_COPY.headerTitle}
+            </span>
+            <span className="text-xs font-medium text-foreground">
+              <span className="tabular-nums">{discount?.percent}</span>% off
+              <span className="hidden sm:inline"> ends</span> in
+            </span>
+            <span className="shrink-0 rounded-[5px] border border-accent-soft-hover bg-linear-to-r from-accent/10 to-accent/7 px-1.5 py-0.5 text-xs leading-tight font-medium text-foreground tabular-nums">
+              <Calligraph animation="snappy" variant="number">
+                {time?.days}
+              </Calligraph>
+              d :{" "}
+              <Calligraph animation="snappy" variant="number">
+                {time?.hours}
+              </Calligraph>
+              h :{" "}
+              <Calligraph animation="snappy" variant="number">
+                {time?.minutes}
+              </Calligraph>
+              m :{" "}
+              <Calligraph animation="snappy" variant="number">
+                {time?.seconds}
+              </Calligraph>
+              s
+            </span>
+          </>
+        ) : (
+          <span className="text-xs font-medium whitespace-nowrap text-foreground">
+            <span className="hidden sm:inline">{DEFAULT_PRO_COPY.headerTitle} — </span>
+            {DEFAULT_PRO_COPY.headerDetail}
+          </span>
+        )}
+      </a>
+      <CloseButton
+        aria-label="Dismiss Pro banner"
+        className="absolute top-1/2 right-2 size-6 -translate-y-1/2 bg-transparent text-muted hover:bg-foreground/10 hover:text-foreground"
+        onPress={handleDismiss}
+      />
+    </div>
   );
 }
+
+const subscribeToNothing = () => () => {};
+const getAttrReducedMotionSnapshot = () =>
+  document.querySelector('[data-reduce-motion="true"]') != null;
+const getAttrReducedMotionServerSnapshot = () => false;
 
 const PRO_BANNER_DISMISSED_KEY = "blakeui-pro-banner-dismissed-session";
 
@@ -186,7 +219,10 @@ const subscribeToDismissed = (callback: () => void) => {
 
   return () => window.removeEventListener("storage", callback);
 };
-const getDismissedSnapshot = () => sessionStorage.getItem(PRO_BANNER_DISMISSED_KEY) === "true";
+// Only consulted when PERSIST_CARD_DISMISSAL is on — otherwise the card
+// returns on every visit and dismissal lives in component state alone.
+const getDismissedSnapshot = () =>
+  PERSIST_CARD_DISMISSAL && localStorage.getItem(PRO_BANNER_DISMISSED_KEY) === "true";
 const getDismissedServerSnapshot = () => true;
 
 export function ProBanner() {
@@ -206,8 +242,41 @@ export function ProBanner() {
 
   const handleDismiss = () => {
     setDismissed(true);
-    sessionStorage.setItem(PRO_BANNER_DISMISSED_KEY, "true");
+
+    if (PERSIST_CARD_DISMISSAL) {
+      localStorage.setItem(PRO_BANNER_DISMISSED_KEY, "true");
+    }
   };
+
+  // Non-modal promo: no focus trap, but Escape dismisses from anywhere.
+  useEffect(() => {
+    if (!visible) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDismissed(true);
+
+        if (PERSIST_CARD_DISMISSAL) {
+          localStorage.setItem(PRO_BANNER_DISMISSED_KEY, "true");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [visible]);
+
+  // Both reduced-motion opt-outs suppress the entrance/exit spring; the card
+  // simply appears in place.
+  const prefersReducedMotion = useReducedMotion();
+  const attrReducedMotion = useSyncExternalStore(
+    subscribeToNothing,
+    getAttrReducedMotionSnapshot,
+    getAttrReducedMotionServerSnapshot,
+  );
+
+  const reduceMotion = Boolean(prefersReducedMotion) || attrReducedMotion;
 
   return (
     <AnimatePresence>
@@ -215,9 +284,16 @@ export function ProBanner() {
         <motion.div
           animate={{opacity: 1, scale: 1, y: 0}}
           className="fixed bottom-6 left-6 z-50 w-[288px] overflow-hidden rounded-[20px] border border-separator bg-surface shadow-xl"
-          exit={{opacity: 0, scale: 0.95, transition: {duration: 0.2, ease: "easeIn"}, y: 20}}
-          initial={{opacity: 0, scale: 0.95, y: 20}}
-          transition={{damping: 25, delay: 0.5, stiffness: 300, type: "spring"}}
+          initial={reduceMotion ? {opacity: 1, scale: 1, y: 0} : {opacity: 0, scale: 0.95, y: 20}}
+          exit={{
+            opacity: 0,
+            scale: reduceMotion ? 1 : 0.95,
+            transition: {duration: reduceMotion ? 0 : 0.2, ease: "easeIn"},
+            y: reduceMotion ? 0 : 20,
+          }}
+          transition={
+            reduceMotion ? {duration: 0} : {damping: 25, delay: 0.5, stiffness: 300, type: "spring"}
+          }
         >
           {/* Top gradient section */}
           <div className="relative flex h-[180px] flex-col items-center justify-center gap-2 overflow-hidden px-6 py-6">
@@ -330,14 +406,24 @@ export function ProBanner() {
                 </clipPath>
               </defs>
             </svg>
-            {/* Floating white particles */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            {/* Floating white particles — decorative, stopped under reduced motion */}
+            <div
+              aria-hidden
+              className="pro-card-stars pointer-events-none absolute inset-0 overflow-hidden"
+            >
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-50">
                 <FloatingStars />
               </div>
             </div>
             <div className="relative flex items-center gap-2">
-              <ProTitle />
+              {}
+              <img
+                alt="BlakeUI Pro"
+                className="h-auto w-44"
+                height={147}
+                src="/images/blakeUI_Card_Logo.svg"
+                width={355}
+              />
             </div>
             {hasLiveDiscount ? (
               <span className="relative text-xs text-[#4E75A5] tabular-nums">
@@ -366,8 +452,9 @@ export function ProBanner() {
             )}
           </div>
 
+          {/* Panel stays light in both themes, so the X is dark-on-light */}
           <CloseButton
-            className="absolute top-2 right-2 bg-transparent text-white/50 hover:bg-white/10 hover:text-white"
+            className="absolute top-2 right-2 bg-transparent text-black/40 hover:bg-black/10 hover:text-black/70"
             onPress={handleDismiss}
           />
 
@@ -378,7 +465,7 @@ export function ProBanner() {
               <p className="text-sm leading-relaxed text-muted">{copy.cardDescription}</p>
             </div>
             <div className="flex items-center gap-2 pt-1">
-              <Button size="md" variant="outline" onPress={handleDismiss}>
+              <Button size="md" variant="secondary" onPress={handleDismiss}>
                 Close
               </Button>
               <a
