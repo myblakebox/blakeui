@@ -8,7 +8,9 @@ import {baseOptions} from "@/app/[lang]/layout.config";
 import {BlakeUILockup} from "@/components/blakeui-lockup";
 import {FrameworksTabs} from "@/components/frameworks-tabs";
 import {DocsLayout} from "@/components/fumadocs/layouts/notebook";
+import {DocsSidebarSection} from "@/components/fumadocs/layouts/notebook/sidebar-section";
 import {ThemeToggle} from "@/components/fumadocs/ui/theme-toggle";
+import {withCollapsibleSections} from "@/lib/sidebar-sections";
 import {source} from "@/lib/source";
 
 const DOCS_TOP_BANNER_HEIGHT = "2rem";
@@ -35,7 +37,7 @@ export default async function Layout({
       <DocsLayout
         containerProps={{style: layoutStyle}}
         tabMode="navbar"
-        tree={source.getPageTree(lang)}
+        tree={withCollapsibleSections(source.getPageTree(lang))}
         sidebar={{
           banner: () => (
             <div className="flex flex-col items-start justify-center gap-4 px-4 pt-4 sm:hidden">
@@ -47,6 +49,7 @@ export default async function Layout({
             </div>
           ),
           collapsible: false,
+          components: {Folder: DocsSidebarSection},
           defaultOpenLevel: 0,
           footer: () => (
             <div className="px-4 pb-4 sm:hidden">
