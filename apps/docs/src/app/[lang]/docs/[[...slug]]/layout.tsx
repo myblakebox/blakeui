@@ -2,7 +2,7 @@ import type {CSSProperties, ReactNode} from "react";
 
 import {Separator} from "@blakeui/react";
 
-import {HeaderBanner, ProBanner} from "@/app/[lang]/(home)/components/pro-banner";
+import {HeaderBanner} from "@/app/[lang]/(home)/components/pro-banner";
 import {SHOW_BANNER} from "@/app/[lang]/(home)/components/pro-constants";
 import {baseOptions} from "@/app/[lang]/layout.config";
 import {BlakeUILockup} from "@/components/blakeui-lockup";
@@ -86,7 +86,8 @@ export default async function Layout({
       >
         {children}
       </DocsLayout>
-      <ProBanner />
+      {/* Card and banner never coincide: the promo card is homepage-only,
+          docs pages carry only the slim HeaderBanner above. */}
     </>
   );
 }

@@ -15,27 +15,23 @@
   opacity: 0;
 }
 
-/* Track and pill paint. The pill used to ride bg-fd-accent, which renders
- * rgb(249,249,249) on a near-white track in light mode: no tonal separation,
- * so the selected state was invisible. The FILL now carries the contrast: the
- * brand accent in light, the shipped dark focus tune of the same hue in dark,
- * both clearing 3:1 against the stepped-down track by fill alone. The
- * hairline rides the --separator token so the pill sits with the header CTA
- * (border-separator) instead of outlining itself in a heavier stroke, plus a
- * soft shadow. The active segment icon flips to keep contrast on the accent
- * fill (light-dark() follows the root color-scheme). */
+/* Track and pill paint. The pill is WHITE by design: the selected state is
+ * carried by the white pill against the stepped-down track, the --separator
+ * hairline (same token as the header CTA border), the soft shadow, and the
+ * active icon's tint flip to the brand accent. The fill alone is not asked to
+ * clear 3:1 — do not reintroduce a coloured fill to chase that number. */
 .theme-toggle-track {
   background: light-dark(oklch(0.92 0 0), oklch(0.24 0 0));
 }
 
 .theme-toggle-pill {
-  background: light-dark(oklch(0.4863 0.0647 250.76), oklch(0.7 0.09 250.76));
+  background: light-dark(oklch(0.99 0 0), oklch(0.96 0 0));
   border: 1px solid var(--separator, var(--fd-border));
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
 }
 
 .theme-toggle-track button[data-active] {
-  color: light-dark(oklch(0.99 0 0), oklch(0.18 0.01 250));
+  color: oklch(0.42 0.075 250.76);
 }
 
 /* Armed one frame after first paint so the initial position never slides. */

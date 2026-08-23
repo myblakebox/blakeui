@@ -8,6 +8,29 @@
 @import "@blakeui/styles";
 @import "../styles/theme-presets.css";
 
+/* Nothing in the header bar may ever wrap to a second line. The nav markup
+   is fumadocs', so the guarantee lives here: labels stay on one line and the
+   search field is the element that gives way first under compression. */
+#nd-nav a,
+#nd-nav button,
+#nd-subnav [data-header-body] a,
+#nd-subnav [data-header-body] button {
+  white-space: nowrap;
+}
+
+/* Pro card particle drift: fully stopped under BOTH reduced-motion opt-outs
+   (the explicit data attribute and the OS media query). The stars stay
+   rendered in their resting position, so the panel still looks finished. */
+[data-reduce-motion="true"] .pro-card-stars * {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pro-card-stars * {
+    animation: none !important;
+  }
+}
+
 @keyframes float-stars {
   0% {
     transform: translateY(0px) translateX(0px);
