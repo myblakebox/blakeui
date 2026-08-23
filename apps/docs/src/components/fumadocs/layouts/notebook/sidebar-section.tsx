@@ -145,12 +145,14 @@ function CollapsibleSection({children, item}: {children: ReactNode; item: PageTr
       <button
         aria-controls={panelId}
         aria-expanded={open}
+        data-active={active}
         data-sidebar-section=""
         type="button"
         className={cn(
           "text-fd-muted-foreground hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80",
           "flex w-full flex-row items-center gap-2 rounded-lg p-2 text-start",
           "transition-colors hover:transition-none [&_svg]:size-4 [&_svg]:shrink-0",
+          "data-[active=true]:text-fd-primary",
         )}
         onClick={toggle}
       >
@@ -175,12 +177,24 @@ function CollapsibleSection({children, item}: {children: ReactNode; item: PageTr
       >
         <div
           className={cn(
-            "flex min-h-0 flex-col gap-0.5 overflow-hidden",
+            "flex min-h-0 flex-col overflow-hidden",
             animate && "transition-[visibility] duration-200 motion-reduce:transition-none",
             !open && "invisible",
           )}
         >
-          {children}
+          {/* Depth-1 folder context indents children off the rail and enables
+              the emphasised rail segment on the active item. The rail itself
+              is a pseudo-element: decorative, unfocusable, absent from the
+              accessibility tree. */}
+          <SidebarFolder
+            collapsible={false}
+            className={cn(
+              "relative flex flex-col gap-0.5",
+              "before:bg-fd-border before:absolute before:inset-y-1 before:start-2.5 before:w-px before:content-['']",
+            )}
+          >
+            {children}
+          </SidebarFolder>
         </div>
       </div>
     </div>
