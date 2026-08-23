@@ -82,8 +82,13 @@
 
   cursor: var(--cursor-interactive);
 
-  /* Focus state */
-  &:focus-visible:not(:focus),
+  /* Focus state. The trigger is a RAC Pressable div, which never receives
+     data-focus-visible, and the old `:focus-visible:not(:focus)` arm can never
+     match (a focus-visible element always also matches :focus) — so a styled
+     trigger painted no package ring on keyboard focus, only the UA default.
+     Plain :focus-visible is the arm that actually fires here; the data
+     attribute stays for RAC-rendered triggers that do carry it. */
+  &:focus-visible,
   &[data-focus-visible="true"] {
     @apply status-focused;
   }
