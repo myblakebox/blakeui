@@ -8,7 +8,15 @@ import {useEffect, useState, useSyncExternalStore} from "react";
 import {env} from "~env";
 
 import {FloatingStars} from "./floating-stars";
-import {PERSIST_CARD_DISMISSAL, PRO_URL, SHOW_BANNER} from "./pro-constants";
+import {
+  PERSIST_CARD_DISMISSAL,
+  PRO_BANNER_DETAIL,
+  PRO_BANNER_TITLE,
+  PRO_CARD_BODY,
+  PRO_CARD_TITLE,
+  PRO_URL,
+  SHOW_BANNER,
+} from "./pro-constants";
 
 interface DiscountData {
   label: string;
@@ -25,12 +33,11 @@ const getProHref = (medium: string, campaign: string) =>
   `${PRO_URL}?utm_source=blakeui.com&utm_medium=${medium}&utm_campaign=${campaign}`;
 
 const DEFAULT_PRO_COPY = {
-  cardDescription:
-    "Components, templates, and AI tooling for React. Made for teams that care about the details.",
-  cardTitle: "Build faster with BlakeUI Pro",
+  cardDescription: PRO_CARD_BODY,
+  cardTitle: PRO_CARD_TITLE,
   cta: "Explore Pro",
-  headerDetail: "components, templates & AI tooling",
-  headerTitle: "BlakeUI Pro is live",
+  headerDetail: PRO_BANNER_DETAIL,
+  headerTitle: PRO_BANNER_TITLE,
   heroLabel: "Now available",
 };
 
@@ -155,13 +162,13 @@ export function HeaderBanner() {
   return (
     <div className="relative">
       <a
-        className="flex h-8 w-full items-center justify-center gap-1.5 bg-surface-secondary transition-colors hover:bg-surface-secondary/80"
+        className="flex h-8 w-full items-center justify-center gap-1.5 bg-default transition-colors hover:bg-default-hover"
         href={getProHref("banner", campaign)}
         rel="noopener noreferrer"
         target="_blank"
       >
-        <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs leading-tight font-medium text-accent-foreground">
-          Pro
+        <span className="shrink-0 rounded-[2.2px] bg-black px-2 py-0.5 text-xs leading-tight font-medium text-white">
+          PRO
         </span>
         {hasLiveDiscount ? (
           <>
@@ -354,7 +361,7 @@ export function ProBanner() {
                   <feComposite in2="hardAlpha" k2="-1" k3="1" operator="arithmetic" />
                   <feColorMatrix
                     type="matrix"
-                    values="0 0 0 0 0.728741 0 0 0 0 0.968353 0 0 0 0 1 0 0 0 0.8 0"
+                    values="0 0 0 0 0.980 0 0 0 0 0.976 0 0 0 0 0.965 0 0 0 0.8 0"
                   />
                   <feBlend in2="shape" mode="normal" result="effect1_innerShadow_pro_banner" />
                 </filter>
@@ -387,8 +394,8 @@ export function ProBanner() {
                   y1="0"
                   y2="365"
                 >
-                  <stop stopColor="#E9E9FF" />
-                  <stop offset="1" stopColor="#CCE5F1" />
+                  <stop stopColor="#FDFCFA" />
+                  <stop offset="1" stopColor="#E5E4DF" />
                 </linearGradient>
                 <linearGradient
                   gradientUnits="userSpaceOnUse"
@@ -398,8 +405,8 @@ export function ProBanner() {
                   y1="219.359"
                   y2="417.953"
                 >
-                  <stop stopColor="#5DD0E7" />
-                  <stop offset="1" stopColor="#7300FF" />
+                  <stop stopColor="#B9CBDD" />
+                  <stop offset="1" stopColor="#436283" />
                 </linearGradient>
                 <clipPath id="clip0_pro_banner">
                   <rect fill="white" height="328" width="406" />
@@ -426,7 +433,7 @@ export function ProBanner() {
               />
             </div>
             {hasLiveDiscount ? (
-              <span className="relative text-xs text-[#4E75A5] tabular-nums">
+              <span className="relative text-xs text-[#436283] tabular-nums">
                 Ends in{" "}
                 <Calligraph animation="snappy" variant="number">
                   {time?.days}
@@ -446,7 +453,7 @@ export function ProBanner() {
                 s
               </span>
             ) : (
-              <span className="relative text-xs font-medium text-[#4E75A5]">
+              <span className="relative text-xs font-medium text-[#436283]">
                 {DEFAULT_PRO_COPY.heroLabel}
               </span>
             )}

@@ -18,6 +18,13 @@
   white-space: nowrap;
 }
 
+/* Star fill on the promo card panel. The star SVG paints every path with
+   var(--fill-0, white); white vanished on the warm-white BlakeUI panel, so
+   the particles ride the muted blue accent instead. */
+.pro-card-stars {
+  --fill-0: #436283;
+}
+
 /* Pro card particle drift: fully stopped under BOTH reduced-motion opt-outs
    (the explicit data attribute and the OS media query). The stars stay
    rendered in their resting position, so the panel still looks finished. */
