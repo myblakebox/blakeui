@@ -184,6 +184,7 @@ export function ThemeToggle({
           key={key}
           aria-label={key}
           className={cn(segmentVariants({active: selected === key}))}
+          data-active={selected === key || undefined}
           data-theme-item={key}
           onClick={() => selectTheme(key)}
         >
