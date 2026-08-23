@@ -114,8 +114,12 @@ export function AccountMenuCard() {
           </MenuItem>
         </Menu>
       </Card.Content>
+      {/* One template literal, ONE text node. As three JSX text nodes (text,
+          expression, entity text) the server HTML lost the space at the node
+          boundary and hydration flagged " · Terms" vs "· Terms" on every home
+          load - a single text node cannot disagree with itself. */}
       <Card.Footer className="w-full justify-center text-xs text-muted">
-        BlakeUI {account.version} &middot; Terms
+        {`BlakeUI ${account.version} · Terms`}
       </Card.Footer>
     </Card>
   );
