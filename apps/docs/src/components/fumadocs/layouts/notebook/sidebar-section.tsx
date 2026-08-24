@@ -178,6 +178,13 @@ function CollapsibleSection({children, item}: {children: ReactNode; item: PageTr
         <div
           className={cn(
             "flex min-h-0 flex-col overflow-hidden",
+            /* The collapse needs overflow-hidden for the grid-rows animation,
+               but hidden clips both axes and this box hugs the pill exactly,
+               so the active pill's surface shadow and the keyboard focus ring
+               were cut off at the pill's own edge. Equal negative margin and
+               padding keep every child in place while moving the clip
+               boundary 14px out to the scroll viewport's padding box. */
+            "-mx-3.5 px-3.5",
             animate && "transition-[visibility] duration-200 motion-reduce:transition-none",
             !open && "invisible",
           )}
