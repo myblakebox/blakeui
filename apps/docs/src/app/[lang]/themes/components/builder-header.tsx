@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import {useParams} from "next/navigation";
 
-import {BlakeUILogo} from "@/components/blakeui-logo";
+import {BlakeUILockup} from "@/components/blakeui-lockup";
 import {useCodePanel} from "@/hooks/use-code-panel";
 import {useDictionary} from "@/hooks/use-dictionary";
 import useKeyPress from "@/hooks/use-key-press";
@@ -53,7 +53,7 @@ export function BuilderHeader() {
       <div className="flex h-14 w-full max-w-[1400px] items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Link href={`/${lang}`}>
-            <BlakeUILogo />
+            <BlakeUILockup />
           </Link>
           <div className="flex items-center gap-3">
             <Tooltip closeDelay={0} delay={100}>
