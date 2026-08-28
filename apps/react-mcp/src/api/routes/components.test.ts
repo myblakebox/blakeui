@@ -170,4 +170,103 @@ describe("Components API", () => {
       expect(res.status).toBe(400);
     });
   });
+
+  // The gate runs before any R2 access, so these assertions hold with or without
+  // credentials configured. See src/shared/behavior and the Tabs incident fixture.
+  describe("POST /v1/components/styles — behavior gate", () => {
+    it("rejects a behavior-required component with no behaviorSource", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({components: ["Tabs"]}),
+      });
+
+      expect(res.status).toBe(400);
+
+      const data = (await res.json()) as any;
+      expect(data.error).toBe("behavior_source required");
+      expect(data.gatedComponents.map((g: any) => g.component).includes("Tabs")).toBe(true);
+      expect(data.message).toMatch(/roving tabindex/);
+      expect(data.behaviorSource).toHaveProperty("blake");
+      expect(data.behaviorSource).toHaveProperty("self");
+    });
+
+    it("rejects a batch when any component in it is behavior-required", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({components: ["Card", "Tabs"]}),
+      });
+
+      expect(res.status).toBe(400);
+
+      const data = (await res.json()) as any;
+      expect(data.gatedComponents.map((g: any) => g.component)).toEqual(["Tabs"]);
+    });
+
+    it("rejects an unrecognised component name", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({components: ["NotAComponent"]}),
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects an invalid behaviorSource value", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({components: ["Tabs"], behaviorSource: "maybe"}),
+      });
+
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe("POST /v1/components/behavior", () => {
+    it("returns the interaction contract for a behavior-required component", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/behavior", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({component: "Tabs"}),
+      });
+
+      expect(res.status).toBe(200);
+
+      const data = (await res.json()) as any;
+      expect(data.component).toBe("Tabs");
+      expect(data.completeness).toBe("behavior-required");
+      expect(data.keyboard.length).toBeGreaterThan(0);
+      expect(data.focus.length).toBeGreaterThan(0);
+      expect(data.dataAttributes.map((a: any) => a.attribute).includes("data-selected")).toBe(true);
+      expect(data.activation.default).toBe("automatic");
+    });
+
+    it("returns a short contract for a styles-sufficient component", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/behavior", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({component: "Card"}),
+      });
+
+      expect(res.status).toBe(200);
+
+      const data = (await res.json()) as any;
+      expect(data.completeness).toBe("styles-sufficient");
+      expect(data.keyboard).toEqual([]);
+      expect(data.criteria).toEqual([]);
+    });
+
+    it("404s for an unknown component", async () => {
+      const res = await SELF.fetch("http://localhost:8787/v1/components/behavior", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({component: "NotAComponent"}),
+      });
+
+      expect(res.status).toBe(404);
+    });
+  });
 });
