@@ -1,3 +1,5 @@
+import type {Completeness} from "../behavior/types";
+
 // Component Data Types (shared across services and lib)
 interface ComponentSourceLinks {
   source?: string;
@@ -8,6 +10,11 @@ interface ComponentSourceLinks {
 // V1 API - Minimal component data structure
 export interface ComponentData {
   name: string;
+  /**
+   * Whether the stylesheet is the whole component. Stamped at extraction time
+   * from `src/shared/behavior`, so the catalog in R2 is self-describing.
+   */
+  completeness?: Completeness;
   links?: ComponentSourceLinks;
 }
 
@@ -36,6 +43,7 @@ interface CssClass {
 
 export interface LegacyComponentData {
   name: string;
+  completeness?: Completeness;
   description?: string;
   importStatement?: string;
   anatomy?: string;

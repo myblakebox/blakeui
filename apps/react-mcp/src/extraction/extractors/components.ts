@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 /**
  * Component extractor for BlakeUI React components
  * Self-contained with all component extraction logic
  */
 
+import type {Completeness} from "../../shared/behavior/types";
 import type {ComponentDataset} from "../../shared/types/data";
 import type {GitHubClient} from "../services/github-client";
 
@@ -22,6 +24,7 @@ export interface ComponentSourceLinks {
 
 export interface ComponentDefinition {
   name: string;
+  completeness?: Completeness;
   links?: ComponentSourceLinks;
 }
 

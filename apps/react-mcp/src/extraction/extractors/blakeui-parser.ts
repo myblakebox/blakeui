@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 /**
  * BlakeUI component documentation parser
  */
@@ -5,6 +6,8 @@
 import type {ComponentDefinition, ComponentParser, ComponentSourceLinks} from "./components";
 
 import * as path from "path";
+
+import {getCompleteness} from "../../shared/behavior";
 
 export class BlakeUIParser implements ComponentParser {
   async parseContent(content: string, filePath: string): Promise<ComponentDefinition | null> {
@@ -17,10 +20,21 @@ export class BlakeUIParser implements ComponentParser {
     // Extract source links from frontmatter
     const links = this.extractSourceLinks(frontmatter);
 
-    console.log(`   ✓ ${componentName}${links ? " (with links)" : ""}`);
+    // Completeness is not authored in the MDX; it comes from the audited
+    // contract registry so the catalog and the tools cannot disagree.
+    const completeness = getCompleteness(componentName);
+
+    if (!completeness) {
+      console.log(`      ⚠️  no completeness verdict recorded for ${componentName}`);
+    }
+
+    console.log(
+      `   ✓ ${componentName}${links ? " (with links)" : ""} [${completeness ?? "unknown"}]`,
+    );
 
     return {
       name: componentName,
+      completeness,
       links,
     };
   }

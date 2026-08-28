@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 /**
  * Base extractor with shared logic for all extraction types
  */
@@ -105,12 +106,18 @@ export abstract class BaseExtractor {
 
           // Create and upload ctx.json with all initialization data
           console.log("🔄 Creating ctx.json...");
-          const componentDataset = data as Record<string, {name: string}>;
+          const componentDataset = data as Record<string, {name: string; completeness?: string}>;
           const componentList = Object.keys(componentDataset).sort();
 
           // Create ctx data
           const ctxData = {
             components: componentList,
+            completeness: Object.fromEntries(
+              componentList.map((name) => [
+                name,
+                componentDataset[name]?.completeness ?? "unknown",
+              ]),
+            ),
             docs: {
               paths,
               categories,
