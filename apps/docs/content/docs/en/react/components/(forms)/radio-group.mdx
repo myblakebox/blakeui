@@ -1,12 +1,21 @@
 ---
 title: RadioGroup
 description: Radio group for selecting a single option from a list
+completeness: behavior-required
 links:
   rac: RadioGroup
   source: radio-group/radio-group.tsx
   styles: radio-group.css
   storybook: Components/Forms/RadioGroup
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("RadioGroup")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -19,7 +28,6 @@ import { RadioGroup, Radio } from '@blakeui/react';
 <ComponentPreview
   name="radio-group-basic"
 />
-
 
 ### Anatomy
 
@@ -111,7 +119,6 @@ When used inside a [Surface](/docs/components/surface) component, use `variant="
   name="radio-group-delivery-and-payment"
 />
 
-
 <RelatedShowcases component="RadioGroup" />
 
 <RelatedComponents component="radiogroup" />
@@ -161,29 +168,7 @@ export default () => (
 To customize the RadioGroup component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .radio-group {
-    @apply gap-2;
-  }
-
-  .radio {
-    @apply gap-4 rounded-lg border border-border p-3 hover:bg-surface-hovered;
-  }
-
-  .radio__control {
-    @apply border-2 border-primary;
-  }
-
-  .radio__indicator {
-    @apply bg-primary;
-  }
-
-  .radio__content {
-    @apply gap-1;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

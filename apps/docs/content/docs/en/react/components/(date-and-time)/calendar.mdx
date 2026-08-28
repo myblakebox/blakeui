@@ -1,12 +1,21 @@
 ---
 title: Calendar
 description: Composable date picker with month grid, navigation, and year picker support built on React Aria Calendar
+completeness: behavior-required
 links:
   rac: Calendar
   source: calendar/calendar.tsx
   styles: calendar.css
   storybook: Components/Date and Time/Calendar
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Calendar")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -150,21 +159,7 @@ function CustomCalendar() {
 
 ### Customizing the component classes
 
-```css
-@layer components {
-  .calendar {
-    @apply w-72 rounded-2xl border border-border bg-surface p-3 shadow-sm;
-  }
-
-  .calendar__heading {
-    @apply text-sm font-semibold text-default-700;
-  }
-
-  .calendar__cell[data-selected="true"] {
-    @apply bg-accent text-accent-foreground;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 ### CSS Classes
 

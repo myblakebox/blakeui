@@ -31,6 +31,11 @@ async function copyCss() {
   execSync("node scripts/copy-css.mjs", {cwd: rootDir, stdio: "inherit"});
 }
 
+async function assertCssImports() {
+  console.log("🔎 Asserting CSS imports resolve in dist...");
+  execSync("node scripts/assert-css-imports.mjs", {cwd: rootDir, stdio: "inherit"});
+}
+
 async function minifyCss() {
   console.log("🗜️  Minifying CSS...");
   execSync("npx @tailwindcss/cli -i ./dist/index.css -o dist/blakeui.min.css --minify", {
@@ -54,6 +59,10 @@ async function main() {
     }
 
     await copyCss();
+    // Before minifying: a dangling @import is dropped silently downstream, so
+    // the build has to fail here rather than ship a stylesheet missing a slice
+    // of its components.
+    await assertCssImports();
     await minifyCss();
 
     console.log("✨ Build completed successfully!");

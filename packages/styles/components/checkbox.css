@@ -119,8 +119,13 @@
   }
 
   /* Interactive states */
-  /* Focus */
-  .checkbox:focus-visible &,
+  /* Focus. The root is a <label> wrapping a visually hidden input, so focus
+     lands on the input and never on `.checkbox` itself — `:focus-visible` does
+     not propagate to ancestors, so a rule written on the root alone can never
+     match. `:has(:focus-visible)` reaches up from the focused input and is what
+     paints the ring without JavaScript; the data attribute stays for the
+     React-driven case. */
+  .checkbox:has(:focus-visible) &,
   .checkbox[data-focus-visible="true"] & {
     @apply status-focused;
   }

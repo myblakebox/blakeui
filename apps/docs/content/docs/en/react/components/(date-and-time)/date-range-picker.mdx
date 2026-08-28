@@ -1,6 +1,7 @@
 ---
 title: DateRangePicker
 description: Composable date range picker built on React Aria DateRangePicker with DateField and RangeCalendar composition
+completeness: behavior-required
 links:
   rac: DateRangePicker
   source: date-range-picker/date-range-picker.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Date and Time/DateRangePicker
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("DateRangePicker")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -160,29 +169,7 @@ function CustomDateRangePicker() {
 
 To customize DateRangePicker base classes, use `@layer components`.
 
-```css
-@layer components {
-  .date-range-picker {
-    @apply inline-flex flex-col gap-1;
-  }
-
-  .date-range-picker__trigger {
-    @apply inline-flex items-center justify-between;
-  }
-
-  .date-range-picker__trigger-indicator {
-    @apply text-muted;
-  }
-
-  .date-range-picker__range-separator {
-    @apply px-2 text-default;
-  }
-
-  .date-range-picker__popover {
-    @apply min-w-[var(--trigger-width)] p-0;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows [BEM](https://getbem.com/) naming for reusable customization.
 

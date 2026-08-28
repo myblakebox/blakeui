@@ -1,12 +1,21 @@
 ---
 title: AlertDialog
 description: Modal dialog for critical confirmations requiring user attention and explicit action
+completeness: behavior-required
 links:
   rac: AlertDialog
   source: alert-dialog/alert-dialog.tsx
   styles: alert-dialog.css
   storybook: Components/Overlays/AlertDialog
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("AlertDialog")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -140,29 +149,7 @@ To customize the AlertDialog component classes, you can use the `@layer componen
 <br />
 [Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .alert-dialog__backdrop {
-    @apply bg-gradient-to-br from-black/60 to-black/80;
-  }
-
-  .alert-dialog__dialog {
-    @apply rounded-2xl border border-red-500/20 shadow-2xl;
-  }
-
-  .alert-dialog__header {
-    @apply gap-4;
-  }
-
-  .alert-dialog__icon {
-    @apply size-16;
-  }
-
-  .alert-dialog__close-trigger {
-    @apply rounded-full bg-white/10 hover:bg-white/20;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

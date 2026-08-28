@@ -2,6 +2,7 @@ import type {HonoContext} from "../types/context";
 
 import {Hono} from "hono";
 
+import {getCompleteness} from "../../shared/behavior";
 import {getComponentService} from "../services/component";
 import {AnalyticsErrorEvent, AnalyticsEvent} from "../types/analytics";
 import {getApp} from "../utils/get-client";
@@ -43,6 +44,9 @@ ctx.get("/", async (c) => {
 
     const response: Record<string, unknown> = {
       components: ctxData.components,
+      completeness: Object.fromEntries(
+        ctxData.components.map((component) => [component, getCompleteness(component) ?? "unknown"]),
+      ),
       docs: {
         paths: ctxData.docs.paths,
         categories: ctxData.docs.categories,

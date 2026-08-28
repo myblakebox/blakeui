@@ -1,6 +1,7 @@
 ---
 title: Button
 description: A clickable button component with multiple variants and states
+completeness: styles-sufficient
 links:
   rac: Button
   source: button/button.tsx
@@ -8,6 +9,12 @@ links:
   storybook: Components/Buttons/Button
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -22,7 +29,6 @@ import { Button } from '@blakeui/react';
 />
 
 ### Variants
-
 
 <ComponentPreview
   name="button-variants"
@@ -68,7 +74,6 @@ By default, the filled variants (`primary`, `secondary`, `tertiary`, `danger`, `
 
 ### Disabled State
 
-
 <ComponentPreview
   name="button-disabled"
 />
@@ -110,17 +115,7 @@ function CustomButton() {
 To customize the Button component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .button {
-    @apply bg-purple-500 text-white hover:bg-purple-600;
-  }
-
-  .button--icon-only {
-    @apply rounded-lg bg-blue-500;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -201,4 +196,3 @@ When using the render prop pattern, these values are provided:
 | `isFocused` | `boolean` | Whether the button is focused |
 | `isFocusVisible` | `boolean` | Whether the button should show focus indicator |
 | `isDisabled` | `boolean` | Whether the button is disabled |
-

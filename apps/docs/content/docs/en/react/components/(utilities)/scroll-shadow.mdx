@@ -1,12 +1,21 @@
 ---
 title: ScrollShadow
 description: Apply visual shadows to indicate scrollable content overflow with automatic detection of scroll position.
+completeness: behavior-required
 links:
   source: scroll-shadow/scroll-shadow.tsx
   styles: scroll-shadow.css
   storybook: Components/Utilities/ScrollShadow
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("ScrollShadow")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -68,21 +77,7 @@ function CustomScrollShadow() {
 To customize the ScrollShadow component classes, you can use the `@layer components` directive.
 <br />[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .scroll-shadow {
-    @apply rounded-xl border border-default-200;
-  }
-
-  .scroll-shadow--vertical {
-    @apply pr-2; /* Add padding for custom scrollbar styling */
-  }
-
-  .scroll-shadow--horizontal {
-    @apply pb-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

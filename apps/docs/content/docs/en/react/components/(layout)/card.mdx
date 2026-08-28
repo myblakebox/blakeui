@@ -1,11 +1,18 @@
 ---
 title: Card
 description: Flexible container component for grouping related content and actions
+completeness: styles-sufficient
 links:
   source: card/card.tsx
   styles: card.css
   storybook: Components/Layout/Card
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -112,24 +119,9 @@ import { cardVariants } from '@blakeui/styles';
 </Card>
 ```
 
-### CSS Variable Overrides
-
-```css
-/* Override specific variants */
-.card--secondary {
-  @apply bg-gradient-to-br from-blue-50 to-purple-50;
-}
-
-/* Custom element styles */
-.card__title {
-  @apply text-xl font-bold;
-}
-```
-
 ## CSS Classes
 
 Card uses [BEM](https://getbem.com/) naming for predictable styling, ([View source styles](https://github.com/myblakebox/BlakeUI/blob/main/packages/styles/components/card.css)):
-
 
 #### Base Classes
 

@@ -1,12 +1,21 @@
 ---
 title: Dropdown
 description: A dropdown displays a list of actions or options that a user can choose
+completeness: behavior-required
 links:
   rac: Menu
   source: dropdown/dropdown.tsx
   styles: dropdown.css
   storybook: Components/Collections/Dropdown
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Dropdown")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -184,25 +193,7 @@ function CustomDropdown() {
 To customize the Dropdown component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .dropdown {
-    @apply flex flex-col gap-1;
-  }
-
-  .dropdown__trigger {
-    @apply outline-none;
-  }
-
-  .dropdown__popover {
-    @apply rounded-lg border border-border bg-overlay p-2;
-  }
-
-  .dropdown__menu {
-    @apply flex flex-col gap-1;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -526,4 +517,3 @@ The Dropdown component implements the ARIA menu pattern and provides:
 - Submenu navigation
 
 For more information, see the [React Aria Menu documentation](https://react-spectrum.adobe.com/react-aria/Menu.html#menu).
-

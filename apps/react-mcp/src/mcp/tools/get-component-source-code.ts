@@ -3,7 +3,9 @@ import type {ComponentContext, Tool} from "../types";
 
 import {z} from "zod";
 
+import {getCompleteness} from "../../shared/behavior";
 import {fetchApi} from "../lib/fetch";
+import {textResult} from "../lib/response";
 
 export const getComponentSourceCodeTool: Tool<ComponentContext> = {
   name: "get_component_source_code",
@@ -36,6 +38,7 @@ This shows internal implementation - use get_component_docs for usage examples.`
           version: string;
           results: Array<{
             component: string;
+            completeness?: string;
             filePath?: string;
             sourceCode?: string;
             githubUrl?: string;
@@ -59,7 +62,12 @@ This shows internal implementation - use get_component_docs for usage examples.`
             responseText += `# ${result.component} Component Source Code\n\n`;
             responseText += `Error: ${result.error || "Source code not available"}\n`;
           } else {
+            const completeness = result.completeness ?? getCompleteness(result.component);
+
             responseText += `# ${result.component} Component Source Code\n\n`;
+            if (completeness) {
+              responseText += `**Completeness:** \`${completeness}\`\n`;
+            }
             responseText += `## React/TypeScript Source\n`;
             responseText += `**File:** \`${result.filePath}\`\n`;
             responseText += `**GitHub:** [View on GitHub](${result.githubUrl})\n\n`;
@@ -67,23 +75,12 @@ This shows internal implementation - use get_component_docs for usage examples.`
           }
         });
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: responseText,
-            },
-          ],
-        };
+        return textResult(responseText, {version: response.version});
       } catch (error: any) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Unable to get source code for components. ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
+        return textResult(
+          `Error: Unable to get source code for components. ${error instanceof Error ? error.message : "Unknown error"}`,
+          {isError: true},
+        );
       }
     };
 

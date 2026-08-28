@@ -1,12 +1,19 @@
 ---
 title: Kbd
 description: Display keyboard shortcuts and key combinations
+completeness: styles-sufficient
 links:
   source: kbd/kbd.tsx
   styles: kbd.css
   storybook: Components/Typography/Kbd
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -88,21 +95,7 @@ function CustomKbd() {
 To customize the Kbd component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .kbd {
-    @apply bg-gray-100 dark:bg-gray-800 border-gray-300;
-  }
-
-  .kbd__abbr {
-    @apply font-bold;
-  }
-
-  .kbd__content {
-    @apply text-sm;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

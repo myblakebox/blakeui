@@ -1,6 +1,7 @@
 ---
 title: TextField
 description: Composition-friendly text fields with labels, descriptions, and inline validation
+completeness: behavior-required
 links:
   rac: TextField
   source: textfield/textfield.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Forms/TextField
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("TextField")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -121,24 +130,7 @@ function CustomTextField() {
 
 TextField has minimal default styling. Override the `.textfield` class to customize the container styling.
 
-```css
-@layer components {
-  .textfield {
-    @apply flex flex-col gap-1;
-  }
-
-  /* When invalid, the description is hidden automatically */
-  .textfield[data-invalid="true"] [data-slot="description"],
-  .textfield[aria-invalid="true"] [data-slot="description"] {
-    @apply hidden;
-  }
-
-  /* Description has default padding */
-  .textfield [data-slot="description"] {
-    @apply px-1;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 ### CSS Classes
 

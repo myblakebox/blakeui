@@ -1,6 +1,7 @@
 ---
 title: Tooltip
 description: Displays informative text when users hover over or focus on an element
+completeness: behavior-required
 links:
   rac: Tooltip
   source: tooltip/tooltip.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Overlays/Tooltip
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Tooltip")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -93,17 +102,7 @@ function CustomTooltip() {
 To customize the Tooltip component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .tooltip {
-    @apply rounded-xl shadow-lg;
-  }
-
-  .tooltip__trigger {
-    @apply cursor-help;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

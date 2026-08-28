@@ -2,7 +2,9 @@ import type {Tool, ToolConfig} from "../types";
 import type {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import {getSharedContext} from "../lib/shared-context";
+import {setBlakeVersion} from "../lib/version-stamp";
 
+import {getComponentBehaviorTool} from "./get-component-behavior";
 import {getComponentDocsTool} from "./get-component-docs";
 import {getComponentSourceCodeTool} from "./get-component-source-code";
 import {getComponentSourceStylesTool} from "./get-component-source-styles";
@@ -14,6 +16,7 @@ import {listComponentsTool} from "./list-components";
 const tools: Tool[] = [
   listComponentsTool,
   getComponentDocsTool,
+  getComponentBehaviorTool,
   getComponentSourceCodeTool,
   getComponentSourceStylesTool,
   getThemeVariablesTool,
@@ -29,6 +32,10 @@ export async function initializeTools(server: McpServer, config: ToolConfig = {}
   const sharedContext = await getSharedContext(
     config.apiBaseUrl || process.env.BLAKEUI_API_URL || "https://mcp-api.blakeui.com",
   );
+
+  // Record the BlakeUI version the catalog was generated from, so every tool
+  // response can say what it came from.
+  setBlakeVersion(sharedContext.version);
 
   const finalConfig: ToolConfig = {
     apiBaseUrl: config.apiBaseUrl || process.env.BLAKEUI_API_URL || "https://mcp-api.blakeui.com",

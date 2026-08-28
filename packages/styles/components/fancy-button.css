@@ -65,7 +65,7 @@
   }
 
   /* Focus state */
-  &:focus-visible:not(:focus),
+  &:focus-visible,
   &[data-focus-visible="true"] {
     @apply status-focused;
   }
@@ -143,7 +143,11 @@
 .fancy-button--neutral {
   /* Theme-inverted ink: dark-on-light in light mode, light-on-dark in dark mode */
   --fancy-button-bg: var(--background-inverse);
-  --fancy-button-bg-hover: color-mix(in oklab, var(--background-inverse) 90%, var(--background) 10%);
+  --fancy-button-bg-hover: color-mix(
+    in oklab,
+    var(--background-inverse) 90%,
+    var(--background) 10%
+  );
   --fancy-button-bg-pressed: color-mix(
     in oklab,
     var(--background-inverse) 90%,

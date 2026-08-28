@@ -23,53 +23,29 @@ async function createServer(): Promise<McpServer> {
       version: packageInfo.version,
     },
     {
-      instructions: `## BlakeUI React MCP Tools - v3 Documentation
+      instructions: `## BlakeUI React MCP — v3 only
 
-These tools provide documentation for **BlakeUI v3** React components.
+Docs for **BlakeUI v3** React components. v2 is not supported (see https://blakeui.com/docs/react/migration).
 
-### ⚠️ IMPORTANT: Version Information
-• **Current Support:** BlakeUI v3 ONLY
-• **BlakeUI v2:** NOT supported by this MCP
-• **Migration from v2 to v3:** Available at https://blakeui.com/docs/react/migration
+### Styles are not the whole component
 
-### Getting Started
-Use the \`get_docs\` tool to fetch the official installation guide:
-\`\`\`javascript
-get_docs({ path: "/docs/react/getting-started/quick-start" })
-\`\`\`
+Every component carries a \`completeness\` value, returned by every tool that returns component metadata:
 
-### Essential Workflow
-Always follow this order when implementing BlakeUI v3 components:
+- \`styles-sufficient\` — the stylesheet reproduces the component. Take the CSS and you have it.
+- \`behavior-required\` — the stylesheet is the visible half. The component also needs a keyboard map beyond Enter/Space, focus managed across more than one element, ARIA attributes pointing at other nodes, and \`[data-*]\` attributes only running code sets. De-Tailwinding the CSS and keeping the BEM class names gives you something that looks right and does not work.
 
-1. **get_docs** - Fetch installation guide: \`get_docs({ path: "/docs/react/getting-started/quick-start" })\`
-2. **list_components** - Check available v3 components
-3. **get_component_docs** - Get complete component documentation (API, examples, usage)
-4. **get_component_source_code** - View source code implementation (optional, for learning)
-5. **get_component_source_styles** - View CSS styles (optional, for customization)
+\`get_component_source_styles\` requires \`behavior_source\` for behavior-required components:
 
-### Key Differences in v3
-• Compound components pattern (e.g., Card.Header, Card.Content)
-• Requires Tailwind CSS v4 (NOT v3)
-• No Provider component needed (unlike v2)
-• Built on React Aria Components
-• Modern React 19+ features
+- \`"blake"\` — you are using \`@blakeui/react\`; the behaviour ships with the component. Returns the styles.
+- \`"self"\` — you are writing the interaction layer yourself, in any framework. Returns the interaction contract first, then the styles.
 
-### Available Tools
-• **list_components** - List all available v3 components
-• **get_component_docs** - Get component documentation (API, examples, usage)
-• **get_component_source_code** - Get component source code
-• **get_component_source_styles** - Get component CSS styles
-• **get_docs** - Get general documentation (guides, getting started, etc.)
-• **get_theme_variables** - Get default theme variables and design tokens
+\`get_component_behavior\` returns that contract on its own: roles and ARIA, the full keyboard map, focus rules including roving tabindex, activation mode, DOM state, and the data-attribute contract.
 
-### Available Documentation
-• Components: Use get_component_docs to explore v3 components
-• Installation: Use get_docs({ path: "/docs/react/getting-started/quick-start" }) for setup guides
-• Guides: Use get_docs({ path: "/docs/react/getting-started" }) for other getting-started guides
-• Theme: Use get_theme_variables() for theme variable values, or get_docs({ path: "/docs/react/getting-started/theming" }) for theming guides
+### Workflow
 
-### Pro Tips
-• This MCP is for v3 ONLY - v2 docs are at https://v2.blakeui.com`,
+\`get_docs({path: "/docs/react/getting-started/quick-start"})\` → \`list_components\` → \`get_component_docs\` → \`get_component_behavior\` (behavior-required only) → \`get_component_source_code\` / \`get_component_source_styles\`.
+
+v3 uses compound components (\`Card.Header\`), requires Tailwind CSS v4, needs no provider, and is built on React Aria Components.`,
       capabilities: {
         tools: {
           listChanged: true,

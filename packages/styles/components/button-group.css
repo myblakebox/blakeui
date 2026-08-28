@@ -11,7 +11,7 @@
    Keep the ::after sheen per segment; only the group carries the elevation
    and the ::before gradient frame is dropped so seams don't double up. */
 .button-group {
-  @apply shadow-surface rounded-3xl;
+  @apply rounded-3xl shadow-surface;
 }
 
 .button-group .button {
@@ -76,7 +76,7 @@
 }
 
 /* Override focus ring to use inset style so it stays within button bounds */
-.button-group .button:focus-visible:not(:focus),
+.button-group .button:focus-visible,
 .button-group .button[data-focus-visible="true"] {
   --tw-ring-offset-width: 0px;
   @apply ring-inset;

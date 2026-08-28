@@ -4,12 +4,14 @@ import type {DocsContext, Tool} from "../types";
 import {z} from "zod";
 
 import {fetchApi} from "../lib/fetch";
+import {textResult} from "../lib/response";
 
 interface DocContentResponse {
   path: string;
   url: string;
   content: string;
   contentType: string;
+  version?: string;
 }
 
 export const getDocsTool: Tool<DocsContext> = {
@@ -52,46 +54,31 @@ NOTE: Paths containing /native/ are for BlakeUI Native docs and require @blakeui
 
     const handler = async ({path}: z.infer<typeof inputSchema>) => {
       if (!path) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "Error: Please provide a documentation path",
-            },
-          ],
-        };
+        return textResult("Error: Please provide a documentation path", {isError: true});
       }
 
       // Check if path includes /native/ - these are handled by native-mcp
       if (path.toLowerCase().includes("/native/")) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: The requested path includes '/native/' which refers to BlakeUI Native documentation.
+        return textResult(
+          `Error: The requested path includes '/native/' which refers to BlakeUI Native documentation.
 
 BlakeUI Native documentation is handled by a separate MCP server (@blakeui/native-mcp).
 Please use the native-mcp server instead to access Native component documentation.
 
 Requested path: ${path}`,
-            },
-          ],
-        };
+          {isError: true},
+        );
       }
 
       // Warn if trying to use component docs path
       if (path.includes("/components/")) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Component documentation should be fetched using get_component_docs tool instead.
+        return textResult(
+          `Error: Component documentation should be fetched using get_component_docs tool instead.
 For component docs, use: get_component_docs({components: ["ComponentName"]})
 
 Requested path: ${path}`,
-            },
-          ],
-        };
+          {isError: true},
+        );
       }
 
       try {
@@ -118,49 +105,30 @@ Requested path: ${path}`,
         }
         text += `**URL:** ${url}\n**Content Type:** ${contentType}\n\n---\n\n${content}`;
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text,
-            },
-          ],
-        };
+        return textResult(text, {version: data.version});
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         const statusCode = (error as any)?.status;
 
         if (statusCode === 404) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Error: Documentation not found at path: ${path}\n\nExample paths:\n  - /docs/react/getting-started/theming\n  - /docs/react/releases/v3-0-0\n\nAll React documentation paths start with /docs/react/ prefix.`,
-              },
-            ],
-          };
+          return textResult(
+            `Error: Documentation not found at path: ${path}\n\nExample paths:\n  - /docs/react/getting-started/theming\n  - /docs/react/releases/v3-0-0\n\nAll React documentation paths start with /docs/react/ prefix.`,
+            {isError: true},
+          );
         }
 
         if (statusCode === 500) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Error: Server error while fetching documentation. Please try again later.\n\nRequested path: ${path}`,
-              },
-            ],
-          };
+          return textResult(
+            `Error: Server error while fetching documentation. Please try again later.\n\nRequested path: ${path}`,
+            {isError: true},
+          );
         }
 
         // Generic error fallback
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Unable to fetch documentation content. ${errorMessage}\n\nRequested path: ${path}`,
-            },
-          ],
-        };
+        return textResult(
+          `Error: Unable to fetch documentation content. ${errorMessage}\n\nRequested path: ${path}`,
+          {isError: true},
+        );
       }
     };
 

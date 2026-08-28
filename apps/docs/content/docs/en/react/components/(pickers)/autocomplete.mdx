@@ -1,12 +1,21 @@
 ---
 title: Autocomplete
 description: An autocomplete combines a select with filtering, allowing users to search and select from a list of options
+completeness: behavior-required
 links:
   rac: Select
   source: autocomplete/autocomplete.tsx
   styles: autocomplete.css
   storybook: Components/Pickers/Autocomplete
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Autocomplete")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -196,33 +205,7 @@ To customize the Autocomplete component classes, you can use the `@layer compone
 <br />
 [Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .autocomplete {
-    @apply flex flex-col gap-1;
-  }
-
-  .autocomplete__trigger {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-
-  .autocomplete__value {
-    @apply text-current;
-  }
-
-  .autocomplete__clear-button {
-    @apply text-muted hover:text-foreground;
-  }
-
-  .autocomplete__indicator {
-    @apply text-muted;
-  }
-
-  .autocomplete__popover {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

@@ -1,12 +1,21 @@
 ---
 title: ComboBox
 description: A combo box combines a text input with a listbox, allowing users to filter a list of options to items matching a query
+completeness: behavior-required
 links:
   rac: ComboBox
   source: combo-box/combo-box.tsx
   styles: combo-box.css
   storybook: Components/Pickers/ComboBox
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("ComboBox")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -198,25 +207,7 @@ function CustomComboBox() {
 To customize the ComboBox component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .combo-box {
-    @apply flex flex-col gap-1;
-  }
-
-  .combo-box__input-group {
-    @apply relative inline-flex items-center;
-  }
-
-  .combo-box__trigger {
-    @apply absolute right-0 text-muted;
-  }
-
-  .combo-box__popover {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -824,4 +815,3 @@ The ComboBox component implements the ARIA comboBox pattern and provides:
 - Support for custom values
 
 For more information, see the [React Aria ComboBox documentation](https://react-spectrum.adobe.com/react-aria/ComboBox.html).
-

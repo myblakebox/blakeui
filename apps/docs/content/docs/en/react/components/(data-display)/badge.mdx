@@ -1,12 +1,19 @@
 ---
 title: Badge
 description: Displays a small indicator positioned relative to another element, commonly used for notification counts, status dots, and labels
+completeness: styles-sufficient
 links:
   source: badge/badge.tsx
   styles: badge.css
   storybook: Components/Data Display/Badge
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -101,21 +108,7 @@ function CustomBadge() {
 To customize the Badge component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .badge {
-    @apply rounded-full text-xs;
-  }
-
-  .badge__label {
-    @apply font-semibold;
-  }
-
-  .badge--accent {
-    @apply shadow-sm;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
