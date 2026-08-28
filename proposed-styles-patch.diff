@@ -1,0 +1,704 @@
+# proposed-styles-patch.diff
+#
+# NOT APPLIED. @blakeui/styles is not edited without Greg's explicit sign-off,
+# so every fix that lands in that package is written here instead.
+#
+# Contents
+# --------
+#  1. Build assertion (audit §1). The published tarballs are NOT broken — all
+#     nine versions of @blakeui/styles and @blakeui/react resolve every relative
+#     @import cleanly, verified by extracting each tarball and by compiling
+#     @blakeui/react@1.3.0's CSS entry end-to-end with the Tailwind CLI. No
+#     copy fix is needed. What is missing is the guard: the docs site resolves
+#     @blakeui/styles through the workspace symlink to the SOURCE tree, so a
+#     dist that is missing component stylesheets would ship green. The new
+#     scripts/assert-css-imports.mjs runs inside the normal build, after the CSS
+#     copy step and before minification, and exits non-zero listing every
+#     unresolved relative @import.
+#
+#     Verified: temporarily skipping the copy of components/tabs.css made the
+#     build fail with
+#         ❌ 1 unresolved relative @import in dist:
+#            dist/components/index.css  →  ./tabs.css
+#     and a non-zero exit; restoring the copy made it pass again.
+#
+#  2. CSS defect (a) — `:focus-visible:not(:focus)` is unsatisfiable. A
+#     :focus-visible element always also matches :focus, so the :not(:focus)
+#     arm can never hold and the package focus ring was painted only when the
+#     JavaScript layer set data-focus-visible. 38 occurrences across 27
+#     component stylesheets. popover.css already carried the corrected form
+#     plus a comment explaining why, and is untouched; this applies the same
+#     correction everywhere else.
+#
+#     Verified in Chrome against a compiled bundle: with the old selector a
+#     keyboard-focused `.button` reported --tw-ring-shadow: 0 0 #0000 (no ring);
+#     with the fix it reports 0 0 0 calc(2px + 2px) oklch(...) and the ring
+#     renders.
+#
+#  3. CSS defect (b) — `:focus-visible` on a root that React Aria renders as a
+#     <label>. Checkbox, Switch and Radio each render `<label>` wrapping a
+#     visually hidden `<input>`. Focus lands on the input, and :focus-visible
+#     matches the focused element only — it does not propagate to ancestors —
+#     so `.checkbox:focus-visible`, `.switch:focus-visible` and
+#     `.radio:focus-visible` can never match. Replaced with
+#     `:has(:focus-visible)`, which reaches up from the focused input.
+#
+#     Verified in Chrome: with the input keyboard-focused,
+#     root.matches(':focus-visible') === false while
+#     root.matches(':has(:focus-visible)') === true, and the control's ring
+#     renders with no JavaScript involved.
+#
+# Apply with:
+#     git apply proposed-styles-patch.diff
+#
+diff --git a/packages/styles/components/accordion.css b/packages/styles/components/accordion.css
+index dc41cc140..b7a2963c2 100644
+--- a/packages/styles/components/accordion.css
++++ b/packages/styles/components/accordion.css
+@@ -79,7 +79,7 @@
+   }
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/alert-dialog.css b/packages/styles/components/alert-dialog.css
+index cc54a4ee6..9deefbe16 100644
+--- a/packages/styles/components/alert-dialog.css
++++ b/packages/styles/components/alert-dialog.css
+@@ -29,7 +29,7 @@
+   --alert-dialog-press-scale: 0.97;
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/autocomplete.css b/packages/styles/components/autocomplete.css
+index 310d9ef45..2a3cd7985 100644
+--- a/packages/styles/components/autocomplete.css
++++ b/packages/styles/components/autocomplete.css
+@@ -35,7 +35,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+     border-color: var(--field-border-focus);
+@@ -83,7 +83,7 @@
+     }
+   }
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     background-color: var(--autocomplete-trigger-bg-focus);
+   }
+@@ -128,7 +128,7 @@
+   box-shadow: var(--shadow-overlay);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/button-group.css b/packages/styles/components/button-group.css
+index 244650532..bea84665b 100644
+--- a/packages/styles/components/button-group.css
++++ b/packages/styles/components/button-group.css
+@@ -76,7 +76,7 @@
+ }
+ 
+ /* Override focus ring to use inset style so it stays within button bounds */
+-.button-group .button:focus-visible:not(:focus),
++.button-group .button:focus-visible,
+ .button-group .button[data-focus-visible="true"] {
+   --tw-ring-offset-width: 0px;
+   @apply ring-inset;
+diff --git a/packages/styles/components/button.css b/packages/styles/components/button.css
+index 08261baf4..292dd9e12 100644
+--- a/packages/styles/components/button.css
++++ b/packages/styles/components/button.css
+@@ -69,7 +69,7 @@
+   }
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/calendar.css b/packages/styles/components/calendar.css
+index 8ea24c1cb..82db54cc4 100644
+--- a/packages/styles/components/calendar.css
++++ b/packages/styles/components/calendar.css
+@@ -170,7 +170,7 @@
+   cursor: var(--cursor-interactive);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/checkbox.css b/packages/styles/components/checkbox.css
+index 330171403..756c5127d 100644
+--- a/packages/styles/components/checkbox.css
++++ b/packages/styles/components/checkbox.css
+@@ -119,8 +119,13 @@
+   }
+ 
+   /* Interactive states */
+-  /* Focus */
+-  .checkbox:focus-visible &,
++  /* Focus. The root is a <label> wrapping a visually hidden input, so focus
++     lands on the input and never on `.checkbox` itself — `:focus-visible` does
++     not propagate to ancestors, so a rule written on the root alone can never
++     match. `:has(:focus-visible)` reaches up from the focused input and is what
++     paints the ring without JavaScript; the data attribute stays for the
++     React-driven case. */
++  .checkbox:has(:focus-visible) &,
+   .checkbox[data-focus-visible="true"] & {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/close-button.css b/packages/styles/components/close-button.css
+index cd75b8073..ba05e0749 100644
+--- a/packages/styles/components/close-button.css
++++ b/packages/styles/components/close-button.css
+@@ -28,7 +28,7 @@
+   --close-button-press-scale: 0.93;
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/color-picker.css b/packages/styles/components/color-picker.css
+index cb728b7a1..1fac6b16a 100644
+--- a/packages/styles/components/color-picker.css
++++ b/packages/styles/components/color-picker.css
+@@ -29,7 +29,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+@@ -54,7 +54,7 @@
+   @apply flex flex-col gap-3;
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/combo-box.css b/packages/styles/components/combo-box.css
+index aca5e0a95..501efc933 100644
+--- a/packages/styles/components/combo-box.css
++++ b/packages/styles/components/combo-box.css
+@@ -57,7 +57,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply rounded ring-2 ring-focus ring-offset-2 ring-offset-background outline-none;
+   }
+@@ -91,7 +91,7 @@
+   box-shadow: var(--shadow-overlay);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/date-picker.css b/packages/styles/components/date-picker.css
+index c7071a44c..2dcf291fd 100644
+--- a/packages/styles/components/date-picker.css
++++ b/packages/styles/components/date-picker.css
+@@ -21,7 +21,7 @@
+    */
+   transition: box-shadow 150ms var(--ease-out);
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+@@ -43,7 +43,7 @@
+   box-shadow: var(--shadow-overlay);
+   border-radius: min(32px, calc(var(--radius) * 2.5));
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/date-range-picker.css b/packages/styles/components/date-range-picker.css
+index b8901071a..4d3f6f746 100644
+--- a/packages/styles/components/date-range-picker.css
++++ b/packages/styles/components/date-range-picker.css
+@@ -21,7 +21,7 @@
+    */
+   transition: box-shadow 150ms var(--ease-out);
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+@@ -47,7 +47,7 @@
+   box-shadow: var(--shadow-overlay);
+   border-radius: min(32px, calc(var(--radius) * 2.5));
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/drawer.css b/packages/styles/components/drawer.css
+index 0a9ff31c5..f47c282ee 100644
+--- a/packages/styles/components/drawer.css
++++ b/packages/styles/components/drawer.css
+@@ -28,7 +28,7 @@
+   --drawer-press-scale: 0.97;
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/dropdown.css b/packages/styles/components/dropdown.css
+index 5050ad33e..9cf26de1a 100644
+--- a/packages/styles/components/dropdown.css
++++ b/packages/styles/components/dropdown.css
+@@ -33,7 +33,7 @@
+   cursor: var(--cursor-interactive);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+@@ -63,7 +63,7 @@
+   box-shadow: var(--shadow-overlay);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/fancy-button.css b/packages/styles/components/fancy-button.css
+index e567c9e96..8cfae7060 100644
+--- a/packages/styles/components/fancy-button.css
++++ b/packages/styles/components/fancy-button.css
+@@ -65,7 +65,7 @@
+   }
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/input.css b/packages/styles/components/input.css
+index 1d11a562a..cbc7f5a3b 100644
+--- a/packages/styles/components/input.css
++++ b/packages/styles/components/input.css
+@@ -29,7 +29,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+   }
+ 
+@@ -73,7 +73,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+   }
+ 
+diff --git a/packages/styles/components/link.css b/packages/styles/components/link.css
+index e5143f034..b3b1524b1 100644
+--- a/packages/styles/components/link.css
++++ b/packages/styles/components/link.css
+@@ -37,7 +37,7 @@
+   }
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+ 
+diff --git a/packages/styles/components/list-box-item.css b/packages/styles/components/list-box-item.css
+index 0dcb834dc..2047a4f2a 100644
+--- a/packages/styles/components/list-box-item.css
++++ b/packages/styles/components/list-box-item.css
+@@ -39,7 +39,7 @@
+   }
+ 
+   /* Focus visible state (keyboard focus only) */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/menu-item.css b/packages/styles/components/menu-item.css
+index 93a315d5e..b20ab8325 100644
+--- a/packages/styles/components/menu-item.css
++++ b/packages/styles/components/menu-item.css
+@@ -48,7 +48,7 @@
+   }
+ 
+   /* Focus visible state (keyboard focus only) */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/modal.css b/packages/styles/components/modal.css
+index 870c1869b..20b34feba 100644
+--- a/packages/styles/components/modal.css
++++ b/packages/styles/components/modal.css
+@@ -28,7 +28,7 @@
+   --modal-press-scale: 0.97;
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/number-field.css b/packages/styles/components/number-field.css
+index 491204653..dba42557f 100644
+--- a/packages/styles/components/number-field.css
++++ b/packages/styles/components/number-field.css
+@@ -113,7 +113,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+   }
+ 
+diff --git a/packages/styles/components/radio.css b/packages/styles/components/radio.css
+index a5250c6cc..b4e525e5c 100644
+--- a/packages/styles/components/radio.css
++++ b/packages/styles/components/radio.css
+@@ -47,8 +47,11 @@
+   cursor: var(--cursor-interactive);
+ 
+   /* Interactive states */
+-  /* Focus */
+-  .radio:focus-visible &,
++  /* Focus. The root is a <label> wrapping a visually hidden input, so focus
++     lands on the input and never on `.radio` itself — `:focus-visible` does not
++     propagate to ancestors. `:has(:focus-visible)` reaches up from the focused
++     input; the data attribute stays for the React-driven case. */
++  .radio:has(:focus-visible) &,
+   .radio[data-focus-visible="true"] & {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/range-calendar.css b/packages/styles/components/range-calendar.css
+index 24815b4aa..cd9b359d5 100644
+--- a/packages/styles/components/range-calendar.css
++++ b/packages/styles/components/range-calendar.css
+@@ -166,7 +166,7 @@
+   }
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply z-2;
+ 
+diff --git a/packages/styles/components/select.css b/packages/styles/components/select.css
+index 0c673a7f4..9476063a4 100644
+--- a/packages/styles/components/select.css
++++ b/packages/styles/components/select.css
+@@ -46,7 +46,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+     border-color: var(--field-border-focus);
+@@ -93,7 +93,7 @@
+     }
+   }
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     background-color: var(--select-trigger-bg-focus);
+   }
+@@ -135,7 +135,7 @@
+   box-shadow: var(--shadow-overlay);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply outline-none;
+   }
+diff --git a/packages/styles/components/switch.css b/packages/styles/components/switch.css
+index 27a12d82d..7dac9c73b 100644
+--- a/packages/styles/components/switch.css
++++ b/packages/styles/components/switch.css
+@@ -65,8 +65,11 @@
+     background-color 250ms var(--ease-smooth),
+     box-shadow 150ms var(--ease-out);
+ 
+-  /* Focus states */
+-  .switch:focus-visible &,
++  /* Focus states. The root is a <label> wrapping a visually hidden input, so
++     focus lands on the input and never on `.switch` itself — `:focus-visible`
++     does not propagate to ancestors. `:has(:focus-visible)` reaches up from the
++     focused input; the data attribute stays for the React-driven case. */
++  .switch:has(:focus-visible) &,
+   .switch[data-focus-visible="true"] & {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/tabs.css b/packages/styles/components/tabs.css
+index 85c77a2e9..179956e19 100644
+--- a/packages/styles/components/tabs.css
++++ b/packages/styles/components/tabs.css
+@@ -86,7 +86,7 @@
+   }
+ 
+   /* Focus states - comprehensive fallback */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/textarea.css b/packages/styles/components/textarea.css
+index 25065d19e..708164ffb 100644
+--- a/packages/styles/components/textarea.css
++++ b/packages/styles/components/textarea.css
+@@ -32,7 +32,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+   }
+ 
+@@ -75,7 +75,7 @@
+   }
+ 
+   /* Focus visible state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+   }
+ 
+diff --git a/packages/styles/components/toggle-button-group.css b/packages/styles/components/toggle-button-group.css
+index 69ba13d6a..30578431e 100644
+--- a/packages/styles/components/toggle-button-group.css
++++ b/packages/styles/components/toggle-button-group.css
+@@ -73,7 +73,7 @@
+ }
+ 
+ /* Override focus ring to use inset style so it stays within button bounds */
+-.toggle-button-group .toggle-button:focus-visible:not(:focus),
++.toggle-button-group .toggle-button:focus-visible,
+ .toggle-button-group .toggle-button[data-focus-visible="true"] {
+   --tw-ring-offset-width: 0px;
+   @apply ring-inset;
+diff --git a/packages/styles/components/toggle-button.css b/packages/styles/components/toggle-button.css
+index d99b957ec..730ca3410 100644
+--- a/packages/styles/components/toggle-button.css
++++ b/packages/styles/components/toggle-button.css
+@@ -46,7 +46,7 @@
+   color: var(--toggle-button-fg);
+ 
+   /* Focus state */
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/components/tooltip.css b/packages/styles/components/tooltip.css
+index b48323ab4..11f4d0c18 100644
+--- a/packages/styles/components/tooltip.css
++++ b/packages/styles/components/tooltip.css
+@@ -71,7 +71,7 @@
+     background-color 150ms var(--ease-smooth),
+     box-shadow 150ms var(--ease-out);
+ 
+-  &:focus-visible:not(:focus),
++  &:focus-visible,
+   &[data-focus-visible="true"] {
+     @apply status-focused;
+   }
+diff --git a/packages/styles/scripts/assert-css-imports.mjs b/packages/styles/scripts/assert-css-imports.mjs
+new file mode 100644
+index 000000000..ab44eb87b
+--- /dev/null
++++ b/packages/styles/scripts/assert-css-imports.mjs
+@@ -0,0 +1,112 @@
++#!/usr/bin/env node
++/* eslint-disable no-console */
++/**
++ * Build-time assertion: every relative @import in the built CSS entry must
++ * resolve against its own location inside dist.
++ *
++ * The failure this guards against is silent. `dist/index.css` is a byte copy of
++ * the source entry, so it keeps importing "./components/index.css" whether or
++ * not the component stylesheets were copied alongside it. The local dev server
++ * never notices — it resolves `@blakeui/styles` through the workspace symlink
++ * to the *source* tree — and neither does a docs build. Only a consumer who
++ * installs the published tarball finds out, at which point the version is out.
++ *
++ * So this runs inside the normal build, after the CSS copy step, and exits
++ * non-zero listing every unresolved import.
++ */
++import fs from "fs";
++import path from "path";
++import {fileURLToPath} from "url";
++
++const __dirname = path.dirname(fileURLToPath(import.meta.url));
++const rootDir = path.resolve(__dirname, "..");
++const distDir = path.join(rootDir, "dist");
++
++const IMPORT_RE = () => /@import\s+(?:url\(\s*)?["']([^"']+)["']/g;
++
++/**
++ * Resolve a relative CSS specifier the way a bundler does: exact path, then
++ * with a .css extension, then as a directory containing index.css.
++ */
++function resolveSpecifier(fromFile, spec) {
++  const dir = path.dirname(fromFile);
++  const candidates = [spec];
++
++  if (!spec.endsWith(".css")) candidates.push(`${spec}.css`);
++
++  for (const candidate of candidates) {
++    const resolved = path.resolve(dir, candidate);
++
++    if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) return resolved;
++
++    const asIndex = path.join(resolved, "index.css");
++
++    if (fs.existsSync(asIndex)) return asIndex;
++  }
++
++  return null;
++}
++
++function walk(entry) {
++  const dangling = [];
++  const seen = new Set();
++  let checked = 0;
++
++  const visit = (file) => {
++    if (seen.has(file)) return;
++    seen.add(file);
++
++    const specifiers = [];
++    const re = IMPORT_RE();
++    const css = fs.readFileSync(file, "utf8");
++    let match;
++
++    while ((match = re.exec(css))) specifiers.push(match[1]);
++
++    for (const spec of specifiers) {
++      // Bare specifiers are package resolution — not this assertion's job.
++      if (!spec.startsWith(".") && !spec.startsWith("/")) continue;
++
++      checked += 1;
++
++      const resolved = resolveSpecifier(file, spec);
++
++      if (resolved) visit(resolved);
++      else dangling.push({from: path.relative(rootDir, file), spec});
++    }
++  };
++
++  visit(entry);
++
++  return {dangling, checked, files: seen.size};
++}
++
++const entry = path.join(distDir, "index.css");
++
++if (!fs.existsSync(entry)) {
++  console.error(`❌ dist/index.css is missing — nothing was built to assert against.`);
++  process.exit(1);
++}
++
++const {checked, dangling, files} = walk(entry);
++
++if (dangling.length > 0) {
++  console.error(
++    `\n❌ ${dangling.length} unresolved relative @import${dangling.length === 1 ? "" : "s"} in dist:\n`,
++  );
++
++  for (const {from, spec} of dangling) {
++    console.error(`   ${from}  →  ${spec}`);
++  }
++
++  console.error(
++    `\n   The stylesheet at that path was not copied into dist. Copy it to the ` +
++      `path the import already expects (see scripts/copy-css.mjs) rather than ` +
++      `rewriting the import.\n`,
++  );
++  process.exit(1);
++}
++
++console.log(
++  `✅ CSS imports resolve: ${checked} relative @import${checked === 1 ? "" : "s"} across ${files} files in dist`,
++);
+diff --git a/packages/styles/scripts/build.mjs b/packages/styles/scripts/build.mjs
+index 73e5ab300..9aa731444 100644
+--- a/packages/styles/scripts/build.mjs
++++ b/packages/styles/scripts/build.mjs
+@@ -31,6 +31,11 @@ async function copyCss() {
+   execSync("node scripts/copy-css.mjs", {cwd: rootDir, stdio: "inherit"});
+ }
+ 
++async function assertCssImports() {
++  console.log("🔎 Asserting CSS imports resolve in dist...");
++  execSync("node scripts/assert-css-imports.mjs", {cwd: rootDir, stdio: "inherit"});
++}
++
+ async function minifyCss() {
+   console.log("🗜️  Minifying CSS...");
+   execSync("npx @tailwindcss/cli -i ./dist/index.css -o dist/blakeui.min.css --minify", {
+@@ -54,6 +59,10 @@ async function main() {
+     }
+ 
+     await copyCss();
++    // Before minifying: a dangling @import is dropped silently downstream, so
++    // the build has to fail here rather than ship a stylesheet missing a slice
++    // of its components.
++    await assertCssImports();
+     await minifyCss();
+ 
+     console.log("✨ Build completed successfully!");
