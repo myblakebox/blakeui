@@ -3,7 +3,9 @@ import type {ComponentContext, Tool} from "../types";
 
 import {z} from "zod";
 
+import {getCompleteness} from "../../shared/behavior";
 import {fetchApi} from "../lib/fetch";
+import {textResult} from "../lib/response";
 
 export const getComponentDocsTool: Tool<ComponentContext> = {
   name: "get_component_docs",
@@ -20,6 +22,9 @@ Returns raw markdown content from the component's .mdx file, which includes:
 
 This tool replaces get_component_info, get_component_props, and get_component_examples.
 Use this when you need complete component documentation in one call.
+Each result also carries the component's 'completeness'. For a 'behavior-required'
+component the docs describe a component whose CSS is only the visible half — use
+get_component_behavior for the interaction contract.
 Workflow: list_components → get_component_docs.`,
 
   async ctx(shared) {
@@ -40,8 +45,10 @@ DO NOT guess names - always verify with list_components first.`),
     const handler = async ({components}: z.infer<typeof inputSchema>) => {
       try {
         const response = await fetchApi<{
+          version?: string;
           results: Array<{
             component: string;
+            completeness?: string;
             url?: string;
             content?: string;
             contentType?: string;
@@ -70,30 +77,27 @@ DO NOT guess names - always verify with list_components first.`),
               responseText += `Status: ${result.status}\n`;
             }
           } else {
+            const completeness = result.completeness ?? getCompleteness(result.component);
+
             responseText += `# ${result.component} Documentation\n\n`;
-            responseText += `**URL:** ${result.url}\n\n`;
-            responseText += `---\n\n`;
+            responseText += `**URL:** ${result.url}\n`;
+            if (completeness) {
+              responseText += `**Completeness:** \`${completeness}\`\n`;
+            }
+            if (completeness === "behavior-required") {
+              responseText += `\n> A CSS-only port of this component will not reproduce it. Call \`get_component_behavior("${result.component}")\` for the keyboard map, focus rules, ARIA wiring and data-attribute contract.\n`;
+            }
+            responseText += `\n---\n\n`;
             responseText += result.content;
           }
         });
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: responseText,
-            },
-          ],
-        };
+        return textResult(responseText, {version: response.version});
       } catch (error) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Unable to get component documentation. ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
+        return textResult(
+          `Error: Unable to get component documentation. ${error instanceof Error ? error.message : "Unknown error"}`,
+          {isError: true},
+        );
       }
     };
 

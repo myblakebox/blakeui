@@ -4,6 +4,7 @@ import type {Tool} from "../types";
 import {z} from "zod";
 
 import {fetchApi} from "../lib/fetch";
+import {textResult} from "../lib/response";
 
 const inputSchema = z.object({});
 
@@ -39,23 +40,12 @@ IMPORTANT: BlakeUI v3 uses Tailwind CSS v4 - ensure compatibility.`,
 
         responseText += formatThemeData(response);
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: responseText,
-            },
-          ],
-        };
+        return textResult(responseText, {version: response.version});
       } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error fetching theme variables: ${error instanceof Error ? error.message : String(error)}`,
-            },
-          ],
-        };
+        return textResult(
+          `Error fetching theme variables: ${error instanceof Error ? error.message : String(error)}`,
+          {isError: true},
+        );
       }
     };
 

@@ -5,6 +5,13 @@ import {Hono} from "hono";
 import {z} from "zod";
 
 import {BLAKEUI_REACT_GITHUB_BASE} from "../../extraction/constants";
+import {
+  BEHAVIOR_SOURCE_VALUES,
+  buildStylesGateResponse,
+  getBehaviorContract,
+  getCompleteness,
+  isBehaviorRequired,
+} from "../../shared/behavior";
 import {REACT_LIBRARY_NAME} from "../contants";
 import {getComponentService} from "../services/component";
 import {AnalyticsErrorEvent, AnalyticsEvent} from "../types/analytics";
@@ -19,6 +26,21 @@ const ComponentsRequestSchema = z.object({
       (components) => components.every((c) => c.trim().length > 0),
       "All component names must be non-empty strings",
     ),
+});
+
+const StylesRequestSchema = ComponentsRequestSchema.extend({
+  /**
+   * Where the interaction layer is coming from. Required for components
+   * classified `behavior-required` — see `src/shared/behavior`.
+   *
+   * The gate lives on the endpoint rather than only on the MCP tool wrapper so
+   * that proxied callers (the Pro Worker among them) hit the same check.
+   */
+  behaviorSource: z.enum(BEHAVIOR_SOURCE_VALUES).optional(),
+});
+
+const BehaviorRequestSchema = z.object({
+  component: z.string().trim().min(1, "Component name cannot be empty"),
 });
 
 const components = new Hono<HonoContext>();
@@ -53,6 +75,9 @@ components.get("/", async (c) => {
     return c.json({
       latestVersion: latestVersion || "unknown",
       components: componentsList,
+      completeness: Object.fromEntries(
+        componentsList.map((component) => [component, getCompleteness(component) ?? "unknown"]),
+      ),
       count: componentsList.length,
     });
   } catch (error) {
@@ -131,6 +156,7 @@ components.post("/docs", zValidator("json", ComponentsRequestSchema), async (c) 
 
             return {
               component,
+              completeness: getCompleteness(component) ?? "unknown",
               error: errorMessage,
               status: response.status,
               statusText: response.statusText,
@@ -156,6 +182,7 @@ components.post("/docs", zValidator("json", ComponentsRequestSchema), async (c) 
 
           return {
             component,
+            completeness: getCompleteness(component) ?? "unknown",
             url: docUrl,
             content,
             contentType,
@@ -185,6 +212,7 @@ components.post("/docs", zValidator("json", ComponentsRequestSchema), async (c) 
 
           return {
             component,
+            completeness: getCompleteness(component) ?? "unknown",
             error: errorMessage,
             url: docUrl,
           };
@@ -326,6 +354,7 @@ components.post("/source", zValidator("json", ComponentsRequestSchema), async (c
 
           return {
             component: result.component,
+            completeness: getCompleteness(result.component) ?? "unknown",
             filePath: result.data.links.source,
             sourceCode,
             githubUrl: sourceUrl
@@ -414,12 +443,31 @@ components.post("/source", zValidator("json", ComponentsRequestSchema), async (c
 });
 
 // Get component styles
-components.post("/styles", zValidator("json", ComponentsRequestSchema), async (c) => {
+components.post("/styles", zValidator("json", StylesRequestSchema), async (c) => {
   const endpoint = "get-component-styles";
   const startTime = Date.now();
-  const {components: componentNames} = c.req.valid("json");
+  const {behaviorSource, components: componentNames} = c.req.valid("json");
   const analytics = c.get("analytics");
   const app = getApp(c);
+
+  // The gate. A `behavior-required` component's stylesheet is only its visible
+  // half; handing it over without the caller saying where the behaviour comes
+  // from is how a CSS-only port ends up looking right and not working.
+  if (!behaviorSource && componentNames.some((component) => isBehaviorRequired(component))) {
+    analytics.track({
+      event: AnalyticsEvent.GET_COMPONENT_SOURCE_STYLES,
+      properties: {
+        endpoint,
+        apiVersion: "v1",
+        app,
+        components: componentNames,
+        gated: true,
+        responseTime: Date.now() - startTime,
+      },
+    });
+
+    return c.json(buildStylesGateResponse(componentNames), 400);
+  }
 
   try {
     const service = await getComponentService(c.env);
@@ -505,6 +553,7 @@ components.post("/styles", zValidator("json", ComponentsRequestSchema), async (c
 
           return {
             component: result.component,
+            completeness: getCompleteness(result.component) ?? "unknown",
             filePath: result.data.links.styles,
             stylesCode,
             githubUrl: stylesUrl
@@ -566,6 +615,7 @@ components.post("/styles", zValidator("json", ComponentsRequestSchema), async (c
 
     return c.json({
       version: latestVersion || "unknown",
+      behaviorSource,
       results: styleResults,
     });
   } catch (error) {
@@ -590,6 +640,24 @@ components.post("/styles", zValidator("json", ComponentsRequestSchema), async (c
       500,
     );
   }
+});
+
+// Get a component's interaction contract
+components.post("/behavior", zValidator("json", BehaviorRequestSchema), async (c) => {
+  const {component} = c.req.valid("json");
+  const contract = getBehaviorContract(component);
+
+  if (!contract) {
+    return c.json(
+      {
+        error: "Component not found",
+        details: `No interaction contract is recorded for '${component}'.`,
+      },
+      404,
+    );
+  }
+
+  return c.json(contract);
 });
 
 export {components};
