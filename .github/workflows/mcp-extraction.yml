@@ -32,9 +32,19 @@ on:
           - both
 
 concurrency:
-  # A deploy that lands while an extraction is running should supersede it
-  # rather than race it into the same bucket.
-  group: mcp-extraction
+  # Scoped per dispatch type, not per workflow.
+  #
+  # Vercel fires several deployment events per deploy, and the trigger relays
+  # each one as BOTH react-docs-deployed and native-docs-deployed. With a single
+  # shared group they queue into one lane, and since only one run may be pending
+  # per group, every newcomer cancels the one waiting. In practice that starved
+  # React completely: of the first eight runs, all four React ones were
+  # cancelled and only Native ever executed.
+  #
+  # One lane per dispatch type means React and Native no longer cancel each
+  # other, while duplicate events within a type still collapse — which is the
+  # deduplication that was wanted.
+  group: mcp-extraction-${{ github.event.action || inputs.target || 'manual' }}
   cancel-in-progress: false
 
 jobs:
