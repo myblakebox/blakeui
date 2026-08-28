@@ -1,0 +1,257 @@
+name: Deploy Workers
+
+# Deploys the Cloudflare Workers behind the MCP APIs when their source changes
+# on main. The docs site deploys separately through Vercel's GitHub integration;
+# npm publishing is release.yml, on a v* tag. This is only the Workers.
+#
+# Mirrors blakeui-pro's ci.yml deploy job, with two additions: each worker is
+# typechecked and dry-run built before it is deployed, and the deployed Worker
+# is probed afterwards to confirm the new code is actually serving. A deploy
+# that reports success while the old build is still live is the failure mode
+# worth spending a step on.
+#
+# Requires repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/react-mcp/**"
+      - "apps/native-mcp/**"
+      - "packages/analytics/**"
+      - ".github/workflows/deploy-workers.yml"
+  workflow_dispatch:
+    inputs:
+      worker:
+        description: "Which Worker to deploy"
+        required: false
+        default: both
+        type: choice
+        options:
+          - react
+          - native
+          - both
+
+concurrency:
+  # Never cancel a deploy in flight — a half-applied Worker rollout is worse
+  # than a queued one. Later pushes wait.
+  group: deploy-workers
+  cancel-in-progress: false
+
+jobs:
+  # Whether this repository can deploy at all.
+  #
+  # The secrets context is not available in a job-level `if`, so the check runs
+  # as a job and hands its answer downstream, the same way mcp-extraction.yml
+  # does.
+  #
+  # An automatic run without credentials skips rather than fails, so a push does
+  # not go red for a configuration gap. It is loud about it: a warning
+  # annotation, the run summary, and both deploy jobs reporting as skipped
+  # rather than succeeded — because "the workflow passed" must not be readable
+  # as "the API is updated". A manual run still fails, since someone asking for
+  # a deploy by hand deserves to be told why they are not getting one.
+  preflight:
+    name: Check Cloudflare credentials
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Look for Cloudflare credentials
+        id: check
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=""
+          for var in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            [ -z "${!var}" ] && missing="$missing $var"
+          done
+
+          if [ -z "$missing" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Cloudflare credentials present"
+            exit 0
+          fi
+
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Worker deploy skipped"
+            echo ""
+            echo "The MCP Worker APIs were **not** updated — this repository has no Cloudflare"
+            echo "credentials, so whatever changed in \`apps/react-mcp\` or \`apps/native-mcp\`"
+            echo "is on \`main\` but not yet serving."
+            echo ""
+            for var in $missing; do echo "- \`$var\`"; done
+            echo ""
+            echo "Add them under **Settings → Secrets and variables → Actions**, then re-run"
+            echo "this workflow from the Actions tab."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::warning title=Worker deploy skipped::No Cloudflare credentials. Missing:$missing — the MCP APIs were not updated."
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "::error title=Worker deploy is not configured::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+  changes:
+    name: Detect changed workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: preflight
+    # Only a push has a diff to filter. A manual dispatch names its target
+    # directly, so this job sits out — and the deploy jobs below use
+    # !cancelled() so a skipped dependency does not skip them too.
+    if: needs.preflight.outputs.configured == 'true' && github.event_name == 'push'
+    outputs:
+      react: ${{ steps.filter.outputs.react }}
+      native: ${{ steps.filter.outputs.native }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Filter paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            react:
+              - 'apps/react-mcp/**'
+              - 'packages/analytics/**'
+            native:
+              - 'apps/native-mcp/**'
+              - 'packages/analytics/**'
+
+  react:
+    name: Deploy blakeui-mcp-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [preflight, changes]
+    # !cancelled() rather than a bare condition: on a manual dispatch the
+    # `changes` job is skipped, and a skipped dependency would otherwise skip
+    # this job before its `if` was ever evaluated.
+    if: |
+      !cancelled() && needs.preflight.outputs.configured == 'true' && (
+        github.event_name == 'workflow_dispatch' && (inputs.worker == 'react' || inputs.worker == 'both') ||
+        github.event_name == 'push' && needs.changes.outputs.react == 'true'
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install
+        uses: ./.github/common-actions/install
+
+      # Scoped to this app on purpose. A repo-wide `pnpm typecheck` also runs
+      # @blakeui/native, which refuses to run under pnpm because it declares
+      # packageManager: yarn — unrelated to this deploy, and not a reason to
+      # block it.
+      - name: Typecheck
+        run: pnpm --filter @blakeui/react-mcp typecheck
+
+      - name: Build (dry run)
+        working-directory: apps/react-mcp
+        run: pnpm exec wrangler deploy --dry-run --outdir dist-api --env=""
+
+      - name: Deploy
+        working-directory: apps/react-mcp
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy src/api.ts --minify --env=""
+
+      # Confirm the new code is the code answering, not just that the upload
+      # returned 200. The styles gate is the sharpest available signal: it is
+      # pure request handling, needs no R2, and returns 400 only on a build that
+      # has it.
+      - name: Verify the deploy is serving
+        run: |
+          API=https://mcp-api.blakeui.com
+
+          echo "Waiting for the new build to take over…"
+          for attempt in $(seq 1 10); do
+            health=$(curl -s -o /dev/null -w '%{http_code}' "$API/health" || echo 000)
+            gate=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$API/v1/components/styles" \
+              -H 'Content-Type: application/json' \
+              -d '{"components":["Tabs"]}' || echo 000)
+
+            echo "  attempt $attempt: /health=$health  gated styles=$gate"
+
+            if [ "$health" = "200" ] && [ "$gate" = "400" ]; then
+              echo "✅ health 200, and the styles gate is live (Tabs refused without behavior_source)"
+
+              # The gate must also let a correctly-answered request through, in
+              # either spelling — the Pro Worker forwards behavior_source.
+              for field in behaviorSource behavior_source; do
+                code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$API/v1/components/styles" \
+                  -H 'Content-Type: application/json' \
+                  -d "{\"components\":[\"Tabs\"],\"$field\":\"blake\"}" || echo 000)
+                echo "  $field=blake → $code"
+                if [ "$code" = "400" ]; then
+                  echo "::error title=Gate rejects a valid request::$field was not accepted"
+                  exit 1
+                fi
+              done
+
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo "::error title=Deploy did not take::/health=$health, gated styles=$gate after 10 attempts"
+          exit 1
+
+  native:
+    name: Deploy blakeui-native-mcp-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [preflight, changes]
+    # !cancelled() rather than a bare condition: on a manual dispatch the
+    # `changes` job is skipped, and a skipped dependency would otherwise skip
+    # this job before its `if` was ever evaluated.
+    if: |
+      !cancelled() && needs.preflight.outputs.configured == 'true' && (
+        github.event_name == 'workflow_dispatch' && (inputs.worker == 'native' || inputs.worker == 'both') ||
+        github.event_name == 'push' && needs.changes.outputs.native == 'true'
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install
+        uses: ./.github/common-actions/install
+
+      - name: Typecheck
+        run: pnpm --filter @blakeui/native-mcp typecheck
+
+      - name: Build (dry run)
+        working-directory: apps/native-mcp
+        run: pnpm exec wrangler deploy --dry-run --outdir dist-api --env=""
+
+      - name: Deploy
+        working-directory: apps/native-mcp
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler deploy src/api.ts --minify --env=""
+
+      - name: Verify the deploy is serving
+        run: |
+          API=https://native-mcp-api.blakeui.com
+
+          for attempt in $(seq 1 10); do
+            health=$(curl -s -o /dev/null -w '%{http_code}' "$API/health" || echo 000)
+            echo "  attempt $attempt: /health=$health"
+            [ "$health" = "200" ] && { echo "✅ health 200"; exit 0; }
+            sleep 10
+          done
+
+          echo "::error title=Deploy did not take::/health=$health after 10 attempts"
+          exit 1
