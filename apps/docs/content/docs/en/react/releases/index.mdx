@@ -9,13 +9,13 @@ description: All updates and changes to BlakeUI, including new features, fixes, 
 
 ## Latest Release
 
-### v1.3.0
+### v1.4.0
 
-**August 22, 2026**
+**August 28, 2026**
 
-Body-role text now ships at font-weight 450 instead of the browser-default 400 — a real value on Figtree's variable axis. Paragraphs, table cells, captions and form values render slightly heavier; headings, buttons, labels and other deliberate weights are untouched. A visual change: screenshot baselines will differ.
+Keyboard focus rings now render. Two selectors could never match — `:focus-visible:not(:focus)`, which is unsatisfiable, and `:focus-visible` on the Checkbox, Switch and Radio roots, which are `<label>` elements that never receive focus. Across thirty-one stylesheets the package ring appeared only when React was driving the component. A visual change on keyboard focus; pointer interaction is unchanged.
 
-[Read full release notes →](/docs/react/releases/v1-3-0)
+[Read full release notes →](/docs/react/releases/v1-4-0)
 
 ---
 
