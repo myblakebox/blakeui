@@ -44,7 +44,7 @@
 
   /* Add inline-end padding when indicator is present and has submenu */
   &[data-has-submenu="true"]:has(.menu-item__indicator) {
-    @apply pe-7 ps-2;
+    @apply ps-2 pe-7;
   }
 
   /* Focus visible state (keyboard focus only) */
@@ -102,7 +102,7 @@
    ========================================================================== */
 
 .menu-item__indicator {
-  @apply absolute top-1/2 start-2 flex size-4 shrink-0 -translate-y-1/2 items-center justify-center text-muted;
+  @apply absolute start-2 top-1/2 flex size-4 shrink-0 -translate-y-1/2 items-center justify-center text-muted;
 
   /**
    * Transitions
@@ -111,7 +111,7 @@
 
   /* Position on the inline-end when menu item has submenu */
   .menu-item[data-has-submenu="true"] & {
-    @apply end-2 start-auto;
+    @apply start-auto end-2;
   }
 
   /* Checkmark SVG indicator */

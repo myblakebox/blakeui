@@ -38,7 +38,7 @@
 }
 
 .date-picker__popover {
-  @apply max-w-(--trigger-width) origin-(--trigger-anchor-point) overflow-x-hidden overflow-y-auto overscroll-contain bg-overlay p-3 scrollbar-none;
+  @apply max-w-(--trigger-width) origin-(--trigger-anchor-point) scrollbar-none overflow-x-hidden overflow-y-auto overscroll-contain bg-overlay p-3;
 
   box-shadow: var(--shadow-overlay);
   border-radius: min(32px, calc(var(--radius) * 2.5));
