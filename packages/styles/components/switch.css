@@ -65,8 +65,11 @@
     background-color 250ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out);
 
-  /* Focus states */
-  .switch:focus-visible &,
+  /* Focus states. The root is a <label> wrapping a visually hidden input, so
+     focus lands on the input and never on `.switch` itself — `:focus-visible`
+     does not propagate to ancestors. `:has(:focus-visible)` reaches up from the
+     focused input; the data attribute stays for the React-driven case. */
+  .switch:has(:focus-visible) &,
   .switch[data-focus-visible="true"] & {
     @apply status-focused;
   }

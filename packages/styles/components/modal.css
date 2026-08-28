@@ -28,7 +28,7 @@
   --modal-press-scale: 0.97;
 
   /* Focus state */
-  &:focus-visible:not(:focus),
+  &:focus-visible,
   &[data-focus-visible="true"] {
     @apply status-focused;
   }

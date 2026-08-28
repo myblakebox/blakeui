@@ -47,8 +47,11 @@
   cursor: var(--cursor-interactive);
 
   /* Interactive states */
-  /* Focus */
-  .radio:focus-visible &,
+  /* Focus. The root is a <label> wrapping a visually hidden input, so focus
+     lands on the input and never on `.radio` itself — `:focus-visible` does not
+     propagate to ancestors. `:has(:focus-visible)` reaches up from the focused
+     input; the data attribute stays for the React-driven case. */
+  .radio:has(:focus-visible) &,
   .radio[data-focus-visible="true"] & {
     @apply status-focused;
   }

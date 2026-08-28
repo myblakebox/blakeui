@@ -21,7 +21,7 @@
    */
   transition: box-shadow 150ms var(--ease-out);
 
-  &:focus-visible:not(:focus),
+  &:focus-visible,
   &[data-focus-visible="true"] {
     @apply status-focused;
   }
@@ -47,7 +47,7 @@
   box-shadow: var(--shadow-overlay);
   border-radius: min(32px, calc(var(--radius) * 2.5));
 
-  &:focus-visible:not(:focus),
+  &:focus-visible,
   &[data-focus-visible="true"] {
     @apply outline-none;
   }
