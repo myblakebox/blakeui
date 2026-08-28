@@ -1,6 +1,7 @@
 ---
 title: Link
 description: A styled anchor component for navigation with built-in icon support
+completeness: styles-sufficient
 links:
   rac: Link
   source: link/link.tsx
@@ -8,6 +9,12 @@ links:
   storybook: Components/Navigation/Link
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -85,7 +92,6 @@ For more details, see the Tailwind CSS documentation:
 - [text-decoration-thickness](https://tailwindcss.com/docs/text-decoration-thickness)
 - [text-underline-offset](https://tailwindcss.com/docs/text-underline-offset)
 
-
 Available BEM classes:
 - Base: `link`
 - Icon: `link__icon`
@@ -122,13 +128,7 @@ function CustomLink() {
 To customize the Link component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .link {
-    @apply font-semibold;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -172,8 +172,6 @@ The component supports both CSS pseudo-classes and data attributes for flexibili
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | - | Custom icon element; defaults to the built-in arrow icon when omitted |
 | `className` | `string` | - | Additional CSS classes |
-
-
 
 ### Using with Routing Libraries
 

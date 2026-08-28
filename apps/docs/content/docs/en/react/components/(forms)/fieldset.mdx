@@ -1,11 +1,18 @@
 ---
 title: Fieldset
 description: Group related form controls with legends, descriptions, and actions
+completeness: styles-sufficient
 links:
   source: fieldset/fieldset.tsx
   styles: fieldset.css
   storybook: Components/Forms/Fieldset
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -80,25 +87,7 @@ function CustomFieldset() {
 
 Use the `@layer components` directive to target Fieldset [BEM](https://getbem.com/)-style classes.
 
-```css
-@layer components {
-  .fieldset {
-    @apply gap-5 rounded-xl border border-border/60 bg-surface p-6 shadow-field;
-  }
-
-  .fieldset__legend {
-    @apply text-lg font-semibold;
-  }
-
-  .fieldset__field_group {
-    @apply gap-3 md:grid md:grid-cols-2;
-  }
-
-  .fieldset__actions {
-    @apply flex justify-end gap-2 pt-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 ### CSS Classes
 

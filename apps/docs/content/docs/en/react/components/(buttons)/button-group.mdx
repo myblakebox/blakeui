@@ -2,6 +2,7 @@
 title: ButtonGroup
 description: Group related buttons together with consistent styling and spacing
 
+completeness: styles-sufficient
 links:
   rac: Button
   source: button-group/button-group.tsx
@@ -9,6 +10,12 @@ links:
   storybook: Components/Buttons/ButtonGroup
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -123,17 +130,7 @@ function CustomButtonGroup() {
 To customize the ButtonGroup component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .button-group {
-    @apply gap-2 rounded-lg;
-  }
-
-  .button-group__separator {
-    @apply opacity-25;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

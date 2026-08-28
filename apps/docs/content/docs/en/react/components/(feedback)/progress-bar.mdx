@@ -1,12 +1,19 @@
 ---
 title: ProgressBar
 description: A progress bar shows either determinate or indeterminate progress of an operation over time.
+completeness: styles-sufficient
 links:
   rac: ProgressBar
   source: progress-bar/progress-bar.tsx
   styles: progress-bar.css
   storybook: Components/Feedback/ProgressBar
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -101,21 +108,7 @@ function CustomProgressBar() {
 To customize the ProgressBar component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .progress-bar {
-    @apply w-full gap-2;
-  }
-
-  .progress-bar__track {
-    @apply h-3 rounded-full;
-  }
-
-  .progress-bar__fill {
-    @apply rounded-full;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

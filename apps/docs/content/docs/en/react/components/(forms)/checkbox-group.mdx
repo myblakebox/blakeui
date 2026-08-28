@@ -1,12 +1,19 @@
 ---
 title: CheckboxGroup
 description: A checkbox group component for managing multiple checkbox selections
+completeness: styles-sufficient
 links:
   rac: CheckboxGroup
   source: checkbox-group/checkbox-group.tsx
   styles: checkbox-group.css
   storybook: Components/Forms/CheckboxGroup
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -127,13 +134,7 @@ function CustomCheckboxGroup() {
 To customize the CheckboxGroup component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .checkbox-group {
-    @apply flex flex-col gap-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -173,4 +174,3 @@ When using the render prop pattern, these values are provided:
 | `isReadOnly` | `boolean` | Whether the checkbox group is read only |
 | `isInvalid` | `boolean` | Whether the checkbox group is in an invalid state |
 | `isRequired` | `boolean` | Whether the checkbox group is required |
-

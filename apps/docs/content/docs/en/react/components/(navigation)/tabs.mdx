@@ -1,6 +1,7 @@
 ---
 title: Tabs
 description: Tabs organize content into multiple sections and allow users to navigate between them.
+completeness: behavior-required
 links:
   rac: Tabs
   source: tabs/tabs.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Navigation/Tabs
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Tabs")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -168,8 +177,6 @@ The component supports both CSS pseudo-classes and data attributes:
 - **Hover**: `:hover` or `[data-hovered="true"]`
 - **Focus**: `:focus-visible` or `[data-focus-visible="true"]`
 - **Disabled**: `[aria-disabled="true"]`
-
-
 
 ## API Reference
 

@@ -1,12 +1,19 @@
 ---
 title: Chip
 description: Small informational badges for displaying labels, statuses, and categories
+completeness: styles-sufficient
 links:
   source: chip/chip.tsx
   styles: chip.css
   storybook: Components/Data Display/Chip
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -77,25 +84,7 @@ function CustomChip() {
 To customize the Chip component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .chip {
-    @apply rounded-full text-xs;
-  }
-
-  .chip__label {
-    @apply font-medium;
-  }
-
-  .chip--accent {
-    @apply border-accent/20;
-  }
-
-  .chip--accent .chip__label {
-    @apply text-accent;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

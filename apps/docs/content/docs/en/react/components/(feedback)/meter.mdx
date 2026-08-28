@@ -1,12 +1,19 @@
 ---
 title: Meter
 description: A meter represents a quantity within a known range, or a fractional value.
+completeness: styles-sufficient
 links:
   rac: Meter
   source: meter/meter.tsx
   styles: meter.css
   storybook: Components/Feedback/Meter
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -93,21 +100,7 @@ function CustomMeter() {
 To customize the Meter component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .meter {
-    @apply w-full gap-2;
-  }
-
-  .meter__track {
-    @apply h-3 rounded-full;
-  }
-
-  .meter__fill {
-    @apply rounded-full;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

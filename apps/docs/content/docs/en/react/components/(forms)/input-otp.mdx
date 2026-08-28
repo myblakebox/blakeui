@@ -1,12 +1,21 @@
 ---
 title: InputOTP
 description: A one-time password input component for verification codes and secure authentication
+completeness: behavior-required
 links:
   source: input-otp/input-otp.tsx
   styles: input-otp.css
   storybook: Components/Forms/InputOTP
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("InputOTP")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -154,25 +163,7 @@ function CustomInputOTP() {
 To customize the InputOTP component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .input-otp {
-    @apply gap-3;
-  }
-
-  .input-otp__slot {
-    @apply size-12 rounded-xl border-2 font-bold;
-  }
-
-  .input-otp__slot[data-active="true"] {
-    @apply border-primary-500 ring-2 ring-primary-200;
-  }
-
-  .input-otp__separator {
-    @apply w-2 h-1 bg-border-strong rounded-full;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

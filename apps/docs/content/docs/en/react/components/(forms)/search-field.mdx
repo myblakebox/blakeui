@@ -1,6 +1,7 @@
 ---
 title: SearchField
 description: Search input field with clear button and search icon
+completeness: behavior-required
 links:
   rac: SearchField
   source: search-field/search-field.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Forms/SearchField
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("SearchField")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -142,37 +151,7 @@ function CustomSearchField() {
 
 SearchField uses CSS classes that can be customized. Override the component classes to match your design system.
 
-```css
-@layer components {
-  .search-field {
-    @apply flex flex-col gap-1;
-  }
-
-  /* When invalid, the description is hidden automatically */
-  .search-field[data-invalid],
-  .search-field[aria-invalid] {
-    [data-slot="description"] {
-      @apply hidden;
-    }
-  }
-
-  .search-field__group {
-    @apply bg-field text-field-foreground shadow-field rounded-field inline-flex h-9 items-center overflow-hidden border;
-  }
-
-  .search-field__input {
-    @apply flex-1 rounded-none border-0 bg-transparent px-3 py-2 shadow-none outline-none;
-  }
-
-  .search-field__search-icon {
-    @apply text-field-placeholder pointer-events-none shrink-0 ml-3 mr-0 size-4;
-  }
-
-  .search-field__clear-button {
-    @apply mr-1 shrink-0;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 ### CSS Classes
 
@@ -346,4 +325,3 @@ When using render props with `className`, `style`, or `children`, these values a
 | `isFocusVisible` | `boolean` | Whether focus is visible (keyboard navigation). |
 | `value` | `string` | Current value. |
 | `isEmpty` | `boolean` | Whether the field is empty. |
-

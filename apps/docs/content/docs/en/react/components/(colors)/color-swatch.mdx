@@ -1,12 +1,19 @@
 ---
 title: ColorSwatch
 description: A visual preview of a color value with accessibility support
+completeness: styles-sufficient
 links:
   rac: ColorSwatch
   source: color-swatch/color-swatch.tsx
   styles: color-swatch.css
   storybook: Components/Colors/ColorSwatch
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -84,13 +91,7 @@ function CustomColorSwatch() {
 To customize the ColorSwatch component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .color-swatch {
-    @apply border-2 border-white;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

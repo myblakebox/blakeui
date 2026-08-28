@@ -1,12 +1,21 @@
 ---
 title: ListBox
 description: A listbox displays a list of options and allows a user to select one or more of them
+completeness: behavior-required
 links:
   rac: ListBox
   source: list-box/list-box.tsx
   styles: list-box.css
   storybook: Components/Collections/ListBox
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("ListBox")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -113,25 +122,7 @@ function CustomListBox() {
 To customize the ListBox component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .list-box {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-
-  .list-box-item {
-    @apply rounded px-2 py-1 cursor-pointer;
-  }
-
-  .list-box-item--danger {
-    @apply text-danger;
-  }
-
-  .list-box-item__indicator {
-    @apply text-accent;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -326,4 +317,3 @@ The ListBox component implements the ARIA listbox pattern and provides:
 - Typeahead search functionality
 
 For more information, see the [React Aria ListBox documentation](https://react-spectrum.adobe.com/react-aria/ListBox.html).
-

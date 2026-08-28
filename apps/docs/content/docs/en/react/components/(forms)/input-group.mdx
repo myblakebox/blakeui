@@ -1,6 +1,7 @@
 ---
 title: InputGroup
 description: Group related input controls with prefix and suffix elements for enhanced form fields
+completeness: behavior-required
 links:
   rac: Group
   source: input-group/input-group.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Forms/InputGroup
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("InputGroup")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -186,31 +195,7 @@ function CustomInputGroup() {
 
 InputGroup uses CSS classes that can be customized. Override the component classes to match your design system.
 
-```css
-@layer components {
-  .input-group {
-    @apply bg-field text-field-foreground shadow-field rounded-field inline-flex min-h-9 items-center overflow-hidden border text-sm outline-none;
-  }
-
-  .input-group__input {
-    @apply flex-1 rounded-none border-0 bg-transparent px-3 py-2 shadow-none outline-none;
-  }
-
-  .input-group__prefix {
-    @apply text-field-placeholder rounded-l-field flex h-full items-center justify-center rounded-r-none bg-transparent px-3;
-  }
-
-  .input-group__suffix {
-    @apply text-field-placeholder rounded-r-field flex h-full items-center justify-center rounded-l-none bg-transparent px-3;
-  }
-
-  /* Secondary variant */
-  .input-group--secondary {
-    @apply shadow-none;
-    background-color: var(--color-default);
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 ### CSS Classes
 
@@ -377,4 +362,3 @@ function TextAreaExample() {
   );
 }
 ```
-

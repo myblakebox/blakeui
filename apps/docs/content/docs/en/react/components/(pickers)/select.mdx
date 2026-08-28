@@ -1,12 +1,21 @@
 ---
 title: Select
 description: A select displays a collapsible list of options and allows a user to select one of them
+completeness: behavior-required
 links:
   rac: Select
   source: select/select.tsx
   styles: select.css
   storybook: Components/Pickers/Select
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Select")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -161,29 +170,7 @@ To customize the Select component classes, you can use the `@layer components` d
 <br />
 [Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .select {
-    @apply flex flex-col gap-1;
-  }
-
-  .select__trigger {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-
-  .select__value {
-    @apply text-current;
-  }
-
-  .select__indicator {
-    @apply text-muted;
-  }
-
-  .select__popover {
-    @apply rounded-lg border border-border bg-surface p-2;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

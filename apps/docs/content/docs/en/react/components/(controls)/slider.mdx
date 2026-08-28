@@ -1,12 +1,21 @@
 ---
 title: Slider
 description: A slider allows a user to select one or more values within a range
+completeness: behavior-required
 links:
   rac: Slider
   source: slider/slider.tsx
   styles: slider.css
   storybook: Components/Controls/Slider
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Slider")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -114,29 +123,7 @@ function CustomSlider() {
 To customize the Slider component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .slider {
-    @apply flex flex-col gap-2;
-  }
-
-  .slider__output {
-    @apply text-muted-fg text-sm;
-  }
-
-  .slider-track {
-    @apply relative h-2 w-full rounded-full bg-surface-secondary;
-  }
-
-  .slider-fill {
-    @apply absolute h-full rounded-full bg-accent;
-  }
-
-  .slider-thumb {
-    @apply size-4 rounded-full bg-accent border-2 border-background;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -377,4 +364,3 @@ The Slider component implements the ARIA slider pattern and provides:
 - Right-to-left (RTL) language support
 
 For more information, see the [React Aria Slider documentation](https://react-spectrum.adobe.com/react-aria/Slider.html).
-

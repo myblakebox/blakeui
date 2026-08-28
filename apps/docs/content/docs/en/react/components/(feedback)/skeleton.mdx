@@ -1,12 +1,19 @@
 ---
 title: Skeleton
 description: Skeleton is a placeholder to show a loading state and the expected shape of a component.
+completeness: styles-sufficient
 links:
   source: skeleton/skeleton.tsx
   styles: skeleton.css
   storybook: Components/Feedback/Skeleton
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -19,7 +26,6 @@ import { Skeleton } from '@blakeui/react';
 <ComponentPreview
   name="skeleton-basic"
 />
-
 
 ### Text Content
 
@@ -66,26 +72,15 @@ A synchronized shimmer effect that passes over all skeleton elements at once. Ap
 
 ### Global Animation Configuration
 
-You can set a default animation type for all Skeleton components in your application by defining the `--skeleton-animation` CSS variable:
+Set a default animation for every Skeleton in your application with the `--skeleton-animation` theme variable. Scope it to `:root`, or to a light/dark selector to vary it by theme — see [Theming](/docs/react/getting-started/theming).
 
-```css
-/* In your global CSS file */
-:root {
-  /* Possible values: shimmer, pulse, none */
-  --skeleton-animation: pulse;
-}
+| Value | Effect |
+|-------|--------|
+| `shimmer` | Gradient sweep across the placeholder (default) |
+| `pulse` | Opacity pulse |
+| `none` | Static placeholder |
 
-/* You can also set different values for light/dark themes */
-.light, [data-theme="light"] {
-  --skeleton-animation: shimmer;
-}
-
-.dark, [data-theme="dark"] {
-  --skeleton-animation: pulse;
-}
-```
-
-This global setting will be overridden by the `animationType` prop when specified on individual components.
+The `animationType` prop overrides this on individual components.
 
 ### Passing Tailwind CSS classes
 
@@ -104,29 +99,7 @@ function CustomSkeleton() {
 To customize the Skeleton component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  /* Base skeleton styles */
-  .skeleton {
-    @apply bg-surface-secondary/50; /* Change base background */
-  }
-
-  /* Shimmer animation gradient */
-  .skeleton--shimmer:before {
-    @apply viasurface; /* Change shimmer gradient color */
-  }
-
-  /* Pulse animation */
-  .skeleton--pulse {
-    @apply animate-pulse opacity-75; /* Customize pulse animation */
-  }
-
-  /* No animation variant */
-  .skeleton--none {
-    @apply opacity-50; /* Style for static skeleton */
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
@@ -144,48 +117,15 @@ The Skeleton component uses these CSS classes ([View source styles](https://gith
 
 ### Animation
 
-The Skeleton component supports three animation types, each with different visual effects:
+The Skeleton component supports three animation types:
 
-#### Shimmer Animation
-The shimmer effect creates a gradient that moves across the skeleton element:
+| Class | Animation |
+|-------|-----------|
+| `.skeleton--shimmer` | A gradient sweeps across the placeholder, driven by the `--animate-skeleton` theme variable |
+| `.skeleton--pulse` | Tailwind's `animate-pulse` opacity cycle |
+| `.skeleton--none` | No animation |
 
-```css
-.skeleton--shimmer:before {
-  @apply animate-skeleton via-surface-3 absolute inset-0 -translate-x-full
-         bg-gradient-to-r from-transparent to-transparent content-[''];
-}
-```
-
-The shimmer animation is defined in the theme using:
-```css
-@theme inline {
-  --animate-skeleton: skeleton 2s linear infinite;
-
-  @keyframes skeleton {
-    100% {
-      transform: translateX(200%);
-    }
-  }
-}
-```
-
-#### Pulse Animation
-The pulse animation uses Tailwind's built-in `animate-pulse` utility:
-
-```css
-.skeleton--pulse {
-  @apply animate-pulse;
-}
-```
-
-#### No Animation
-For static skeletons without any animation:
-
-```css
-.skeleton--none {
-  /* No animation styles applied */
-}
-```
+All three respect `prefers-reduced-motion`.
 
 ## API Reference
 

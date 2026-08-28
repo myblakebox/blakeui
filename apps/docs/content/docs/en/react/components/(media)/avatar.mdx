@@ -1,6 +1,7 @@
 ---
 title: Avatar
 description: Display user profile images with customizable fallback content
+completeness: styles-sufficient
 links:
   radix: avatar
   source: avatar/avatar.tsx
@@ -8,6 +9,12 @@ links:
   storybook: Components/Media/Avatar
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -82,17 +89,7 @@ function CustomAvatar() {
 To customize the Avatar component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .avatar {
-    @apply size-16 border-2 border-primary;
-  }
-
-  .avatar__fallback {
-    @apply bg-gradient-to-br from-purple-500 to-pink-500;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

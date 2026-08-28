@@ -1,6 +1,7 @@
 ---
 title: Separator
 description: Visually divide content sections
+completeness: styles-sufficient
 links:
   rac: Separator
   source: separator/separator.tsx
@@ -8,6 +9,12 @@ links:
   storybook: Components/Layout/Separator
   figma: true
 ---
+
+<Callout title="Completeness: styles-sufficient" type="info">
+  The stylesheet is the whole component. There is no keyboard map beyond what the native
+  element already does and nothing sets state at runtime that the CSS keys on, so a
+  CSS-only port reproduces it.
+</Callout>
 
 ## Import
 
@@ -74,17 +81,7 @@ function CustomSeparator() {
 To customize the Separator component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .separator {
-    @apply bg-accent h-[2px];
-  }
-
-  .separator--vertical {
-    @apply bg-accent w-[2px];
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

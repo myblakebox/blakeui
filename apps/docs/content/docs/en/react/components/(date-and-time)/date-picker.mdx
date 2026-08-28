@@ -1,6 +1,7 @@
 ---
 title: DatePicker
 description: Composable date picker built on React Aria DatePicker with DateField and Calendar composition
+completeness: behavior-required
 links:
   rac: DatePicker
   source: date-picker/date-picker.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Date and Time/DatePicker
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("DatePicker")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -148,25 +157,7 @@ function CustomDatePicker() {
 
 To customize DatePicker base classes, use `@layer components`.
 
-```css
-@layer components {
-  .date-picker {
-    @apply inline-flex flex-col gap-1;
-  }
-
-  .date-picker__trigger {
-    @apply inline-flex items-center justify-between;
-  }
-
-  .date-picker__trigger-indicator {
-    @apply text-muted;
-  }
-
-  .date-picker__popover {
-    @apply min-w-[var(--trigger-width)] p-0;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows [BEM](https://getbem.com/) naming for reusable customization.
 

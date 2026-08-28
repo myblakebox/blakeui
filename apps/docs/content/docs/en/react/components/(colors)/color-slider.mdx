@@ -1,6 +1,7 @@
 ---
 title: ColorSlider
 description: A color slider allows users to adjust an individual channel of a color value
+completeness: behavior-required
 links:
   rac: ColorSlider
   source: color-slider/color-slider.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Colors/ColorSlider
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("ColorSlider")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -113,25 +122,7 @@ function CustomColorSlider() {
 To customize the ColorSlider component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .color-slider {
-    @apply flex flex-col gap-2;
-  }
-
-  .color-slider__output {
-    @apply text-muted text-sm;
-  }
-
-  .color-slider__track {
-    @apply relative h-5 w-full rounded-full;
-  }
-
-  .color-slider__thumb {
-    @apply size-4 rounded-full border-3 border-white shadow-overlay;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

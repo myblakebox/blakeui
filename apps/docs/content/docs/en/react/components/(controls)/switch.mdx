@@ -1,6 +1,7 @@
 ---
 title: Switch
 description: A toggle switch component for boolean states
+completeness: behavior-required
 links:
   rac: Switch
   source: switch/switch.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Controls/Switch
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Switch")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -211,29 +220,7 @@ function CustomSwitchGroup() {
 To customize the Switch component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .switch {
-    @apply inline-flex gap-3 items-center;
-  }
-
-  .switch__control {
-    @apply h-5 w-8 bg-gray-400 data-[selected=true]:bg-blue-500;
-  }
-
-  .switch__thumb {
-    @apply bg-white shadow-sm;
-  }
-
-  .switch__content {
-    @apply flex flex-col gap-1;
-  }
-
-  .switch__icon {
-    @apply h-3 w-3 text-current;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 

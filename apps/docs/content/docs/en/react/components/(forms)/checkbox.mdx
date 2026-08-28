@@ -1,6 +1,7 @@
 ---
 title: Checkbox
 description: Checkboxes allow users to select multiple items from a list of individual items, or to mark one individual item as selected.
+completeness: behavior-required
 links:
   rac: Checkbox
   source: checkbox/checkbox.tsx
@@ -8,6 +9,14 @@ links:
   storybook: Components/Forms/Checkbox
   figma: true
 ---
+
+<Callout title="Completeness: behavior-required" type="warn">
+  The stylesheet is only the visible half of this component. It also needs a keyboard
+  map, focus managed across more than one element, ARIA attributes that point at other
+  nodes, and `[data-*]` attributes that only running code sets — so a CSS-only port will
+  not reproduce it. Use `@blakeui/react`, or read the interaction contract from the MCP
+  server with `get_component_behavior("Checkbox")` and build the behaviour yourself.
+</Callout>
 
 ## Import
 
@@ -152,40 +161,7 @@ function CustomCheckbox() {
 To customize the Checkbox component classes, you can use the `@layer components` directive.
 <br/>[Learn more](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes).
 
-```css
-@layer components {
-  .checkbox {
-    @apply inline-flex gap-3 items-center;
-  }
-
-  .checkbox__control {
-    @apply size-5 border-2 border-gray-400 rounded data-[selected=true]:bg-blue-500 data-[selected=true]:border-blue-500;
-
-    /* Animated background indicator */
-    &::before {
-      @apply bg-accent pointer-events-none absolute inset-0 z-0 origin-center scale-50 rounded-md opacity-0 content-[''];
-
-      transition:
-        scale 200ms linear,
-        opacity 200ms linear,
-        background-color 200ms ease-out;
-    }
-
-    /* Show indicator when selected */
-    &[data-selected="true"]::before {
-      @apply scale-100 opacity-100;
-    }
-  }
-
-  .checkbox__indicator {
-    @apply text-white;
-  }
-
-  .checkbox__content {
-    @apply flex flex-col gap-1;
-  }
-}
-```
+A worked example is in [Styling](/docs/react/getting-started/styling#bem-classes).
 
 blakeUI follows the [BEM](https://getbem.com/) methodology to ensure component variants and states are reusable and easy to customize.
 
