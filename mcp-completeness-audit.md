@@ -26,8 +26,11 @@ to BEM class names through `tv()` definitions that also live in `@blakeui/styles
 (`packages/styles/src/components/*/`). The split is clean: **no stylesheet fix can be made
 outside `@blakeui/styles`.**
 
-Consequence for this session's standing rule: every CSS fix below is written to
-`proposed-styles-patch.diff` at the repo root and is **not applied**.
+Consequence for this session's standing rule: every CSS fix below was first written to
+`proposed-styles-patch.diff` at the repo root and held back. **Greg signed off, and the patch
+has been applied** — see `build(styles): fail the build on an unresolved relative @import in
+dist` and `fix(styles): paint the focus ring that never rendered`. The patch file has been
+removed now that the changes are in the history.
 
 ---
 
@@ -256,12 +259,12 @@ reverted.
 **So a working docs site proves nothing about the tarball.** The dist tree is exercised only by
 consumers installing from npm — which is exactly how the Pro failure stayed invisible.
 
-### The guard (proposed, not applied)
+### The guard
 
-`proposed-styles-patch.diff` adds `packages/styles/scripts/assert-css-imports.mjs`, wired into
-`scripts/build.mjs` between the CSS copy step and minification — inside the normal build, not as
-a separate script. It resolves every relative `@import` reachable from `dist/index.css` and exits
-non-zero listing any that dangle.
+`packages/styles/scripts/assert-css-imports.mjs` is wired into `scripts/build.mjs` between the
+CSS copy step and minification — inside the normal build, not as a separate script. It resolves
+every relative `@import` reachable from `dist/index.css` and exits non-zero listing any that
+dangle.
 
 Verified by temporarily skipping the copy of `components/tabs.css`:
 
@@ -274,16 +277,15 @@ Exit status 1
 
 Restoring the copy made the build pass again.
 
-**This lands in `@blakeui/styles`, so it is written to `proposed-styles-patch.diff` and not
-applied.** No published version is affected — the assertion is a guard against a regression, not
-a fix for one.
+This lands in `@blakeui/styles`, so it was held for sign-off and then applied. No published
+version is affected — the assertion is a guard against a regression, not a fix for one.
 
 ---
 
 ## §2 — CSS defects
 
-Both patterns from the Pro audit appear here. Both fixes land in `@blakeui/styles` and are in
-`proposed-styles-patch.diff`, **not applied**.
+Both patterns from the Pro audit appear here. Both fixes land in `@blakeui/styles`, so they were
+held for sign-off and then applied.
 
 ### (a) `:focus-visible:not(:focus)` — unsatisfiable
 
@@ -406,7 +408,8 @@ Derived from `@blakeui/react` imports in `~/Projects/blakeui-pro/packages/react/
 
 ## What shipped in this repo
 
-Everything below is outside `@blakeui/styles` and was applied.
+The two `@blakeui/styles` changes above shipped after sign-off. Everything below is outside that
+package and shipped with the audit.
 
 - **`completeness` on every catalog entry.** Source of truth:
   `apps/react-mcp/src/shared/behavior/contracts.ts` — 70 entries, each with its verdict, the
