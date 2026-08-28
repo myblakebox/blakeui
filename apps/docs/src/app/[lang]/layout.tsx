@@ -76,7 +76,14 @@ export const metadata: Metadata = {
   icons: [
     {
       rel: "icon",
-      type: "image/svg",
+      sizes: "48x48",
+      type: "image/x-icon",
+      url: "/icons/favicon.ico",
+    },
+    {
+      rel: "icon",
+      sizes: "any",
+      type: "image/svg+xml",
       url: "/icons/favicon.svg",
     },
     {
