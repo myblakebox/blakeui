@@ -116,15 +116,20 @@ describe("get_component_source_styles — Tabs regression", () => {
     expect(text).toContain('behavior_source: "self"');
   });
 
-  it("mentions Pro without making the error depend on it", async () => {
+  it("points at the contract without advertising anything", async () => {
     vi.stubGlobal("fetch", vi.fn());
 
     const text = (await handler({components: ["Tabs"]})).content[0]!.text;
-    const proMentions = text.match(/Pro/g) ?? [];
 
-    // One line, at the end, after everything a free user needs to get it right.
-    expect(proMentions).toHaveLength(1);
-    expect(text.indexOf("Pro")).toBeGreaterThan(text.indexOf('behavior_source: "self"'));
+    // Everything the caller needs is in the error itself, and the next step is
+    // another free tool.
+    expect(text).toContain("get_component_behavior");
+
+    // This error used to close by offering "prebuilt vanilla and Web Component
+    // adapters" from Pro. No such adapters exist — Pro ships @blakeui/pro-react
+    // and nothing else, so the line was telling people to buy a thing that was
+    // not there. Anything added back here has to be true of a shipped package.
+    expect(text).not.toMatch(/vanilla and Web Component|prebuilt .*adapter/i);
   });
 
   it('returns the contract ahead of the styles for behavior_source: "self"', async () => {

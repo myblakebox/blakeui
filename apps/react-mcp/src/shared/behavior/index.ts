@@ -299,10 +299,7 @@ export function buildStylesGateError(components: string[]): string {
     '- `behavior_source: "self"` — you are writing the interaction layer yourself (vanilla JS, Vue, Svelte, Web Components, anything). Returns the full interaction contract first, then the styles.',
   );
   lines.push("");
-  lines.push(
-    "You can also read the contract on its own with `get_component_behavior`. " +
-      "BlakeUI Pro ships prebuilt vanilla and Web Component adapters if you would rather not hand-write the behaviour layer.",
-  );
+  lines.push("You can also read the contract on its own with `get_component_behavior`.");
   lines.push("");
 
   return lines.join("\n");
