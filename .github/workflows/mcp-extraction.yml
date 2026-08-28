@@ -1,0 +1,147 @@
+name: MCP Extraction
+
+# The other half of trigger-mcp-extraction.yml.
+#
+# That workflow fires on every Vercel deploy of main and dispatches
+# `react-docs-deployed` and `native-docs-deployed` — at this repository. Nothing
+# listened for either event, so the relay reported success into a void on every
+# run and the MCP datasets in R2 were never refreshed. That is why ctx.json sat
+# at v1.0.0 while packages/react moved to 1.3.0: not a broken extractor, a
+# missing listener.
+#
+# The extraction reads the component catalog from the deployed docs site and
+# GitHub, stamps it with the completeness verdicts from
+# apps/react-mcp/src/shared/behavior, and writes it to R2, where the MCP API
+# serves it.
+
+on:
+  repository_dispatch:
+    types:
+      - react-docs-deployed
+      - native-docs-deployed
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which MCP datasets to refresh"
+        required: false
+        default: both
+        type: choice
+        options:
+          - react
+          - native
+          - both
+
+concurrency:
+  # A deploy that lands while an extraction is running should supersede it
+  # rather than race it into the same bucket.
+  group: mcp-extraction
+  cancel-in-progress: false
+
+jobs:
+  react:
+    name: Extract React MCP data to R2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: |
+      github.event_name == 'workflow_dispatch' && (inputs.target == 'react' || inputs.target == 'both') ||
+      github.event.action == 'react-docs-deployed' && (
+        github.event.client_payload.git_ref == 'main' ||
+        github.event.client_payload.git_ref == 'refs/heads/main'
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Install
+        uses: ./.github/common-actions/install
+
+      # Fail here, loudly and by name, rather than letting the extractor throw
+      # "Missing required environment variable" three layers down — or worse,
+      # letting a half-configured run write a partial dataset.
+      - name: Check R2 credentials
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          missing=""
+          for var in CLOUDFLARE_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
+            [ -z "${!var}" ] && missing="$missing $var"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error title=MCP extraction is not configured::Missing repository secrets:$missing"
+            echo ""
+            echo "The extraction writes the component catalog to the blakeui-mcp-data R2"
+            echo "bucket and needs S3-style R2 credentials (not a Cloudflare API token):"
+            for var in $missing; do echo "  - $var"; done
+            echo ""
+            echo "Add them under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "✅ R2 credentials present"
+
+      - name: Extract React components and theme
+        working-directory: apps/react-mcp
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/extract.sh production both
+
+      # An extraction that uploads nothing still exits 0 today. Read the dataset
+      # back and assert it is the shape the API expects, so a silent no-op
+      # cannot pass for a refresh a second time.
+      - name: Verify the uploaded dataset
+        working-directory: apps/react-mcp
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: pnpm exec tsx scripts/verify-extraction.ts
+
+  native:
+    name: Extract Native MCP data to R2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: |
+      github.event_name == 'workflow_dispatch' && (inputs.target == 'native' || inputs.target == 'both') ||
+      github.event.action == 'native-docs-deployed' && (
+        github.event.client_payload.git_ref == 'main' ||
+        github.event.client_payload.git_ref == 'refs/heads/main'
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Install
+        uses: ./.github/common-actions/install
+
+      - name: Check R2 credentials
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          missing=""
+          for var in CLOUDFLARE_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
+            [ -z "${!var}" ] && missing="$missing $var"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error title=MCP extraction is not configured::Missing repository secrets:$missing"
+            exit 1
+          fi
+          echo "✅ R2 credentials present"
+
+      - name: Extract Native components and theme
+        working-directory: apps/native-mcp
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/extract.sh production both
