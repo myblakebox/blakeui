@@ -48,29 +48,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  react:
-    name: Extract React MCP data to R2
+  # Whether this repository can talk to R2 at all.
+  #
+  # The `secrets` context is not available in a job-level `if`, so the check has
+  # to run as a job and hand its answer downstream as an output.
+  #
+  # An automatic run over a repository with no credentials skips rather than
+  # fails: a deploy that had nothing to do with the MCP should not paint the
+  # commit red. A manual run still fails, because someone asking for a refresh
+  # by hand deserves to be told why they are not getting one.
+  #
+  # It is never silently green. The skip is annotated as a warning and written
+  # to the run summary, and the extraction jobs report as skipped rather than
+  # succeeded — the point being that "this workflow passed" must never again be
+  # mistakable for "the data is fresh".
+  preflight:
+    name: Check R2 credentials
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    if: |
-      github.event_name == 'workflow_dispatch' && (inputs.target == 'react' || inputs.target == 'both') ||
-      github.event.action == 'react-docs-deployed' && (
-        github.event.client_payload.git_ref == 'main' ||
-        github.event.client_payload.git_ref == 'refs/heads/main'
-      )
+    timeout-minutes: 5
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: main
-
-      - name: Install
-        uses: ./.github/common-actions/install
-
-      # Fail here, loudly and by name, rather than letting the extractor throw
-      # "Missing required environment variable" three layers down — or worse,
-      # letting a half-configured run write a partial dataset.
-      - name: Check R2 credentials
+      - name: Look for R2 credentials
+        id: check
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -80,17 +80,57 @@ jobs:
           for var in CLOUDFLARE_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
             [ -z "${!var}" ] && missing="$missing $var"
           done
-          if [ -n "$missing" ]; then
+
+          if [ -z "$missing" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "✅ R2 credentials present"
+            exit 0
+          fi
+
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### MCP extraction skipped"
+            echo ""
+            echo "The R2 datasets were **not** refreshed: this repository has no R2 credentials."
+            echo ""
+            echo "The extraction needs S3-style R2 keys (not a Cloudflare API token):"
+            for var in $missing; do echo "- \`$var\`"; done
+            echo ""
+            echo "Add them under **Settings → Secrets and variables → Actions**."
+            echo "Until then \`ctx.json\` keeps whatever version it already had, and every MCP"
+            echo "response is stamped with it."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::warning title=MCP extraction skipped::No R2 credentials. Missing:$missing — the datasets were not refreshed."
+
+          # Asked for by hand: say no out loud rather than shrugging.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "::error title=MCP extraction is not configured::Missing repository secrets:$missing"
-            echo ""
-            echo "The extraction writes the component catalog to the blakeui-mcp-data R2"
-            echo "bucket and needs S3-style R2 credentials (not a Cloudflare API token):"
-            for var in $missing; do echo "  - $var"; done
-            echo ""
-            echo "Add them under Settings → Secrets and variables → Actions."
             exit 1
           fi
-          echo "✅ R2 credentials present"
+
+  react:
+    name: Extract React MCP data to R2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: preflight
+    if: |
+      needs.preflight.outputs.configured == 'true' && (
+        github.event_name == 'workflow_dispatch' && (inputs.target == 'react' || inputs.target == 'both') ||
+        github.event.action == 'react-docs-deployed' && (
+          github.event.client_payload.git_ref == 'main' ||
+          github.event.client_payload.git_ref == 'refs/heads/main'
+        )
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Install
+        uses: ./.github/common-actions/install
 
       - name: Extract React components and theme
         working-directory: apps/react-mcp
@@ -116,11 +156,14 @@ jobs:
     name: Extract Native MCP data to R2
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: preflight
     if: |
-      github.event_name == 'workflow_dispatch' && (inputs.target == 'native' || inputs.target == 'both') ||
-      github.event.action == 'native-docs-deployed' && (
-        github.event.client_payload.git_ref == 'main' ||
-        github.event.client_payload.git_ref == 'refs/heads/main'
+      needs.preflight.outputs.configured == 'true' && (
+        github.event_name == 'workflow_dispatch' && (inputs.target == 'native' || inputs.target == 'both') ||
+        github.event.action == 'native-docs-deployed' && (
+          github.event.client_payload.git_ref == 'main' ||
+          github.event.client_payload.git_ref == 'refs/heads/main'
+        )
       )
     steps:
       - name: Checkout
@@ -130,22 +173,6 @@ jobs:
 
       - name: Install
         uses: ./.github/common-actions/install
-
-      - name: Check R2 credentials
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          missing=""
-          for var in CLOUDFLARE_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
-            [ -z "${!var}" ] && missing="$missing $var"
-          done
-          if [ -n "$missing" ]; then
-            echo "::error title=MCP extraction is not configured::Missing repository secrets:$missing"
-            exit 1
-          fi
-          echo "✅ R2 credentials present"
 
       - name: Extract Native components and theme
         working-directory: apps/native-mcp
