@@ -7,6 +7,8 @@ import {useEffect, useState, useSyncExternalStore} from "react";
 
 import {env} from "~env";
 
+import {CardLogo} from "@/components/brand/card-logo";
+
 import {FloatingStars} from "./floating-stars";
 import {
   PERSIST_CARD_DISMISSAL,
@@ -423,14 +425,7 @@ export function ProBanner() {
               </div>
             </div>
             <div className="relative flex items-center gap-2">
-              {}
-              <img
-                alt="BlakeUI Pro"
-                className="h-auto w-44"
-                height={147}
-                src="/images/blakeUI_Card_Logo.svg"
-                width={355}
-              />
+              <CardLogo className="h-auto w-44" />
             </div>
             {hasLiveDiscount ? (
               <span className="relative text-xs text-[#436283] tabular-nums">
