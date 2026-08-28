@@ -214,6 +214,20 @@ describe("Components API", () => {
       expect(res.status).toBe(400);
     });
 
+    it("accepts the tool's snake_case spelling, which is what Pro forwards", async () => {
+      // The Pro Worker proxies get_css straight through, forwarding the MCP
+      // tool's `behavior_source`. Zod strips unknown keys, so if this endpoint
+      // took only `behaviorSource` the answer would vanish and the request
+      // would be gated despite being answered.
+      const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({components: ["Tabs"], behavior_source: "blake"}),
+      });
+
+      expect(res.status).not.toBe(400);
+    });
+
     it("rejects an invalid behaviorSource value", async () => {
       const res = await SELF.fetch("http://localhost:8787/v1/components/styles", {
         method: "POST",

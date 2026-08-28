@@ -35,8 +35,16 @@ const StylesRequestSchema = ComponentsRequestSchema.extend({
    *
    * The gate lives on the endpoint rather than only on the MCP tool wrapper so
    * that proxied callers (the Pro Worker among them) hit the same check.
+   *
+   * Both spellings are accepted. The MCP tool parameter is `behavior_source`,
+   * this endpoint was written as `behaviorSource`, and the Pro Worker forwards
+   * the tool's spelling straight through. Zod strips unknown keys, so taking
+   * only one of the two silently drops a caller's answer and gates a request
+   * that was answered correctly — an authorization failure that looks like a
+   * validation failure. Accepting both costs nothing.
    */
   behaviorSource: z.enum(BEHAVIOR_SOURCE_VALUES).optional(),
+  behavior_source: z.enum(BEHAVIOR_SOURCE_VALUES).optional(),
 });
 
 const BehaviorRequestSchema = z.object({
@@ -446,7 +454,12 @@ components.post("/source", zValidator("json", ComponentsRequestSchema), async (c
 components.post("/styles", zValidator("json", StylesRequestSchema), async (c) => {
   const endpoint = "get-component-styles";
   const startTime = Date.now();
-  const {behaviorSource, components: componentNames} = c.req.valid("json");
+  const {
+    behaviorSource: behaviorSourceCamel,
+    behavior_source: behaviorSourceSnake,
+    components: componentNames,
+  } = c.req.valid("json");
+  const behaviorSource = behaviorSourceCamel ?? behaviorSourceSnake;
   const analytics = c.get("analytics");
   const app = getApp(c);
 
