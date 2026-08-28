@@ -1,0 +1,134 @@
+---
+title: v1.4.0
+description: Keyboard focus rings now render. Two selectors could never match — one unsatisfiable, one written on an element that never receives focus — so on around thirty components the package focus ring only appeared when React was driving them, and never in a CSS-only port.
+---
+
+<div className="flex items-center gap-3 mb-6">
+  <span className="text-sm text-muted">August 28, 2026</span>
+</div>
+
+A focus release. Thirty-one component stylesheets carried a keyboard-focus rule that could never
+match, so the ring they describe was painted by the React layer's data attribute or not at all.
+Both selectors are fixed.
+
+Rings appear where none appeared before, so this is a minor rather than a patch.
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+    npm i @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```bash
+    pnpm add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```bash
+    yarn add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```bash
+    bun add @blakeui/styles@latest @blakeui/react@latest
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warn">
+  **This is a visual change.** Keyboard focus rings now render on components where they
+  previously did not. Nothing changes under the mouse, and nothing changes for components that
+  were already ringed — but if you keep screenshot baselines that capture a focused element, or
+  assert on computed `box-shadow` in tests, expect differences. No component API changes.
+</Callout>
+
+<Callout type="info">
+  **Using AI assistants?** Simply prompt "Hey Cursor, update BlakeUI to the latest version" and your AI assistant will automatically compare versions and apply the necessary changes. Learn more about the [BlakeUI MCP Server](/docs/react/getting-started/mcp-server).
+</Callout>
+
+## Fixes
+
+### `:focus-visible:not(:focus)` could never match
+
+Thirty-nine rules across twenty-eight stylesheets were written as:
+
+```css
+&:focus-visible:not(:focus),
+&[data-focus-visible="true"] {
+  @apply status-focused;
+}
+```
+
+An element matching `:focus-visible` always also matches `:focus`, so `:not(:focus)` can never
+hold and the first arm is dead. Only the data-attribute arm ever fired — which React Aria sets,
+and a CSS-only port does not. A keyboard-focused `.button` reported
+`--tw-ring-shadow: 0 0 #0000`: no package ring, only whatever the browser drew by default.
+
+The arm is now plain `:focus-visible`. The data attribute stays for elements that carry it.
+
+Affected: `accordion` `alert-dialog` `autocomplete` `button` `button-group` `calendar`
+`close-button` `color-picker` `combo-box` `date-picker` `date-range-picker` `drawer` `dropdown`
+`fancy-button` `input` `link` `list-box-item` `menu-item` `modal` `number-field` `popover`
+`range-calendar` `select` `tabs` `textarea` `toggle-button` `toggle-button-group` `tooltip`.
+
+### `:focus-visible` on Checkbox, Switch and Radio never matched either
+
+Those three render their root as a `<label>` wrapping a visually hidden `<input>`. Focus lands on
+the input, and `:focus-visible` matches only the focused element — it does not propagate to
+ancestors. So `.checkbox:focus-visible`, `.switch:focus-visible` and `.radio:focus-visible` could
+not match no matter what the user did.
+
+They now reach up from the focused input:
+
+```css
+.checkbox:has(:focus-visible) &,
+.checkbox[data-focus-visible="true"] & {
+  @apply status-focused;
+}
+```
+
+Measured in Chrome with the input keyboard-focused: `root.matches(':focus-visible')` is `false`
+while `root.matches(':has(:focus-visible)')` is `true`, and the control's ring renders with no
+JavaScript involved.
+
+## Build
+
+### The build now fails on an unresolved `@import` in `dist`
+
+`dist/index.css` is a byte copy of the source entry, so it keeps importing
+`./components/index.css` whether or not the component stylesheets were copied beside it. A
+dangling `@import` is dropped silently downstream, and the docs site resolves `@blakeui/styles`
+through the workspace symlink to the *source* tree — so a build could stay green over a `dist`
+missing a slice of its components, and only someone installing from npm would find out.
+
+Every relative `@import` reachable from `dist/index.css` is now resolved during the normal build,
+which exits non-zero listing any that dangle. No published version was affected; this is a guard,
+not a repair.
+
+## Upgrading
+
+No API changes and no migration steps. One thing will look different:
+
+- **Keyboard focus rings appear on components that previously showed none.** Only on keyboard
+  focus — pointer interaction is unchanged. If you assert on focus styling in tests, or keep
+  screenshots of a focused control, those baselines will move.
+
+If you were compensating for the missing ring with your own `:focus-visible` rule, it now applies
+alongside the package's. Remove yours, or keep it and win on specificity as before.
+
+## Links
+
+- [Styling](/docs/react/getting-started/styling)
+- [Theming](/docs/react/getting-started/theming)
+- [GitHub Repository](https://github.com/myblakebox/BlakeUI)
