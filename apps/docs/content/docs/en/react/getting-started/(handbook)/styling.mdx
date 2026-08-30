@@ -287,6 +287,28 @@ import { Button } from '@blakeui/react';
 </Button>
 ```
 
+## Completeness
+
+Every component page declares one of two verdicts. Components that need more than their CSS
+carry a **Behavior required** badge beside their source links; the rest carry nothing.
+
+**Behavior required** means the stylesheet is half the component. The keyboard map, focus
+managed across more than one element, ARIA attributes that point at other nodes, and the
+`[data-*]` attributes the CSS keys on are all set by running code in `@blakeui/react`. Take
+the CSS on its own and you get something that renders correctly and responds to nothing —
+it looks finished, which is exactly why it is worth flagging.
+
+**Styles sufficient** means the stylesheet is the whole component. There is no behaviour to
+re-implement.
+
+Porting a component outside React? Ask the [MCP server](/docs/react/getting-started/mcp-server)
+for the contract instead of inferring it from the source. `get_component_behavior("Tabs")`
+returns it framework-neutral: required roles and ARIA, the full keyboard map, focus rules, and
+every `[data-*]` the stylesheet depends on — what sets each one, and when it changes. For a
+behavior-required component, `get_component_source_styles` withholds the CSS until you pass
+`behavior_source`, declaring whether `@blakeui/react` drives the component or you are writing
+the interaction layer yourself.
+
 ## Component Classes Reference
 
 **Button:** `.button`, `.button--{variant}`, `.button--{size}`, `.button--icon-only`
