@@ -3,6 +3,7 @@ import LinkRoot from "fumadocs-core/link";
 import {notFound} from "next/navigation";
 
 import {Footer} from "@/components/footer";
+import {LatestReleaseBadge} from "@/components/latest-release-badge";
 import {getDictionary, hasLocale} from "@/lib/dictionaries";
 import {i18n} from "@/lib/i18n";
 
@@ -29,6 +30,7 @@ export default async function HomePage({params}: {params: Promise<{lang: string}
     <main className="flex min-h-[calc(100vh-4rem)] flex-col">
       <section className="home-hero z-10 flex min-h-0 flex-1 flex-col items-center px-4 pt-12 text-center">
         <div className="mx-auto flex max-w-4xl flex-col items-center justify-center">
+          <LatestReleaseBadge />
           <h1 className="mt-2 text-3xl font-normal tracking-tight text-foreground sm:text-4xl lg:mt-4 lg:text-5xl">
             <span className="whitespace-nowrap" data-annotate="underline">
               {home.titleUnderline}
