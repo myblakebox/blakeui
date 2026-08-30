@@ -81,6 +81,8 @@
     "jumpTo": "Jump to"
   },
   "componentLinks": {
+    "behaviorRequired": "Behavior required",
+    "behaviorRequiredHint": "Behavior required — this component needs more than its stylesheet. Read more in the styling handbook.",
     "source": "Source",
     "stylesSource": "Styles source",
     "themeSource": "Theme source"
