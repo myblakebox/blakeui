@@ -133,7 +133,9 @@ export default async function Page(props: {params: Promise<{lang: string; slug?:
             )}
           </div>
           <DocsDescription className="text-md mt-2 mb-4">{page.data.description}</DocsDescription>
-          {!!links && <ComponentLinks links={links} />}
+          {/* Not nested under a `links` guard: the completeness pill has to
+              render for a component that declares no external sources. */}
+          <ComponentLinks completeness={page.data.completeness} links={links ?? undefined} />
         </section>
         <DocsBody className="prose-sm">
           <MDXContent
