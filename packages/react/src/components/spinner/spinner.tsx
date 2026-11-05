@@ -5,7 +5,7 @@ import type {SpinnerVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {spinnerVariants} from "@blakeui/styles";
-import React, {useId} from "react";
+import React, {useId, useMemo} from "react";
 
 import {dom} from "../../utils/dom";
 
@@ -79,20 +79,30 @@ const SpinnerRoot = <E extends keyof React.JSX.IntrinsicElements = "span">({
   size,
   ...props
 }: SpinnerRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof SpinnerRootProps<E>>) => {
-  return (
-    <dom.span
-      data-slot="spinner"
-      {...(props as any)}
-      className={spinnerVariants({
+  const resolvedClassName = useMemo(
+    () =>
+      spinnerVariants({
         className,
         color,
         size,
-      })}
+      }),
+    [className, color, size],
+  );
+
+  return (
+    <dom.span
+      aria-label="Loading"
+      data-slot="spinner"
+      role="status"
+      {...(props as any)}
+      className={resolvedClassName}
     >
-      <SpinnerPrimitive aria-hidden aria-label="Loading" role="presentation" />
+      <SpinnerPrimitive aria-hidden />
     </dom.span>
   );
 };
+
+SpinnerRoot.displayName = "BlakeUI.Spinner";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

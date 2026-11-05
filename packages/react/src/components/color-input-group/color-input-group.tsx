@@ -6,11 +6,11 @@ import type {ComponentPropsWithRef, ReactNode} from "react";
 import type {InputProps as InputPrimitiveProps} from "react-aria-components/Input";
 
 import {colorInputGroupVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Group as GroupPrimitive} from "react-aria-components/Group";
 import {Input as InputPrimitive} from "react-aria-components/Input";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 
 /* -------------------------------------------------------------------------------------------------
@@ -39,19 +39,22 @@ const ColorInputGroupRoot = ({
     () => colorInputGroupVariants({fullWidth, variant}),
     [fullWidth, variant],
   );
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <ColorInputGroupContext value={{slots}}>
+    <ColorInputGroupContext value={contextValue}>
       <GroupPrimitive
-        className={composeTwRenderProps(className, slots?.base())}
+        className={useResolvedClassName(className, slots?.base())}
         data-slot="color-input-group"
         {...props}
       >
-        {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+        {children}
       </GroupPrimitive>
     </ColorInputGroupContext>
   );
 };
+
+ColorInputGroupRoot.displayName = "BlakeUI.ColorInputGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorInputGroup Prefix
@@ -69,7 +72,7 @@ const ColorInputGroupPrefix = <E extends keyof React.JSX.IntrinsicElements = "di
   ...props
 }: ColorInputGroupPrefixProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof ColorInputGroupPrefixProps<E>>) => {
-  const {slots} = useContext(ColorInputGroupContext);
+  const {slots} = use(ColorInputGroupContext);
 
   return (
     <dom.div
@@ -82,6 +85,8 @@ const ColorInputGroupPrefix = <E extends keyof React.JSX.IntrinsicElements = "di
   );
 };
 
+ColorInputGroupPrefix.displayName = "BlakeUI.ColorInputGroup.Prefix";
+
 /* -------------------------------------------------------------------------------------------------
  * ColorInputGroup Input
  * -----------------------------------------------------------------------------------------------*/
@@ -90,16 +95,18 @@ interface ColorInputGroupInputProps extends InputPrimitiveProps {
 }
 
 const ColorInputGroupInput = ({className, ...props}: ColorInputGroupInputProps) => {
-  const {slots} = useContext(ColorInputGroupContext);
+  const {slots} = use(ColorInputGroupContext);
 
   return (
     <InputPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="color-input-group-input"
       {...props}
     />
   );
 };
+
+ColorInputGroupInput.displayName = "BlakeUI.ColorInputGroup.Input";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorInputGroup Suffix
@@ -117,7 +124,7 @@ const ColorInputGroupSuffix = <E extends keyof React.JSX.IntrinsicElements = "di
   ...props
 }: ColorInputGroupSuffixProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof ColorInputGroupSuffixProps<E>>) => {
-  const {slots} = useContext(ColorInputGroupContext);
+  const {slots} = use(ColorInputGroupContext);
 
   return (
     <dom.div
@@ -129,6 +136,8 @@ const ColorInputGroupSuffix = <E extends keyof React.JSX.IntrinsicElements = "di
     </dom.div>
   );
 };
+
+ColorInputGroupSuffix.displayName = "BlakeUI.ColorInputGroup.Suffix";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

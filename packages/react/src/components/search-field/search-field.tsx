@@ -5,12 +5,12 @@ import type {SearchFieldVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {searchFieldVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Group as GroupPrimitive} from "react-aria-components/Group";
 import {Input as InputPrimitive} from "react-aria-components/Input";
 import {SearchField as SearchFieldPrimitive} from "react-aria-components/SearchField";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {CloseButton} from "../close-button";
 import {IconSearch} from "../icons";
 
@@ -40,19 +40,22 @@ const SearchFieldRoot = ({
     () => searchFieldVariants({fullWidth, variant}),
     [fullWidth, variant],
   );
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <SearchFieldContext value={{slots}}>
+    <SearchFieldContext value={contextValue}>
       <SearchFieldPrimitive
         data-slot="search-field"
         {...props}
-        className={composeTwRenderProps(className, slots?.base())}
+        className={useResolvedClassName(className, slots?.base())}
       >
-        {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+        {children}
       </SearchFieldPrimitive>
     </SearchFieldContext>
   );
 };
+
+SearchFieldRoot.displayName = "BlakeUI.SearchField";
 
 /* -------------------------------------------------------------------------------------------------
  * SearchField Group
@@ -60,18 +63,20 @@ const SearchFieldRoot = ({
 interface SearchFieldGroupProps extends ComponentPropsWithRef<typeof GroupPrimitive> {}
 
 const SearchFieldGroup = ({children, className, ...props}: SearchFieldGroupProps) => {
-  const {slots} = useContext(SearchFieldContext);
+  const {slots} = use(SearchFieldContext);
 
   return (
     <GroupPrimitive
-      className={composeTwRenderProps(className, slots?.group())}
+      className={useResolvedClassName(className, slots?.group())}
       data-slot="search-field-group"
       {...props}
     >
-      {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+      {children}
     </GroupPrimitive>
   );
 };
+
+SearchFieldGroup.displayName = "BlakeUI.SearchField.Group";
 
 /* -------------------------------------------------------------------------------------------------
  * SearchField Input
@@ -79,16 +84,18 @@ const SearchFieldGroup = ({children, className, ...props}: SearchFieldGroupProps
 interface SearchFieldInputProps extends ComponentPropsWithRef<typeof InputPrimitive> {}
 
 const SearchFieldInput = ({className, ...props}: SearchFieldInputProps) => {
-  const {slots} = useContext(SearchFieldContext);
+  const {slots} = use(SearchFieldContext);
 
   return (
     <InputPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="search-field-input"
       {...props}
     />
   );
 };
+
+SearchFieldInput.displayName = "BlakeUI.SearchField.Input";
 
 /* -------------------------------------------------------------------------------------------------
  * SearchField Search Icon
@@ -106,7 +113,7 @@ const SearchFieldSearchIcon = <E extends keyof React.JSX.IntrinsicElements = "sv
   ...props
 }: SearchFieldSearchIconProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof SearchFieldSearchIconProps<E>>) => {
-  const {slots} = useContext(SearchFieldContext);
+  const {slots} = use(SearchFieldContext);
 
   if (children && React.isValidElement(children)) {
     return React.cloneElement(
@@ -131,23 +138,27 @@ const SearchFieldSearchIcon = <E extends keyof React.JSX.IntrinsicElements = "sv
   );
 };
 
+SearchFieldSearchIcon.displayName = "BlakeUI.SearchField.SearchIcon";
+
 /* -------------------------------------------------------------------------------------------------
  * SearchField Clear Button
  * -----------------------------------------------------------------------------------------------*/
 interface SearchFieldClearButtonProps extends ComponentPropsWithRef<typeof CloseButton> {}
 
 const SearchFieldClearButton = ({className, ...props}: SearchFieldClearButtonProps) => {
-  const {slots} = useContext(SearchFieldContext);
+  const {slots} = use(SearchFieldContext);
 
   return (
     <CloseButton
-      className={composeTwRenderProps(className, slots?.clearButton())}
+      className={useResolvedClassName(className, slots?.clearButton())}
       data-slot="search-field-clear-button"
       slot="clear"
       {...props}
     />
   );
 };
+
+SearchFieldClearButton.displayName = "BlakeUI.SearchField.ClearButton";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

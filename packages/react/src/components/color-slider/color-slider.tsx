@@ -5,7 +5,7 @@ import type {ComponentPropsWithRef} from "react";
 import type {ColorSliderRenderProps, ColorSpace} from "react-aria-components/ColorSlider";
 
 import {colorSliderVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {
   ColorSlider as ColorSliderPrimitive,
   ColorThumb as ColorThumbPrimitive,
@@ -13,7 +13,7 @@ import {
   SliderTrack as SliderTrackPrimitive,
 } from "react-aria-components/ColorSlider";
 
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorSlider Channel Types
@@ -63,6 +63,17 @@ const CHANNEL_TO_REQUIRED_COLORSPACE: Partial<Record<string, ColorSpace>> = {
 const HSL_HSB_ONLY_CHANNELS = new Set(["hue", "saturation"]);
 
 /**
+ * `getValidColorSpace` runs in the render body, so an unguarded warning would fire on
+ * every render of a misconfigured slider in production builds.
+ */
+function warnInDev(message: string) {
+  if (typeof process !== "undefined" && process.env?.["NODE_ENV"] !== "production") {
+    // eslint-disable-next-line no-console
+    console.warn(message);
+  }
+}
+
+/**
  * Validates and returns a valid colorSpace for the given channel.
  * If an invalid combination is detected, logs a warning and returns the correct colorSpace.
  */
@@ -71,8 +82,7 @@ function getValidColorSpace(channel: string, colorSpace?: ColorSpace): ColorSpac
   const requiredSpace = CHANNEL_TO_REQUIRED_COLORSPACE[channel];
 
   if (requiredSpace && colorSpace && colorSpace !== requiredSpace) {
-    // eslint-disable-next-line no-console
-    console.warn(
+    warnInDev(
       `[BlakeUI ColorSlider] Invalid combination: channel="${channel}" requires colorSpace="${requiredSpace}", ` +
         `but received colorSpace="${colorSpace}". Auto-correcting to "${requiredSpace}".`,
     );
@@ -82,8 +92,7 @@ function getValidColorSpace(channel: string, colorSpace?: ColorSpace): ColorSpac
 
   // Check if channel is HSL/HSB only (hue, saturation) but RGB was specified
   if (HSL_HSB_ONLY_CHANNELS.has(channel) && colorSpace === "rgb") {
-    // eslint-disable-next-line no-console
-    console.warn(
+    warnInDev(
       `[BlakeUI ColorSlider] Invalid combination: channel="${channel}" is not available in RGB color space. ` +
         `Use colorSpace="hsl" or colorSpace="hsb" instead. Auto-correcting to "hsl".`,
     );
@@ -135,7 +144,7 @@ const ColorSliderRoot = ({
       data-slot="color-slider"
       orientation={orientation}
       {...props}
-      className={composeTwRenderProps(className, slots.base())}
+      className={useResolvedClassName(className, slots.base())}
     >
       {(values) => (
         <ColorSliderContext value={{channel, slots, state: values}}>
@@ -146,26 +155,28 @@ const ColorSliderRoot = ({
   );
 };
 
+ColorSliderRoot.displayName = "BlakeUI.ColorSlider";
+
 /* -------------------------------------------------------------------------------------------------
  * ColorSlider Output
  * -----------------------------------------------------------------------------------------------*/
 interface ColorSliderOutputProps extends ComponentPropsWithRef<typeof SliderOutputPrimitive> {}
 
 const ColorSliderOutput = ({children, className, ...props}: ColorSliderOutputProps) => {
-  const {slots} = useContext(ColorSliderContext);
+  const {slots} = use(ColorSliderContext);
 
   return (
     <SliderOutputPrimitive
-      className={composeTwRenderProps(className, slots?.output())}
+      className={useResolvedClassName(className, slots?.output())}
       data-slot="color-slider-output"
       {...props}
     >
-      {children
-        ? (values) => <>{typeof children === "function" ? children(values) : children}</>
-        : ({state}) => state.getThumbValueLabel(0)}
+      {children ? children : ({state}) => state.getThumbValueLabel(0)}
     </SliderOutputPrimitive>
   );
 };
+
+ColorSliderOutput.displayName = "BlakeUI.ColorSlider.Output";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorSlider Track
@@ -173,7 +184,7 @@ const ColorSliderOutput = ({children, className, ...props}: ColorSliderOutputPro
 interface ColorSliderTrackProps extends ComponentPropsWithRef<typeof SliderTrackPrimitive> {}
 
 const ColorSliderTrack = ({children, className, style, ...props}: ColorSliderTrackProps) => {
-  const {channel, slots, state} = useContext(ColorSliderContext);
+  const {channel, slots, state} = use(ColorSliderContext);
   // Calculate start and end colors for the gradient edge caps
   const displayColor = state?.state?.getDisplayColor();
 
@@ -205,7 +216,7 @@ const ColorSliderTrack = ({children, className, style, ...props}: ColorSliderTra
 
   return (
     <SliderTrackPrimitive
-      className={composeTwRenderProps(className, slots?.track())}
+      className={useResolvedClassName(className, slots?.track())}
       data-slot="color-slider-track"
       style={({defaultStyle, ...rest}) => ({
         // Add transparency checkerboard pattern for alpha channel
@@ -217,10 +228,12 @@ const ColorSliderTrack = ({children, className, style, ...props}: ColorSliderTra
       })}
       {...props}
     >
-      {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+      {children}
     </SliderTrackPrimitive>
   );
 };
+
+ColorSliderTrack.displayName = "BlakeUI.ColorSlider.Track";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorSlider Thumb
@@ -228,11 +241,11 @@ const ColorSliderTrack = ({children, className, style, ...props}: ColorSliderTra
 interface ColorSliderThumbProps extends ComponentPropsWithRef<typeof ColorThumbPrimitive> {}
 
 const ColorSliderThumb = ({children, className, style, ...props}: ColorSliderThumbProps) => {
-  const {slots} = useContext(ColorSliderContext);
+  const {slots} = use(ColorSliderContext);
 
   return (
     <ColorThumbPrimitive
-      className={composeTwRenderProps(className, slots?.thumb())}
+      className={useResolvedClassName(className, slots?.thumb())}
       data-slot="color-slider-thumb"
       style={({defaultStyle, isDisabled, ...rest}) => ({
         ...defaultStyle,
@@ -241,10 +254,12 @@ const ColorSliderThumb = ({children, className, style, ...props}: ColorSliderThu
       })}
       {...props}
     >
-      {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+      {children}
     </ColorThumbPrimitive>
   );
 };
+
+ColorSliderThumb.displayName = "BlakeUI.ColorSlider.Thumb";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

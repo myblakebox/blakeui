@@ -10,7 +10,7 @@ import type {DialogProps as DialogPrimitiveProps} from "react-aria-components/Di
 
 import {drawerVariants} from "@blakeui/styles";
 import {mergeProps} from "@react-aria/utils";
-import React, {createContext, useCallback, useContext, useMemo, useRef} from "react";
+import React, {createContext, use, useCallback, useMemo, useRef} from "react";
 import {Button as ButtonPrimitive} from "react-aria-components/Button";
 import {
   Dialog as DialogPrimitive,
@@ -23,10 +23,14 @@ import {
   Modal as ModalPrimitive,
 } from "react-aria-components/Modal";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 import {CloseButton} from "../close-button";
 import {SurfaceContext} from "../surface";
+
+import {isDrawerDragTargetOwnedBy} from "./drawer.utils";
+
+const DEFAULT_SURFACE_CONTEXT = {variant: "default" as SurfaceVariants["variant"]};
 
 type DrawerPlacement = "top" | "bottom" | "left" | "right";
 
@@ -41,7 +45,7 @@ const DISMISS_FRACTION = 0.3; // dismiss if dragged > 30% of dimension
 const VELOCITY_THRESHOLD = 0.5; // px/ms — dismiss on fast flick
 
 function useDrawerDrag(placement: DrawerPlacement | undefined, isDismissable: boolean) {
-  const overlayState = useContext(OverlayTriggerStateContext);
+  const overlayState = use(OverlayTriggerStateContext);
   const dialogRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const isActive = useRef(false);
@@ -83,6 +87,9 @@ function useDrawerDrag(placement: DrawerPlacement | undefined, isDismissable: bo
       if (e.button !== 0) return;
 
       const target = e.target as HTMLElement;
+      const currentTarget = e.currentTarget as HTMLElement;
+
+      if (!isDrawerDragTargetOwnedBy(target, currentTarget)) return;
 
       // Don't drag from interactive elements or scrollable body
       if (
@@ -139,6 +146,17 @@ function useDrawerDrag(placement: DrawerPlacement | undefined, isDismissable: bo
     [getPos, clamp, isVertical],
   );
 
+  const snapBack = useCallback((el: HTMLDivElement) => {
+    el.style.transition = "transform 300ms cubic-bezier(0.32, 0.72, 0, 1)";
+    el.style.transform = "";
+
+    const cleanup = () => {
+      el.style.transition = "";
+    };
+
+    el.addEventListener("transitionend", cleanup, {once: true});
+  }, []);
+
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
       if (!isDragging.current) return;
@@ -169,30 +187,69 @@ function useDrawerDrag(placement: DrawerPlacement | undefined, isDismissable: bo
 
       if (shouldDismiss && overlayState) {
         // Keep the inline transform — it compounds with the content exit animation
-        // so the drawer continues sliding from the dragged position
+        // so the drawer continues sliding from the dragged position.
+        // Drop the inline `transition: none` set while dragging, otherwise the exit
+        // `translate` transition never runs and the drawer disappears without sliding out.
+        el.style.transition = "";
         overlayState.close();
       } else {
         // Snap back with a spring-like ease
-        el.style.transition = "transform 300ms cubic-bezier(0.32, 0.72, 0, 1)";
-        el.style.transform = "";
-
-        const cleanup = () => {
-          el.style.transition = "";
-        };
-
-        el.addEventListener("transitionend", cleanup, {once: true});
+        snapBack(el);
       }
 
       currentOffset.current = 0;
       velocity.current = 0;
     },
-    [isVertical, overlayState],
+    [isVertical, overlayState, snapBack],
+  );
+
+  const onPointerCancel = useCallback(
+    (e: React.PointerEvent) => {
+      // Normal pointer-up also releases capture; don't undo its exit animation.
+      if (!isDragging.current) return;
+
+      const wasActive = isActive.current;
+
+      isDragging.current = false;
+      isActive.current = false;
+      currentOffset.current = 0;
+      velocity.current = 0;
+
+      const el = dialogRef.current;
+
+      if (!el) return;
+
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        // Cancellation or lost capture may have already released the pointer.
+      }
+
+      if (!wasActive) return;
+
+      // A cancelled gesture must restore the resting position without dismissing.
+      snapBack(el);
+    },
+    [snapBack],
+  );
+
+  const onLostPointerCapture = useCallback(
+    (e: React.PointerEvent) => {
+      // setPointerCapture moves capture off the hit child, and that child fires
+      // lostpointercapture first. Only the dialog losing its own capture aborts the drag.
+      if (e.target !== e.currentTarget) return;
+
+      onPointerCancel(e);
+    },
+    [onPointerCancel],
   );
 
   return {
     dialogRef,
     dragHandlers: isDismissable
       ? {
+          onLostPointerCapture,
+          onPointerCancel,
           onPointerDown,
           onPointerMove,
           onPointerUp,
@@ -247,11 +304,11 @@ DrawerRoot.displayName = "BlakeUI.Drawer";
 interface DrawerTriggerProps extends ComponentPropsWithRef<typeof ButtonPrimitive> {}
 
 const DrawerTrigger = ({children, className, ...props}: DrawerTriggerProps) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <ButtonPrimitive
-      className={composeTwRenderProps(className, slots?.trigger())}
+      className={useResolvedClassName(className, slots?.trigger())}
       data-slot="drawer-trigger"
       {...props}
     >
@@ -281,7 +338,7 @@ const DrawerBackdrop = ({
   variant,
   ...props
 }: DrawerBackdropProps) => {
-  const {slots: contextSlots} = useContext(DrawerContext);
+  const {slots: contextSlots} = use(DrawerContext);
 
   const updatedSlots = useMemo(() => drawerVariants({variant}), [variant]);
 
@@ -292,7 +349,7 @@ const DrawerBackdrop = ({
 
   return (
     <ModalOverlayPrimitive
-      className={composeTwRenderProps(className, updatedSlots?.backdrop())}
+      className={useResolvedClassName(className, updatedSlots?.backdrop())}
       data-slot="drawer-backdrop"
       isDismissable={isDismissable}
       {...props}
@@ -324,7 +381,7 @@ const DrawerContent = ({
   placement = "bottom",
   ...props
 }: DrawerContentProps) => {
-  const {isDismissable, slots: contextSlots} = useContext(DrawerContext);
+  const {isDismissable, slots: contextSlots} = use(DrawerContext);
 
   const updatedSlots = useMemo(() => drawerVariants({placement}), [placement]);
 
@@ -335,7 +392,7 @@ const DrawerContent = ({
 
   return (
     <ModalPrimitive
-      className={composeTwRenderProps(className, updatedSlots?.content())}
+      className={useResolvedClassName(className, updatedSlots?.content())}
       data-placement={placement}
       data-slot="drawer-content"
       {...props}
@@ -356,20 +413,20 @@ DrawerContent.displayName = "BlakeUI.Drawer.Content";
  * -----------------------------------------------------------------------------------------------*/
 interface DrawerDialogProps extends DialogPrimitiveProps {}
 
-const DrawerDialog = ({children, className, ...props}: DrawerDialogProps) => {
-  const {isDismissable = true, placement, slots} = useContext(DrawerContext);
+const DrawerDialog = ({children, className, style, ...props}: DrawerDialogProps) => {
+  const {isDismissable = true, placement, slots} = use(DrawerContext);
   const {dialogRef, dragHandlers} = useDrawerDrag(placement, isDismissable);
 
   return (
-    <SurfaceContext value={{variant: "default" as SurfaceVariants["variant"]}}>
+    <SurfaceContext value={DEFAULT_SURFACE_CONTEXT}>
       <DialogPrimitive
         ref={dialogRef}
         className={composeSlotClassName(slots?.dialog, className)}
         data-placement={placement}
         data-slot="drawer-dialog"
-        style={isDismissable ? {touchAction: "none"} : undefined}
         {...dragHandlers}
         {...props}
+        style={isDismissable ? {touchAction: "none", ...style} : style}
       >
         {children}
       </DialogPrimitive>
@@ -394,7 +451,7 @@ const DrawerHeader = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: DrawerHeaderProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof DrawerHeaderProps<E>>) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <dom.div
@@ -424,7 +481,7 @@ const DrawerBody = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: DrawerBodyProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof DrawerBodyProps<E>>) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <dom.div
@@ -455,7 +512,7 @@ const DrawerFooter = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: DrawerFooterProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof DrawerFooterProps<E>>) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <dom.div
@@ -476,7 +533,7 @@ DrawerFooter.displayName = "BlakeUI.Drawer.Footer";
 interface DrawerHeadingProps extends ComponentPropsWithRef<typeof HeadingPrimitive> {}
 
 const DrawerHeading = ({children, className, ...props}: DrawerHeadingProps) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <HeadingPrimitive
@@ -506,7 +563,7 @@ const DrawerHandle = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: DrawerHandleProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof DrawerHandleProps<E>>) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <dom.div
@@ -531,11 +588,11 @@ interface DrawerCloseTriggerProps extends ButtonPrimitiveProps {
 }
 
 const DrawerCloseTrigger = ({className, ...rest}: DrawerCloseTriggerProps) => {
-  const {slots} = useContext(DrawerContext);
+  const {slots} = use(DrawerContext);
 
   return (
     <CloseButton
-      className={composeTwRenderProps(className, slots?.closeTrigger())}
+      className={useResolvedClassName(className, slots?.closeTrigger())}
       data-slot="drawer-close-trigger"
       slot="close"
       {...rest}

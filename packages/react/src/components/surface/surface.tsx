@@ -5,7 +5,7 @@ import type {SurfaceVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {surfaceVariants} from "@blakeui/styles";
-import React, {createContext} from "react";
+import React, {createContext, useMemo} from "react";
 
 import {dom} from "../../utils/dom";
 
@@ -36,18 +36,22 @@ const SurfaceRoot = <E extends keyof React.JSX.IntrinsicElements = "div">({
   variant = "default",
   ...rest
 }: SurfaceRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof SurfaceRootProps<E>>) => {
+  const contextValue = React.useMemo(() => ({variant}), [variant]);
+  const resolvedClassName = useMemo(
+    () => surfaceVariants({className, variant}),
+    [className, variant],
+  );
+
   return (
-    <SurfaceContext value={{variant}}>
-      <dom.div
-        className={surfaceVariants({variant, className})}
-        data-slot="surface"
-        {...(rest as any)}
-      >
+    <SurfaceContext value={contextValue}>
+      <dom.div className={resolvedClassName} data-slot="surface" {...(rest as any)}>
         {children}
       </dom.div>
     </SurfaceContext>
   );
 };
+
+SurfaceRoot.displayName = "BlakeUI.Surface";
 
 /* ------------------------------------------------------------------------------------------------
  * Exports

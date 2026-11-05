@@ -5,7 +5,7 @@ import type {BadgeVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {badgeVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {cx} from "tailwind-variants";
 
 import {composeSlotClassName} from "../../utils/compose";
@@ -45,6 +45,8 @@ const BadgeAnchor = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </dom.span>
   );
 };
+
+BadgeAnchor.displayName = "BlakeUI.Badge.Anchor";
 
 /* -------------------------------------------------------------------------------------------------
  * Badge Root
@@ -86,8 +88,10 @@ const BadgeRoot = <E extends keyof React.JSX.IntrinsicElements = "span">({
     return children;
   }, [children]);
 
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
+
   return (
-    <BadgeContext value={{slots}}>
+    <BadgeContext value={contextValue}>
       <dom.span
         {...(props as any)}
         className={composeSlotClassName(slots.base, className)}
@@ -98,6 +102,8 @@ const BadgeRoot = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </BadgeContext>
   );
 };
+
+BadgeRoot.displayName = "BlakeUI.Badge";
 
 /* -------------------------------------------------------------------------------------------------
  * Badge Label
@@ -114,7 +120,7 @@ const BadgeLabel = <E extends keyof React.JSX.IntrinsicElements = "span">({
   className,
   ...props
 }: BadgeLabelProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof BadgeLabelProps<E>>) => {
-  const {slots} = useContext(BadgeContext);
+  const {slots} = use(BadgeContext);
 
   return (
     <dom.span
@@ -126,6 +132,8 @@ const BadgeLabel = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </dom.span>
   );
 };
+
+BadgeLabel.displayName = "BlakeUI.Badge.Label";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

@@ -4,8 +4,17 @@ import type {DOMRenderProps} from "../../utils/dom";
 import type {ReactNode} from "react";
 
 import {fieldsetVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
-import {Provider, RadioGroupContext, SliderContext} from "react-aria-components";
+import React, {createContext, use} from "react";
+import {
+  ButtonContext,
+  CheckboxGroupContext,
+  LinkContext,
+  Provider,
+  RadioGroupContext,
+  SliderContext,
+  ToggleButtonContext,
+  ToggleButtonGroupContext,
+} from "react-aria-components";
 
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
@@ -41,9 +50,10 @@ const FieldsetRoot = <E extends keyof React.JSX.IntrinsicElements = "fieldset">(
   // cascade disabled styling to descendant fields, just like a direct
   // `isDisabled` prop on TextField/Checkbox/etc. would.
   const isDisabled = "disabled" in props && props.disabled === true;
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <FieldsetContext value={{slots}}>
+    <FieldsetContext value={contextValue}>
       <dom.fieldset
         className={slots?.base({className})}
         data-disabled={isDisabled || undefined}
@@ -51,14 +61,29 @@ const FieldsetRoot = <E extends keyof React.JSX.IntrinsicElements = "fieldset">(
         {...(props as any)}
       >
         {isDisabled ? (
-          // Slider and RadioGroup render as <div> (no native form controls),
-          // so the browser doesn't propagate <fieldset disabled> to them.
-          // Forward `isDisabled` explicitly via React Aria's context so their
-          // wrapper elements receive `data-disabled` and behave as disabled.
+          // Forward `isDisabled` through React Aria contexts so descendant
+          // components stay consistent with the native `<fieldset disabled>`
+          // behaviour. There are two reasons we need to do this manually:
+          //
+          // 1. Some primitives (Slider, RadioGroup, CheckboxGroup, ...) render
+          //    as `<div>` so the browser does not propagate the fieldset's
+          //    `disabled` attribute to them — without this, they would still
+          //    look enabled and remain interactive.
+          // 2. Other primitives (Button, ToggleButton, Link, ...) do get
+          //    natively disabled by the browser, but React Aria's internal
+          //    `isDisabled` state — which drives `data-disabled` and the
+          //    `{isDisabled}` render prop — only updates from props/context.
+          //    Without this, the button is unclickable but its render prop
+          //    keeps returning `isDisabled: false`.
           <Provider
             values={[
+              [ButtonContext, {isDisabled: true}],
+              [CheckboxGroupContext, {isDisabled: true}],
+              [LinkContext, {isDisabled: true}],
               [RadioGroupContext, {isDisabled: true}],
               [SliderContext, {isDisabled: true}],
+              [ToggleButtonContext, {isDisabled: true}],
+              [ToggleButtonGroupContext, {isDisabled: true}],
             ]}
           >
             {children}
@@ -70,6 +95,8 @@ const FieldsetRoot = <E extends keyof React.JSX.IntrinsicElements = "fieldset">(
     </FieldsetContext>
   );
 };
+
+FieldsetRoot.displayName = "BlakeUI.Fieldset";
 
 /* -------------------------------------------------------------------------------------------------
  * Fieldset Legend
@@ -85,7 +112,7 @@ const FieldsetLegend = <E extends keyof React.JSX.IntrinsicElements = "legend">(
   className,
   ...props
 }: FieldsetLegendProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof FieldsetLegendProps<E>>) => {
-  const {slots} = useContext(FieldsetContext);
+  const {slots} = use(FieldsetContext);
 
   return (
     <dom.legend
@@ -95,6 +122,8 @@ const FieldsetLegend = <E extends keyof React.JSX.IntrinsicElements = "legend">(
     />
   );
 };
+
+FieldsetLegend.displayName = "BlakeUI.Fieldset.Legend";
 
 /* -------------------------------------------------------------------------------------------------
  * Field Group
@@ -110,7 +139,7 @@ const FieldGroup = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...rest
 }: FieldGroupProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof FieldGroupProps<E>>) => {
-  const {slots} = useContext(FieldsetContext);
+  const {slots} = use(FieldsetContext);
 
   return (
     <dom.div
@@ -120,6 +149,8 @@ const FieldGroup = <E extends keyof React.JSX.IntrinsicElements = "div">({
     />
   );
 };
+
+FieldGroup.displayName = "BlakeUI.Fieldset.Group";
 
 /* -------------------------------------------------------------------------------------------------
  * Field Actions
@@ -137,7 +168,7 @@ const FieldsetActions = <E extends keyof React.JSX.IntrinsicElements = "div">({
   ...rest
 }: FieldsetActionsProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof FieldsetActionsProps<E>>) => {
-  const {slots} = useContext(FieldsetContext);
+  const {slots} = use(FieldsetContext);
 
   return (
     <dom.div
@@ -149,6 +180,8 @@ const FieldsetActions = <E extends keyof React.JSX.IntrinsicElements = "div">({
     </dom.div>
   );
 };
+
+FieldsetActions.displayName = "BlakeUI.Fieldset.Actions";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

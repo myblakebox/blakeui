@@ -6,7 +6,7 @@ import type {AccordionVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef, ReactNode} from "react";
 
 import {accordionVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Button} from "react-aria-components/Button";
 import {
   Disclosure,
@@ -17,7 +17,7 @@ import {
 import {DisclosureGroup} from "react-aria-components/DisclosureGroup";
 
 import {dataAttr} from "../../utils/assertion";
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 import {IconChevronDown} from "../icons";
 import {SurfaceContext} from "../surface";
@@ -26,6 +26,8 @@ const AccordionContext = createContext<{
   slots?: ReturnType<typeof accordionVariants>;
   hideSeparator?: boolean;
 }>({});
+
+const DEFAULT_SURFACE_CONTEXT = {variant: "default" as const};
 
 /* -------------------------------------------------------------------------------------------------
  * Accordion Root
@@ -46,19 +48,20 @@ const AccordionRoot = ({
 
   const content = (
     <DisclosureGroup
-      className={composeTwRenderProps(className, slots.base())}
+      className={useResolvedClassName(className, slots.base())}
       data-slot="accordion"
       {...props}
     >
-      {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+      {children}
     </DisclosureGroup>
   );
+  const contextValue = React.useMemo(() => ({slots, hideSeparator}), [slots, hideSeparator]);
 
   return (
-    <AccordionContext value={{slots, hideSeparator}}>
+    <AccordionContext value={contextValue}>
       {variant === "surface" ? (
         // Allows inner components to apply "on-surface" colors for proper contrast
-        <SurfaceContext value={{variant: "default"}}>{content}</SurfaceContext>
+        <SurfaceContext value={DEFAULT_SURFACE_CONTEXT}>{content}</SurfaceContext>
       ) : (
         content
       )}
@@ -66,17 +69,19 @@ const AccordionRoot = ({
   );
 };
 
+AccordionRoot.displayName = "BlakeUI.Accordion";
+
 /* -------------------------------------------------------------------------------------------------
  * AccordionItem
  * -----------------------------------------------------------------------------------------------*/
 interface AccordionItemProps extends ComponentPropsWithRef<typeof Disclosure> {}
 
 const AccordionItem = ({className, ...props}: AccordionItemProps) => {
-  const {hideSeparator, slots} = useContext(AccordionContext);
+  const {hideSeparator, slots} = use(AccordionContext);
 
   return (
     <Disclosure
-      className={composeTwRenderProps(className, slots?.item())}
+      className={useResolvedClassName(className, slots?.item())}
       data-hide-separator={hideSeparator ? "true" : undefined}
       data-slot="accordion-item"
       {...props}
@@ -85,6 +90,8 @@ const AccordionItem = ({className, ...props}: AccordionItemProps) => {
     </Disclosure>
   );
 };
+
+AccordionItem.displayName = "BlakeUI.Accordion.Item";
 
 /* -------------------------------------------------------------------------------------------------
  * AccordionIndicator
@@ -102,8 +109,8 @@ const AccordionIndicator = <E extends keyof React.JSX.IntrinsicElements = "svg">
   ...props
 }: AccordionIndicatorProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof AccordionIndicatorProps<E>>) => {
-  const {slots} = useContext(AccordionContext);
-  const {isExpanded} = useContext(DisclosureStateContext)!;
+  const {slots} = use(AccordionContext);
+  const {isExpanded} = use(DisclosureStateContext)!;
 
   if (children && React.isValidElement(children)) {
     return React.cloneElement(
@@ -131,6 +138,8 @@ const AccordionIndicator = <E extends keyof React.JSX.IntrinsicElements = "svg">
   );
 };
 
+AccordionIndicator.displayName = "BlakeUI.Accordion.Indicator";
+
 /* -------------------------------------------------------------------------------------------------
  * AccordionHeading
  * -----------------------------------------------------------------------------------------------*/
@@ -139,7 +148,7 @@ interface AccordionHeadingProps extends ComponentPropsWithRef<typeof DisclosureH
 }
 
 const AccordionHeading = ({className, ...props}: AccordionHeadingProps) => {
-  const {slots} = useContext(AccordionContext);
+  const {slots} = use(AccordionContext);
 
   return (
     <DisclosureHeading
@@ -150,17 +159,19 @@ const AccordionHeading = ({className, ...props}: AccordionHeadingProps) => {
   );
 };
 
+AccordionHeading.displayName = "BlakeUI.Accordion.Heading";
+
 /* -------------------------------------------------------------------------------------------------
  * AccordionTrigger
  * -----------------------------------------------------------------------------------------------*/
 interface AccordionTriggerProps extends ComponentPropsWithRef<typeof Button> {}
 
 const AccordionTrigger = ({className, ...props}: AccordionTriggerProps) => {
-  const {slots} = useContext(AccordionContext);
+  const {slots} = use(AccordionContext);
 
   return (
     <Button
-      className={composeTwRenderProps(className, slots?.trigger())}
+      className={useResolvedClassName(className, slots?.trigger())}
       data-slot="accordion-trigger"
       slot="trigger"
       {...props}
@@ -171,6 +182,8 @@ const AccordionTrigger = ({className, ...props}: AccordionTriggerProps) => {
     </Button>
   );
 };
+
+AccordionTrigger.displayName = "BlakeUI.Accordion.Trigger";
 
 /* -------------------------------------------------------------------------------------------------
  * AccordionBody
@@ -187,7 +200,7 @@ const AccordionBody = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: AccordionBodyProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof AccordionBodyProps<E>>) => {
-  const {slots} = useContext(AccordionContext);
+  const {slots} = use(AccordionContext);
 
   return (
     <dom.div className={slots?.body({})} data-slot="accordion-body" {...(props as any)}>
@@ -196,18 +209,20 @@ const AccordionBody = <E extends keyof React.JSX.IntrinsicElements = "div">({
   );
 };
 
+AccordionBody.displayName = "BlakeUI.Accordion.Body";
+
 /* -------------------------------------------------------------------------------------------------
  * AccordionPanel
  * -----------------------------------------------------------------------------------------------*/
 interface AccordionPanelProps extends ComponentPropsWithRef<typeof DisclosurePanel> {}
 
 const AccordionPanel = ({children, className, ...props}: AccordionPanelProps) => {
-  const {slots} = useContext(AccordionContext);
-  const {isExpanded} = useContext(DisclosureStateContext)!;
+  const {slots} = use(AccordionContext);
+  const {isExpanded} = use(DisclosureStateContext)!;
 
   return (
     <DisclosurePanel
-      className={composeTwRenderProps(className, slots?.panel())}
+      className={useResolvedClassName(className, slots?.panel())}
       data-expanded={dataAttr(isExpanded)}
       data-slot="accordion-panel"
       {...props}
@@ -216,6 +231,8 @@ const AccordionPanel = ({children, className, ...props}: AccordionPanelProps) =>
     </DisclosurePanel>
   );
 };
+
+AccordionPanel.displayName = "BlakeUI.Accordion.Panel";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

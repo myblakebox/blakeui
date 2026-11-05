@@ -5,11 +5,11 @@ import type {LinkVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef, ReactNode} from "react";
 
 import {linkVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Link as LinkPrimitive} from "react-aria-components/Link";
 
 import {dataAttr} from "../../utils/assertion";
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 import {ExternalLinkIcon} from "../icons";
 
@@ -29,15 +29,22 @@ interface LinkRootProps extends ComponentPropsWithRef<typeof LinkPrimitive>, Lin
 
 const LinkRoot = ({children, className, ...props}: LinkRootProps) => {
   const slots = React.useMemo(() => linkVariants(), []);
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <LinkContext value={{slots}}>
-      <LinkPrimitive {...props} className={composeTwRenderProps(className, slots?.base())}>
-        {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+    <LinkContext value={contextValue}>
+      <LinkPrimitive
+        data-slot="link"
+        {...props}
+        className={useResolvedClassName(className, slots?.base())}
+      >
+        {children}
       </LinkPrimitive>
     </LinkContext>
   );
 };
+
+LinkRoot.displayName = "BlakeUI.Link";
 
 /* ------------------------------------------------------------------------------------------------
  * Link Icon
@@ -54,7 +61,7 @@ const LinkIcon = <E extends keyof React.JSX.IntrinsicElements = "span">({
   className,
   ...rest
 }: LinkIconProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof LinkIconProps<E>>) => {
-  const {slots} = useContext(LinkContext);
+  const {slots} = use(LinkContext);
 
   return (
     <dom.span
@@ -67,6 +74,8 @@ const LinkIcon = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </dom.span>
   );
 };
+
+LinkIcon.displayName = "BlakeUI.Link.Icon";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

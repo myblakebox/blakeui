@@ -6,12 +6,12 @@ import type {ButtonGroupVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef, ReactNode} from "react";
 
 import {buttonGroupVariants} from "@blakeui/styles";
-import React, {Children, createContext, isValidElement, useContext} from "react";
+import React, {Children, createContext, isValidElement, use} from "react";
 import {Group} from "react-aria-components/Group";
 import {useSlottedContext} from "react-aria-components/slots";
 import {ToggleButtonGroupContext as RACToggleButtonGroupContext} from "react-aria-components/ToggleButtonGroup";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils";
+import {composeSlotClassName, useResolvedClassName} from "../../utils";
 import {dom} from "../../utils/dom";
 
 /* -------------------------------------------------------------------------------------------------
@@ -61,21 +61,30 @@ const ButtonGroupRoot = ({
   );
 
   // Wrap only direct children with context provider
-  const wrappedChildren = Children.map(children as React.ReactNode, (child) => {
-    if (!isValidElement(child)) {
-      return child;
-    }
+  const wrappedChildren = React.useMemo(
+    () =>
+      Children.map(children as React.ReactNode, (child) => {
+        if (!isValidElement(child)) {
+          return child;
+        }
 
-    // Clone the child and add the special prop
-    return React.cloneElement(child, {
-      [BUTTON_GROUP_CHILD]: true,
-    } as any);
-  });
+        // Clone the child and add the special prop
+        return React.cloneElement(child, {
+          [BUTTON_GROUP_CHILD]: true,
+        } as any);
+      }),
+    [children],
+  );
+
+  const context = React.useMemo<ButtonGroupContext>(
+    () => ({slots, size, variant, isDisabled, fullWidth}),
+    [slots, size, variant, isDisabled, fullWidth],
+  );
 
   return (
-    <ButtonGroupContext value={{slots, size, variant, isDisabled, fullWidth}}>
+    <ButtonGroupContext value={context}>
       <Group
-        className={composeTwRenderProps(className, slots.base())}
+        className={useResolvedClassName(className, slots.base())}
         data-slot="button-group"
         isDisabled={isDisabled}
         {...rest}
@@ -85,6 +94,8 @@ const ButtonGroupRoot = ({
     </ButtonGroupContext>
   );
 };
+
+ButtonGroupRoot.displayName = "BlakeUI.ButtonGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * ButtonGroup Separator
@@ -101,7 +112,7 @@ const ButtonGroupSeparator = <E extends keyof React.JSX.IntrinsicElements = "spa
   ...props
 }: ButtonGroupSeparatorProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof ButtonGroupSeparatorProps<E>>) => {
-  const {slots} = useContext(ButtonGroupContext);
+  const {slots} = use(ButtonGroupContext);
 
   return (
     <dom.span
@@ -112,6 +123,8 @@ const ButtonGroupSeparator = <E extends keyof React.JSX.IntrinsicElements = "spa
     />
   );
 };
+
+ButtonGroupSeparator.displayName = "BlakeUI.ButtonGroup.Separator";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

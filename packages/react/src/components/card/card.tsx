@@ -6,7 +6,7 @@ import type {CardVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {cardVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
@@ -41,6 +41,11 @@ const CardRoot = <E extends keyof React.JSX.IntrinsicElements = "div">({
   ...props
 }: CardRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof CardRootProps<E>>) => {
   const slots = React.useMemo(() => cardVariants({variant}), [variant]);
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
+  const surfaceContextValue = React.useMemo(
+    () => ({variant: variant as SurfaceVariants["variant"]}),
+    [variant],
+  );
 
   const content = (
     <dom.div className={slots.base({className})} data-slot="card" {...(props as any)}>
@@ -49,22 +54,18 @@ const CardRoot = <E extends keyof React.JSX.IntrinsicElements = "div">({
   );
 
   return (
-    <CardContext value={{slots}}>
+    <CardContext value={contextValue}>
       {variant === "transparent" ? (
         content
       ) : (
         // Allows inner components to apply "on-surface" colors for proper contrast
-        <SurfaceContext
-          value={{
-            variant: variant as SurfaceVariants["variant"],
-          }}
-        >
-          {content}
-        </SurfaceContext>
+        <SurfaceContext value={surfaceContextValue}>{content}</SurfaceContext>
       )}
     </CardContext>
   );
 };
+
+CardRoot.displayName = "BlakeUI.Card";
 
 /* -------------------------------------------------------------------------------------------------
  * Card Header
@@ -80,7 +81,7 @@ const CardHeader = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: CardHeaderProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof CardHeaderProps<E>>) => {
-  const {slots} = useContext(CardContext);
+  const {slots} = use(CardContext);
 
   return (
     <dom.div
@@ -90,6 +91,8 @@ const CardHeader = <E extends keyof React.JSX.IntrinsicElements = "div">({
     />
   );
 };
+
+CardHeader.displayName = "BlakeUI.Card.Header";
 
 /* -------------------------------------------------------------------------------------------------
  * Card Title
@@ -107,7 +110,7 @@ const CardTitle = <E extends keyof React.JSX.IntrinsicElements = "h3">({
   className,
   ...props
 }: CardTitleProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof CardTitleProps<E>>) => {
-  const {slots} = useContext(CardContext);
+  const {slots} = use(CardContext);
 
   return (
     <dom.h3
@@ -119,6 +122,8 @@ const CardTitle = <E extends keyof React.JSX.IntrinsicElements = "h3">({
     </dom.h3>
   );
 };
+
+CardTitle.displayName = "BlakeUI.Card.Title";
 
 /* -------------------------------------------------------------------------------------------------
  * Card Description
@@ -136,7 +141,7 @@ const CardDescription = <E extends keyof React.JSX.IntrinsicElements = "p">({
   ...props
 }: CardDescriptionProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof CardDescriptionProps<E>>) => {
-  const {slots} = useContext(CardContext);
+  const {slots} = use(CardContext);
 
   return (
     <dom.p
@@ -148,6 +153,8 @@ const CardDescription = <E extends keyof React.JSX.IntrinsicElements = "p">({
     </dom.p>
   );
 };
+
+CardDescription.displayName = "BlakeUI.Card.Description";
 
 /* -------------------------------------------------------------------------------------------------
  * Card Content
@@ -163,7 +170,7 @@ const CardContent = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: CardContentProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof CardContentProps<E>>) => {
-  const {slots} = useContext(CardContext);
+  const {slots} = use(CardContext);
 
   return (
     <dom.div
@@ -173,6 +180,8 @@ const CardContent = <E extends keyof React.JSX.IntrinsicElements = "div">({
     />
   );
 };
+
+CardContent.displayName = "BlakeUI.Card.Content";
 
 /* -------------------------------------------------------------------------------------------------
  * Card Footer
@@ -188,7 +197,7 @@ const CardFooter = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...props
 }: CardFooterProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof CardFooterProps<E>>) => {
-  const {slots} = useContext(CardContext);
+  const {slots} = use(CardContext);
 
   return (
     <dom.div
@@ -198,6 +207,8 @@ const CardFooter = <E extends keyof React.JSX.IntrinsicElements = "div">({
     />
   );
 };
+
+CardFooter.displayName = "BlakeUI.Card.Footer";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

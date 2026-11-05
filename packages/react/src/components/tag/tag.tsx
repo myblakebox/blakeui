@@ -5,11 +5,11 @@ import type {ComponentPropsWithRef} from "react";
 import type {Button as ButtonPrimitive} from "react-aria-components/Button";
 
 import {tagVariants} from "@blakeui/styles";
-import React, {Children, createContext, useContext, useMemo} from "react";
+import React, {Children, createContext, use, useMemo} from "react";
 import {Tag as TagPrimitive} from "react-aria-components/TagGroup";
 
 import {pickChildren} from "../../utils/children";
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
 import {CloseButton} from "../close-button";
 import {TagGroupContext} from "../tag-group";
 
@@ -28,7 +28,7 @@ const TagContext = createContext<TagContext>({});
 interface TagRootProps extends ComponentPropsWithRef<typeof TagPrimitive>, TagVariants {}
 
 const TagRoot = ({children, className, ...restProps}: TagRootProps) => {
-  const {size, variant} = useContext(TagGroupContext);
+  const {size, variant} = use(TagGroupContext);
 
   const slots = useMemo(() => tagVariants({size, variant}), [size, variant]);
 
@@ -55,15 +55,17 @@ const TagRoot = ({children, className, ...restProps}: TagRootProps) => {
     return pickChildren(children, TagRemoveButton);
   }, [children]);
 
+  const contextValue = useMemo(() => ({slots}), [slots]);
+
   return (
     <TagPrimitive
-      className={composeTwRenderProps(className, slots.base())}
+      className={useResolvedClassName(className, slots.base())}
       data-slot="tag"
       textValue={textValue}
       {...restProps}
     >
       {(renderProps) => (
-        <TagContext value={{slots}}>
+        <TagContext value={contextValue}>
           {typeof children === "function" ? (
             children(renderProps)
           ) : (
@@ -83,6 +85,8 @@ const TagRoot = ({children, className, ...restProps}: TagRootProps) => {
   );
 };
 
+TagRoot.displayName = "BlakeUI.Tag";
+
 /* -------------------------------------------------------------------------------------------------
  * Tag Remove Button
  * -----------------------------------------------------------------------------------------------*/
@@ -91,12 +95,12 @@ type TagRemoveButtonProps = ComponentPropsWithRef<typeof ButtonPrimitive> & {
 };
 
 const TagRemoveButton = ({children, className, ...restProps}: TagRemoveButtonProps) => {
-  const {slots} = useContext(TagContext);
+  const {slots} = use(TagContext);
 
   return (
     <CloseButton
       aria-label="Remove tag"
-      className={composeTwRenderProps(className, slots?.removeButton())}
+      className={useResolvedClassName(className, slots?.removeButton())}
       data-slot="tag-remove-button"
       slot="remove"
       {...restProps}
@@ -105,6 +109,8 @@ const TagRemoveButton = ({children, className, ...restProps}: TagRemoveButtonPro
     </CloseButton>
   );
 };
+
+TagRemoveButton.displayName = "BlakeUI.Tag.RemoveButton";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

@@ -6,14 +6,14 @@ import type {CSSProperties, ComponentPropsWithRef} from "react";
 import type {ColorSwatchPickerItemRenderProps} from "react-aria-components/ColorSwatchPicker";
 
 import {colorSwatchPickerVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {
   ColorSwatchPickerItem as ColorSwatchPickerItemPrimitive,
   ColorSwatchPicker as ColorSwatchPickerPrimitive,
   ColorSwatch as ColorSwatchPrimitive,
 } from "react-aria-components/ColorSwatchPicker";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 
 /* -------------------------------------------------------------------------------------------------
@@ -52,19 +52,22 @@ const ColorSwatchPickerRoot = ({
     () => colorSwatchPickerVariants({layout, size, variant}),
     [layout, size, variant],
   );
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <ColorSwatchPickerContext value={{slots}}>
+    <ColorSwatchPickerContext value={contextValue}>
       <ColorSwatchPickerPrimitive
         data-slot="color-swatch-picker"
         {...props}
-        className={composeTwRenderProps(className, slots.base())}
+        className={useResolvedClassName(className, slots.base())}
       >
         {children}
       </ColorSwatchPickerPrimitive>
     </ColorSwatchPickerContext>
   );
 };
+
+ColorSwatchPickerRoot.displayName = "BlakeUI.ColorSwatchPicker";
 
 /* -------------------------------------------------------------------------------------------------
 | * ColorSwatchPicker Item
@@ -74,13 +77,13 @@ interface ColorSwatchPickerItemProps extends ComponentPropsWithRef<
 > {}
 
 const ColorSwatchPickerItem = ({children, className, ...props}: ColorSwatchPickerItemProps) => {
-  const {slots} = useContext(ColorSwatchPickerContext);
+  const {slots} = use(ColorSwatchPickerContext);
 
   return (
     <ColorSwatchPickerItemPrimitive
       data-slot="color-swatch-picker-item"
       {...props}
-      className={composeTwRenderProps(className, slots?.item())}
+      className={useResolvedClassName(className, slots?.item())}
       style={(renderProps) =>
         ({
           "--color-swatch-current": renderProps.color.toString("css"),
@@ -96,22 +99,26 @@ const ColorSwatchPickerItem = ({children, className, ...props}: ColorSwatchPicke
   );
 };
 
+ColorSwatchPickerItem.displayName = "BlakeUI.ColorSwatchPicker.Item";
+
 /* -------------------------------------------------------------------------------------------------
 | * ColorSwatchPicker Swatch
 | * -----------------------------------------------------------------------------------------------*/
 interface ColorSwatchPickerSwatchProps extends ComponentPropsWithRef<typeof ColorSwatchPrimitive> {}
 
 const ColorSwatchPickerSwatch = ({className, ...props}: ColorSwatchPickerSwatchProps) => {
-  const {slots} = useContext(ColorSwatchPickerContext);
+  const {slots} = use(ColorSwatchPickerContext);
 
   return (
     <ColorSwatchPrimitive
-      className={composeTwRenderProps(className, slots?.swatch())}
+      className={useResolvedClassName(className, slots?.swatch())}
       data-slot="color-swatch-picker-swatch"
       {...props}
     />
   );
 };
+
+ColorSwatchPickerSwatch.displayName = "BlakeUI.ColorSwatchPicker.Swatch";
 
 /* -------------------------------------------------------------------------------------------------
 | * ColorSwatchPicker Indicator
@@ -144,8 +151,8 @@ const ColorSwatchPickerIndicator = <E extends keyof React.JSX.IntrinsicElements 
   ...props
 }: ColorSwatchPickerIndicatorProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof ColorSwatchPickerIndicatorProps<E>>) => {
-  const {slots} = useContext(ColorSwatchPickerContext);
-  const {state} = useContext(ColorSwatchPickerItemContext);
+  const {slots} = use(ColorSwatchPickerContext);
+  const {state} = use(ColorSwatchPickerItemContext);
 
   // Determine if the background color is light (luminance > 0.5)
   // Use white checkmark on dark backgrounds, black on light backgrounds
@@ -184,6 +191,8 @@ const ColorSwatchPickerIndicator = <E extends keyof React.JSX.IntrinsicElements 
     </dom.span>
   );
 };
+
+ColorSwatchPickerIndicator.displayName = "BlakeUI.ColorSwatchPicker.Indicator";
 
 /* -------------------------------------------------------------------------------------------------
 | * Exports

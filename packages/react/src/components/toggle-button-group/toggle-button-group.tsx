@@ -5,14 +5,14 @@ import type {ToggleButtonGroupVariants, ToggleButtonVariants} from "@blakeui/sty
 import type {ComponentPropsWithRef} from "react";
 
 import {toggleButtonGroupVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {useSlottedContext} from "react-aria-components/slots";
 import {
   ToggleButtonGroupContext as RACToggleButtonGroupContext,
   ToggleButtonGroup as ToggleButtonGroupPrimitive,
 } from "react-aria-components/ToggleButtonGroup";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils";
+import {composeSlotClassName, useResolvedClassName} from "../../utils";
 import {dom} from "../../utils/dom";
 
 /* -------------------------------------------------------------------------------------------------
@@ -47,31 +47,49 @@ const ToggleButtonGroupRoot = ({
   isDetached = false,
   isDisabled,
   orientation: orientationProp,
+  render,
   size,
   ...rest
 }: ToggleButtonGroupRootProps) => {
-  const racContext = useSlottedContext(RACToggleButtonGroupContext);
+  const racContext = useSlottedContext(RACToggleButtonGroupContext, rest.slot);
+  const resolvedRender = render ?? racContext?.render;
   const orientation = orientationProp ?? racContext?.orientation ?? "horizontal";
 
   const slots = React.useMemo(
     () => toggleButtonGroupVariants({fullWidth, isDetached, orientation}),
     [fullWidth, isDetached, orientation],
   );
+  const contextValue = React.useMemo(() => ({slots, size, isDisabled}), [slots, size, isDisabled]);
 
   return (
-    <ToggleButtonGroupContext value={{slots, size, isDisabled}}>
+    <ToggleButtonGroupContext value={contextValue}>
       <ToggleButtonGroupPrimitive
-        className={composeTwRenderProps(className, slots.base())}
+        className={useResolvedClassName(className, slots.base())}
         data-slot="toggle-button-group"
         isDisabled={isDisabled}
         orientation={orientation}
         {...rest}
+        render={(domProps, values) => {
+          // Custom renderers may supply their own semantic role.
+          if (resolvedRender) return resolvedRender(domProps, values);
+
+          // RAC changes nested toolbars to groups, which do not support aria-orientation.
+          const groupProps = {
+            ...domProps,
+            "aria-orientation":
+              domProps.role === "group" ? undefined : domProps["aria-orientation"],
+          };
+
+          return <div {...groupProps} />;
+        }}
       >
         {children}
       </ToggleButtonGroupPrimitive>
     </ToggleButtonGroupContext>
   );
 };
+
+ToggleButtonGroupRoot.displayName = "BlakeUI.ToggleButtonGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * ToggleButtonGroup Separator
@@ -87,7 +105,7 @@ const ToggleButtonGroupSeparator = <E extends keyof React.JSX.IntrinsicElements 
   ...props
 }: ToggleButtonGroupSeparatorProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof ToggleButtonGroupSeparatorProps<E>>) => {
-  const {slots} = useContext(ToggleButtonGroupContext);
+  const {slots} = use(ToggleButtonGroupContext);
 
   return (
     <dom.span
@@ -98,6 +116,8 @@ const ToggleButtonGroupSeparator = <E extends keyof React.JSX.IntrinsicElements 
     />
   );
 };
+
+ToggleButtonGroupSeparator.displayName = "BlakeUI.ToggleButtonGroup.Separator";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

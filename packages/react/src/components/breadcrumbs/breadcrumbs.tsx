@@ -5,13 +5,13 @@ import type {BreadcrumbsVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {breadcrumbsVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {
   Breadcrumb as BreadcrumbPrimitive,
   Breadcrumbs as BreadcrumbsPrimitive,
 } from "react-aria-components/Breadcrumbs";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {IconChevronRight} from "../icons";
 import {Link} from "../link";
 
@@ -49,6 +49,8 @@ const BreadcrumbsRoot = ({children, className, separator, ...props}: Breadcrumbs
   );
 };
 
+BreadcrumbsRoot.displayName = "BlakeUI.Breadcrumbs";
+
 /* -------------------------------------------------------------------------------------------------
  * Breadcrumbs Item
  * -----------------------------------------------------------------------------------------------*/
@@ -59,7 +61,7 @@ const BreadcrumbsItem = ({
   className,
   ...props
 }: BreadcrumbsItemProps & Omit<LinkProps, "className">) => {
-  const {separator, slots} = useContext(BreadcrumbsContext);
+  const {separator, slots} = use(BreadcrumbsContext);
 
   const renderSeparator = () => {
     if (!separator)
@@ -83,7 +85,7 @@ const BreadcrumbsItem = ({
 
   return (
     <BreadcrumbPrimitive
-      className={composeTwRenderProps(className, slots?.item())}
+      className={useResolvedClassName(className, slots?.item())}
       data-slot="breadcrumbs-item"
       {...props}
     >
@@ -104,6 +106,8 @@ const BreadcrumbsItem = ({
     </BreadcrumbPrimitive>
   );
 };
+
+BreadcrumbsItem.displayName = "BlakeUI.Breadcrumbs.Item";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

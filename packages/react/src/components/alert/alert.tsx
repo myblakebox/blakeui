@@ -6,7 +6,7 @@ import type {AlertVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {alertVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
@@ -22,6 +22,8 @@ type AlertContext = {
 };
 
 const AlertContext = createContext<AlertContext>({});
+
+const DEFAULT_SURFACE_CONTEXT = {variant: "default" as SurfaceVariants["variant"]};
 
 /* ------------------------------------------------------------------------------------------------
  * Alert Root
@@ -42,14 +44,11 @@ const AlertRoot = <E extends keyof React.JSX.IntrinsicElements = "div">({
   ...rest
 }: AlertRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof AlertRootProps<E>>) => {
   const slots = React.useMemo(() => alertVariants({status}), [status]);
+  const contextValue = React.useMemo(() => ({slots, status}), [slots, status]);
 
   return (
-    <AlertContext value={{slots, status}}>
-      <SurfaceContext
-        value={{
-          variant: "default" as SurfaceVariants["variant"],
-        }}
-      >
+    <AlertContext value={contextValue}>
+      <SurfaceContext value={DEFAULT_SURFACE_CONTEXT}>
         <dom.div className={slots?.base({className})} data-slot="alert-root" {...(rest as any)}>
           {children}
         </dom.div>
@@ -57,6 +56,8 @@ const AlertRoot = <E extends keyof React.JSX.IntrinsicElements = "div">({
     </AlertContext>
   );
 };
+
+AlertRoot.displayName = "BlakeUI.Alert";
 
 /* ------------------------------------------------------------------------------------------------
  * Alert Indicator
@@ -73,7 +74,7 @@ const AlertIndicator = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...rest
 }: AlertIndicatorProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof AlertIndicatorProps<E>>) => {
-  const {slots, status} = useContext(AlertContext);
+  const {slots, status} = use(AlertContext);
 
   // Map status to default icons
   const getDefaultIcon = () => {
@@ -102,6 +103,8 @@ const AlertIndicator = <E extends keyof React.JSX.IntrinsicElements = "div">({
   );
 };
 
+AlertIndicator.displayName = "BlakeUI.Alert.Indicator";
+
 /* ------------------------------------------------------------------------------------------------
  * Alert Content
  * --------------------------------------------------------------------------------------------- */
@@ -117,7 +120,7 @@ const AlertContent = <E extends keyof React.JSX.IntrinsicElements = "div">({
   className,
   ...rest
 }: AlertContentProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof AlertContentProps<E>>) => {
-  const {slots} = useContext(AlertContext);
+  const {slots} = use(AlertContext);
 
   return (
     <dom.div
@@ -129,6 +132,8 @@ const AlertContent = <E extends keyof React.JSX.IntrinsicElements = "div">({
     </dom.div>
   );
 };
+
+AlertContent.displayName = "BlakeUI.Alert.Content";
 
 /* ------------------------------------------------------------------------------------------------
  * Alert Title
@@ -146,7 +151,7 @@ const AlertTitle = <E extends keyof React.JSX.IntrinsicElements = "p">({
   className,
   ...rest
 }: AlertTitleProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof AlertTitleProps<E>>) => {
-  const {slots} = useContext(AlertContext);
+  const {slots} = use(AlertContext);
 
   return (
     <dom.p
@@ -158,6 +163,8 @@ const AlertTitle = <E extends keyof React.JSX.IntrinsicElements = "p">({
     </dom.p>
   );
 };
+
+AlertTitle.displayName = "BlakeUI.Alert.Title";
 
 /* ------------------------------------------------------------------------------------------------
  * Alert Description
@@ -175,7 +182,7 @@ const AlertDescription = <E extends keyof React.JSX.IntrinsicElements = "span">(
   ...rest
 }: AlertDescriptionProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof AlertDescriptionProps<E>>) => {
-  const {slots} = useContext(AlertContext);
+  const {slots} = use(AlertContext);
 
   return (
     <dom.span
@@ -187,6 +194,8 @@ const AlertDescription = <E extends keyof React.JSX.IntrinsicElements = "span">(
     </dom.span>
   );
 };
+
+AlertDescription.displayName = "BlakeUI.Alert.Description";
 
 /* ------------------------------------------------------------------------------------------------
  * Exports

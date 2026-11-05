@@ -5,7 +5,7 @@ import type {ChipVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {chipVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
@@ -53,8 +53,10 @@ const ChipRoot = <E extends keyof React.JSX.IntrinsicElements = "span">({
     return children;
   }, [children]);
 
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
+
   return (
-    <ChipContext value={{slots}}>
+    <ChipContext value={contextValue}>
       <dom.span
         {...(props as any)}
         className={composeSlotClassName(slots.base, className)}
@@ -65,6 +67,8 @@ const ChipRoot = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </ChipContext>
   );
 };
+
+ChipRoot.displayName = "BlakeUI.Chip";
 
 /* -------------------------------------------------------------------------------------------------
  * Chip Label
@@ -81,7 +85,7 @@ const ChipLabel = <E extends keyof React.JSX.IntrinsicElements = "span">({
   className,
   ...props
 }: ChipLabelProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof ChipLabelProps<E>>) => {
-  const {slots} = useContext(ChipContext);
+  const {slots} = use(ChipContext);
 
   return (
     <dom.span
@@ -93,6 +97,8 @@ const ChipLabel = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </dom.span>
   );
 };
+
+ChipLabel.displayName = "BlakeUI.Chip.Label";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

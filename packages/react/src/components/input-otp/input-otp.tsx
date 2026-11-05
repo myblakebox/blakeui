@@ -6,11 +6,13 @@ import type {ValidationResult} from "react-aria-components/CheckboxGroup";
 
 import {inputOTPVariants} from "@blakeui/styles";
 import {OTPInput, OTPInputContext} from "input-otp";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {FieldErrorContext} from "react-aria-components/FieldError";
 
 import {dataAttr} from "../../utils/assertion";
 import {composeSlotClassName} from "../../utils/compose";
+
+const EMPTY_VALIDATION_ERRORS: string[] = [];
 
 /* -------------------------------------------------------------------------------------------------
  * Input OTP Context
@@ -47,7 +49,7 @@ const InputOTPRoot = ({
   isDisabled = false,
   isInvalid = false,
   validationDetails,
-  validationErrors = [],
+  validationErrors = EMPTY_VALIDATION_ERRORS,
   variant,
   ...props
 }: InputOTPRootProps) => {
@@ -62,9 +64,13 @@ const InputOTPRoot = ({
       }) as ValidationResult,
     [isInvalid, validationErrors, validationDetails],
   );
+  const contextValue = React.useMemo(
+    () => ({slots, isDisabled, isInvalid}),
+    [slots, isDisabled, isInvalid],
+  );
 
   return (
-    <InputOTPContext value={{slots, isDisabled, isInvalid}}>
+    <InputOTPContext value={contextValue}>
       <FieldErrorContext value={validation}>
         <OTPInput
           // OTP Input package uses the `className` prop for the actual `input` element which is not visible to the user so no need to pass it to the base container
@@ -81,6 +87,8 @@ const InputOTPRoot = ({
   );
 };
 
+InputOTPRoot.displayName = "BlakeUI.InputOTP";
+
 /* -------------------------------------------------------------------------------------------------
  * Input OTP Group
  * -----------------------------------------------------------------------------------------------*/
@@ -88,7 +96,7 @@ const InputOTPRoot = ({
 interface InputOTPGroupProps extends ComponentPropsWithRef<"div"> {}
 
 const InputOTPGroup = ({className, ...props}: InputOTPGroupProps) => {
-  const {slots} = useContext(InputOTPContext);
+  const {slots} = use(InputOTPContext);
 
   return (
     <div
@@ -99,6 +107,8 @@ const InputOTPGroup = ({className, ...props}: InputOTPGroupProps) => {
   );
 };
 
+InputOTPGroup.displayName = "BlakeUI.InputOTP.Group";
+
 /* -------------------------------------------------------------------------------------------------
  * Input OTP Slot
  * -----------------------------------------------------------------------------------------------*/
@@ -107,9 +117,9 @@ interface InputOTPSlotProps extends ComponentPropsWithRef<"div"> {
 }
 
 const InputOTPSlot = ({className, index, ...props}: InputOTPSlotProps) => {
-  const {isDisabled, isInvalid, slots} = useContext(InputOTPContext);
+  const {isDisabled, isInvalid, slots} = use(InputOTPContext);
 
-  const inputOTPContext = useContext(OTPInputContext);
+  const inputOTPContext = use(OTPInputContext);
   const {char, hasFakeCaret, isActive} = inputOTPContext?.slots[index] ?? {};
 
   return (
@@ -134,6 +144,8 @@ const InputOTPSlot = ({className, index, ...props}: InputOTPSlotProps) => {
   );
 };
 
+InputOTPSlot.displayName = "BlakeUI.InputOTP.Slot";
+
 /* -------------------------------------------------------------------------------------------------
  * Input OTP Separator
  * -----------------------------------------------------------------------------------------------*/
@@ -142,7 +154,7 @@ interface InputOTPSeparatorProps extends ComponentPropsWithRef<"div"> {
 }
 
 const InputOTPSeparator = ({className, ...props}: InputOTPSeparatorProps) => {
-  const {slots} = useContext(InputOTPContext);
+  const {slots} = use(InputOTPContext);
 
   return (
     <div
@@ -152,6 +164,8 @@ const InputOTPSeparator = ({className, ...props}: InputOTPSeparatorProps) => {
     />
   );
 };
+
+InputOTPSeparator.displayName = "BlakeUI.InputOTP.Separator";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

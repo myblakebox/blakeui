@@ -26,6 +26,8 @@ const ListBoxSectionRoot = ({children, className, ...props}: ListBoxSectionRootP
   );
 };
 
+ListBoxSectionRoot.displayName = "BlakeUI.ListBoxSection";
+
 /* -------------------------------------------------------------------------------------------------
  * Exports
  * -----------------------------------------------------------------------------------------------*/

@@ -4,12 +4,12 @@ import type {InputGroupVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {inputGroupVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Group as GroupPrimitive} from "react-aria-components/Group";
 import {Input as InputPrimitive} from "react-aria-components/Input";
 import {TextArea as TextAreaPrimitive} from "react-aria-components/TextArea";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {TextFieldContext} from "../textfield";
 
 /* -------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ const InputGroupRoot = ({
   variant,
   ...props
 }: InputGroupRootProps) => {
-  const textFieldContext = useContext(TextFieldContext);
+  const textFieldContext = use(TextFieldContext);
   const resolvedVariant = variant ?? textFieldContext?.variant;
   const groupRef = React.useRef<HTMLDivElement>(null);
 
@@ -55,20 +55,24 @@ const InputGroupRoot = ({
     onClick?.(e);
   };
 
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
+
   return (
-    <InputGroupContext value={{slots}}>
+    <InputGroupContext value={contextValue}>
       <GroupPrimitive
         {...props}
         ref={groupRef}
-        className={composeTwRenderProps(className, slots?.base())}
+        className={useResolvedClassName(className, slots?.base())}
         data-slot="input-group"
         onClick={handleClick}
       >
-        {(renderProps) => (typeof children === "function" ? children(renderProps) : children)}
+        {children}
       </GroupPrimitive>
     </InputGroupContext>
   );
 };
+
+InputGroupRoot.displayName = "BlakeUI.InputGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * InputGroup Input
@@ -76,16 +80,18 @@ const InputGroupRoot = ({
 interface InputGroupInputProps extends ComponentPropsWithRef<typeof InputPrimitive> {}
 
 const InputGroupInput = ({className, ...props}: InputGroupInputProps) => {
-  const {slots} = useContext(InputGroupContext);
+  const {slots} = use(InputGroupContext);
 
   return (
     <InputPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="input-group-input"
       {...props}
     />
   );
 };
+
+InputGroupInput.displayName = "BlakeUI.InputGroup.Input";
 
 /* -------------------------------------------------------------------------------------------------
  * InputGroup Prefix
@@ -93,7 +99,7 @@ const InputGroupInput = ({className, ...props}: InputGroupInputProps) => {
 interface InputGroupPrefixProps extends ComponentPropsWithRef<"div"> {}
 
 const InputGroupPrefix = ({children, className, ...props}: InputGroupPrefixProps) => {
-  const {slots} = useContext(InputGroupContext);
+  const {slots} = use(InputGroupContext);
 
   return (
     <div
@@ -106,22 +112,26 @@ const InputGroupPrefix = ({children, className, ...props}: InputGroupPrefixProps
   );
 };
 
+InputGroupPrefix.displayName = "BlakeUI.InputGroup.Prefix";
+
 /* -------------------------------------------------------------------------------------------------
  * InputGroup TextArea
  * -----------------------------------------------------------------------------------------------*/
 interface InputGroupTextAreaProps extends ComponentPropsWithRef<typeof TextAreaPrimitive> {}
 
 const InputGroupTextArea = ({className, ...props}: InputGroupTextAreaProps) => {
-  const {slots} = useContext(InputGroupContext);
+  const {slots} = use(InputGroupContext);
 
   return (
     <TextAreaPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="input-group-textarea"
       {...props}
     />
   );
 };
+
+InputGroupTextArea.displayName = "BlakeUI.InputGroup.TextArea";
 
 /* -------------------------------------------------------------------------------------------------
  * InputGroup Suffix
@@ -129,7 +139,7 @@ const InputGroupTextArea = ({className, ...props}: InputGroupTextAreaProps) => {
 interface InputGroupSuffixProps extends ComponentPropsWithRef<"div"> {}
 
 const InputGroupSuffix = ({children, className, ...props}: InputGroupSuffixProps) => {
-  const {slots} = useContext(InputGroupContext);
+  const {slots} = use(InputGroupContext);
 
   return (
     <div
@@ -141,6 +151,8 @@ const InputGroupSuffix = ({children, className, ...props}: InputGroupSuffixProps
     </div>
   );
 };
+
+InputGroupSuffix.displayName = "BlakeUI.InputGroup.Suffix";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

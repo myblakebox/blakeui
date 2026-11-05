@@ -4,13 +4,13 @@ import type {ColorAreaVariants} from "@blakeui/styles";
 import type {CSSProperties, ComponentPropsWithRef} from "react";
 
 import {colorAreaVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {
   ColorArea as ColorAreaPrimitive,
   ColorThumb as ColorThumbPrimitive,
 } from "react-aria-components/ColorArea";
 
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
 
 /* -------------------------------------------------------------------------------------------------
  * ColorArea Context
@@ -29,12 +29,13 @@ interface ColorAreaRootProps
 
 const ColorAreaRoot = ({children, className, showDots, style, ...props}: ColorAreaRootProps) => {
   const slots = React.useMemo(() => colorAreaVariants({showDots}), [showDots]);
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <ColorAreaContext value={{slots}}>
+    <ColorAreaContext value={contextValue}>
       <ColorAreaPrimitive
         {...props}
-        className={composeTwRenderProps(className, slots.base())}
+        className={useResolvedClassName(className, slots.base())}
         data-slot="color-area"
         style={(renderProps) => {
           const userStyle = typeof style === "function" ? style(renderProps) : style;
@@ -51,17 +52,19 @@ const ColorAreaRoot = ({children, className, showDots, style, ...props}: ColorAr
   );
 };
 
+ColorAreaRoot.displayName = "BlakeUI.ColorArea";
+
 /* -------------------------------------------------------------------------------------------------
  * ColorArea Thumb
  * -----------------------------------------------------------------------------------------------*/
 interface ColorAreaThumbProps extends ComponentPropsWithRef<typeof ColorThumbPrimitive> {}
 
 const ColorAreaThumb = ({className, style, ...props}: ColorAreaThumbProps) => {
-  const {slots} = useContext(ColorAreaContext);
+  const {slots} = use(ColorAreaContext);
 
   return (
     <ColorThumbPrimitive
-      className={composeTwRenderProps(className, slots?.thumb())}
+      className={useResolvedClassName(className, slots?.thumb())}
       data-slot="color-area-thumb"
       style={(renderProps) => {
         const userStyle = typeof style === "function" ? style(renderProps) : style;
@@ -75,6 +78,8 @@ const ColorAreaThumb = ({className, style, ...props}: ColorAreaThumbProps) => {
     />
   );
 };
+
+ColorAreaThumb.displayName = "BlakeUI.ColorArea.Thumb";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

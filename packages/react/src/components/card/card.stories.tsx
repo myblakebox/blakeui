@@ -127,15 +127,8 @@ export const Horizontal: Story = {
         </Card.Header>
         <Card.Footer className="mt-auto flex w-full flex-row items-center justify-between">
           <div className="flex flex-col">
-            <span
-              aria-label="Price: 36,799 US dollars"
-              className="text-sm font-medium text-foreground"
-            >
-              $36,799
-            </span>
-            <span aria-label="Available stock: 11 units" className="text-xs text-muted">
-              11 available
-            </span>
+            <span className="text-sm font-medium text-foreground">$36,799</span>
+            <span className="text-xs text-muted">11 available</span>
           </div>
           <Button>Buy Now</Button>
         </Card.Footer>
@@ -159,7 +152,7 @@ export const WithAvatar: Story = {
           <Card.Description>148 members</Card.Description>
         </Card.Header>
         <Card.Footer className="flex gap-2">
-          <Avatar aria-label="Martha's profile picture" className="size-5">
+          <Avatar className="size-5">
             <Avatar.Image alt="Martha's avatar" src="https://cdn.blakeui.com/avatars/red.jpg" />
             <Avatar.Fallback className="text-xs">IH</Avatar.Fallback>
           </Avatar>
@@ -179,7 +172,7 @@ export const WithAvatar: Story = {
           <Card.Description>362 members</Card.Description>
         </Card.Header>
         <Card.Footer className="flex gap-2">
-          <Avatar aria-label="John's profile picture" className="size-5">
+          <Avatar className="size-5">
             <Avatar.Image
               alt="John's avatar - blue themed"
               src="https://cdn.blakeui.com/avatars/blue.jpg"
@@ -212,12 +205,12 @@ export const WithImages: Story = {
           </div>
           <div className="flex flex-1 flex-col gap-3">
             <Card.Header className="gap-1">
-              <Card.Title className="pr-8">Become an ACME Creator!</Card.Title>
+              <Card.Title className="pe-8">Become an ACME Creator!</Card.Title>
               <Card.Description>
                 Lorem ipsum dolor sit amet consectetur. Sed arcu donec id aliquam dolor sed amet
                 faucibus etiam.
               </Card.Description>
-              <CloseButton aria-label="Close banner" className="absolute top-3 right-3" />
+              <CloseButton aria-label="Close banner" className="absolute end-3 top-3" />
             </Card.Header>
             <Card.Footer className="mt-auto flex w-full flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col">
@@ -235,7 +228,7 @@ export const WithImages: Story = {
           <div className="col-span-12 grid grid-cols-12 gap-4 lg:col-span-6">
             {/* Top Card */}
             <Card className="col-span-12">
-              <div className="absolute top-3 right-3 z-10">
+              <div className="absolute end-3 top-3 z-10">
                 <CloseButton aria-label="Close notification" />
               </div>
               <Card.Header className="gap-3">
@@ -247,7 +240,7 @@ export const WithImages: Story = {
                 />
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-medium text-muted uppercase">PAYMENT</span>
-                  <Card.Title className="pr-8 text-sm sm:text-base">
+                  <Card.Title className="pe-8 text-sm sm:text-base">
                     You can now withdraw on crypto
                   </Card.Title>
                   <Card.Description className="text-xs sm:text-sm">
@@ -329,7 +322,7 @@ export const WithImages: Story = {
             {/* Bottom gradient blur overlay */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute right-0 bottom-0 left-0 h-[64px]"
+              className="pointer-events-none absolute start-0 end-0 bottom-0 h-[64px]"
             >
               <div
                 className="absolute inset-0 h-[100%] rounded-b-[inherit] backdrop-blur-sm"
@@ -371,7 +364,7 @@ export const WithImages: Story = {
             {/* Bottom gradient blur overlay */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute right-0 bottom-0 left-0 h-16 sm:h-20"
+              className="pointer-events-none absolute start-0 end-0 bottom-0 h-16 sm:h-20"
             >
               <div
                 className="absolute inset-0 h-[100%] rounded-b-[inherit] backdrop-blur-sm"
@@ -444,7 +437,7 @@ export const WithImages: Story = {
 
 export const WithForm: Story = {
   render: (args) => {
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const data: Record<string, string> = {};

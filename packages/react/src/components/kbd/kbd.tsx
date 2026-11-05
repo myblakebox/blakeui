@@ -6,7 +6,7 @@ import type {KbdVariants} from "@blakeui/styles";
 import type {ReactNode} from "react";
 
 import {kbdVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
@@ -42,15 +42,18 @@ const KbdRoot = <E extends keyof React.JSX.IntrinsicElements = "kbd">({
   ...props
 }: KbdRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof KbdRootProps<E>>) => {
   const slots = React.useMemo(() => kbdVariants({variant}), [variant]);
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <KbdContext value={{slots}}>
+    <KbdContext value={contextValue}>
       <dom.kbd {...(props as any)} className={slots.base({className})}>
         {children}
       </dom.kbd>
     </KbdContext>
   );
 };
+
+KbdRoot.displayName = "BlakeUI.Kbd";
 
 /* -------------------------------------------------------------------------------------------------
  * Kbd Abbr
@@ -69,7 +72,7 @@ const KbdAbbr = <E extends keyof React.JSX.IntrinsicElements = "abbr">({
   keyValue,
   ...props
 }: KbdAbbrProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof KbdAbbrProps<E>>) => {
-  const {slots} = useContext(KbdContext);
+  const {slots} = use(KbdContext);
 
   return (
     <dom.abbr
@@ -81,6 +84,8 @@ const KbdAbbr = <E extends keyof React.JSX.IntrinsicElements = "abbr">({
     </dom.abbr>
   );
 };
+
+KbdAbbr.displayName = "BlakeUI.Kbd.Abbr";
 
 /* -------------------------------------------------------------------------------------------------
  * Kbd Content
@@ -97,7 +102,7 @@ const KbdContent = <E extends keyof React.JSX.IntrinsicElements = "span">({
   className,
   ...props
 }: KbdContentProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof KbdContentProps<E>>) => {
-  const {slots} = useContext(KbdContext);
+  const {slots} = use(KbdContext);
 
   return (
     <dom.span className={composeSlotClassName(slots?.content, className)} {...(props as any)}>
@@ -105,6 +110,8 @@ const KbdContent = <E extends keyof React.JSX.IntrinsicElements = "span">({
     </dom.span>
   );
 };
+
+KbdContent.displayName = "BlakeUI.Kbd.Content";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

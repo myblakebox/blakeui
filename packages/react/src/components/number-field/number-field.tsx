@@ -4,13 +4,13 @@ import type {NumberFieldVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {numberFieldVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Button as ButtonPrimitive} from "react-aria-components/Button";
 import {Group as GroupPrimitive} from "react-aria-components/Group";
 import {Input as InputPrimitive} from "react-aria-components/Input";
 import {NumberField as NumberFieldPrimitive} from "react-aria-components/NumberField";
 
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
 import {IconMinus, IconPlus} from "../icons";
 
 /* -------------------------------------------------------------------------------------------------
@@ -39,19 +39,22 @@ const NumberFieldRoot = ({
     () => numberFieldVariants({fullWidth, variant}),
     [fullWidth, variant],
   );
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <NumberFieldContext value={{slots}}>
+    <NumberFieldContext value={contextValue}>
       <NumberFieldPrimitive
         data-slot="number-field"
         {...props}
-        className={composeTwRenderProps(className, slots?.base())}
+        className={useResolvedClassName(className, slots?.base())}
       >
-        {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+        {children}
       </NumberFieldPrimitive>
     </NumberFieldContext>
   );
 };
+
+NumberFieldRoot.displayName = "BlakeUI.NumberField";
 
 /* -------------------------------------------------------------------------------------------------
  * NumberField Group
@@ -59,18 +62,20 @@ const NumberFieldRoot = ({
 interface NumberFieldGroupProps extends ComponentPropsWithRef<typeof GroupPrimitive> {}
 
 const NumberFieldGroup = ({children, className, ...props}: NumberFieldGroupProps) => {
-  const {slots} = useContext(NumberFieldContext);
+  const {slots} = use(NumberFieldContext);
 
   return (
     <GroupPrimitive
-      className={composeTwRenderProps(className, slots?.group())}
+      className={useResolvedClassName(className, slots?.group())}
       data-slot="number-field-group"
       {...props}
     >
-      {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+      {children}
     </GroupPrimitive>
   );
 };
+
+NumberFieldGroup.displayName = "BlakeUI.NumberField.Group";
 
 /* -------------------------------------------------------------------------------------------------
  * NumberField Input
@@ -78,16 +83,18 @@ const NumberFieldGroup = ({children, className, ...props}: NumberFieldGroupProps
 interface NumberFieldInputProps extends ComponentPropsWithRef<typeof InputPrimitive> {}
 
 const NumberFieldInput = ({className, ...props}: NumberFieldInputProps) => {
-  const {slots} = useContext(NumberFieldContext);
+  const {slots} = use(NumberFieldContext);
 
   return (
     <InputPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="number-field-input"
       {...props}
     />
   );
 };
+
+NumberFieldInput.displayName = "BlakeUI.NumberField.Input";
 
 /* -------------------------------------------------------------------------------------------------
  * NumberField Increment Button
@@ -99,11 +106,11 @@ const NumberFieldIncrementButton = ({
   className,
   ...props
 }: NumberFieldIncrementButtonProps) => {
-  const {slots} = useContext(NumberFieldContext);
+  const {slots} = use(NumberFieldContext);
 
   return (
     <ButtonPrimitive
-      className={composeTwRenderProps(className, slots?.incrementButton())}
+      className={useResolvedClassName(className, slots?.incrementButton())}
       data-slot="number-field-increment-button"
       slot="increment"
       {...props}
@@ -117,6 +124,8 @@ const NumberFieldIncrementButton = ({
   );
 };
 
+NumberFieldIncrementButton.displayName = "BlakeUI.NumberField.IncrementButton";
+
 /* -------------------------------------------------------------------------------------------------
  * NumberField Decrement Button
  * -----------------------------------------------------------------------------------------------*/
@@ -127,11 +136,11 @@ const NumberFieldDecrementButton = ({
   className,
   ...props
 }: NumberFieldDecrementButtonProps) => {
-  const {slots} = useContext(NumberFieldContext);
+  const {slots} = use(NumberFieldContext);
 
   return (
     <ButtonPrimitive
-      className={composeTwRenderProps(className, slots?.decrementButton())}
+      className={useResolvedClassName(className, slots?.decrementButton())}
       data-slot="number-field-decrement-button"
       slot="decrement"
       {...props}
@@ -144,6 +153,8 @@ const NumberFieldDecrementButton = ({
     </ButtonPrimitive>
   );
 };
+
+NumberFieldDecrementButton.displayName = "BlakeUI.NumberField.DecrementButton";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

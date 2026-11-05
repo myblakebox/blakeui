@@ -4,10 +4,10 @@ import type {TextAreaVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {textAreaVariants} from "@blakeui/styles";
-import React, {useContext} from "react";
+import React, {use, useMemo} from "react";
 import {TextArea as TextAreaPrimitive} from "react-aria-components/TextArea";
 
-import {composeTwRenderProps} from "../../utils";
+import {useResolvedClassName} from "../../utils";
 import {TextFieldContext} from "../textfield";
 
 /* -------------------------------------------------------------------------------------------------
@@ -17,20 +17,18 @@ interface TextAreaRootProps
   extends ComponentPropsWithRef<typeof TextAreaPrimitive>, TextAreaVariants {}
 
 const TextAreaRoot = ({className, fullWidth, variant, ...rest}: TextAreaRootProps) => {
-  const textFieldContext = useContext(TextFieldContext);
+  const textFieldContext = use(TextFieldContext);
   const resolvedVariant = variant ?? textFieldContext?.variant;
-
-  return (
-    <TextAreaPrimitive
-      data-slot="textarea"
-      className={composeTwRenderProps(
-        className,
-        textAreaVariants({fullWidth, variant: resolvedVariant}),
-      )}
-      {...rest}
-    />
+  const styles = useMemo(
+    () => textAreaVariants({fullWidth, variant: resolvedVariant}),
+    [fullWidth, resolvedVariant],
   );
+  const resolvedClassName = useResolvedClassName(className, styles);
+
+  return <TextAreaPrimitive className={resolvedClassName} data-slot="textarea" {...rest} />;
 };
+
+TextAreaRoot.displayName = "BlakeUI.TextArea";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

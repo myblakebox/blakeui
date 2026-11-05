@@ -4,10 +4,10 @@ import type {ToggleButtonVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef} from "react";
 
 import {toggleButtonVariants} from "@blakeui/styles";
-import {useContext} from "react";
+import {use, useMemo} from "react";
 import {ToggleButton as ToggleButtonPrimitive} from "react-aria-components/ToggleButton";
 
-import {composeTwRenderProps} from "../../utils";
+import {useResolvedClassName} from "../../utils";
 import {ToggleButtonGroupContext} from "../toggle-button-group";
 
 /* -------------------------------------------------------------------------------------------------
@@ -25,28 +25,35 @@ const ToggleButtonRoot = ({
   variant,
   ...rest
 }: ToggleButtonRootProps) => {
-  const groupContext = useContext(ToggleButtonGroupContext);
+  const groupContext = use(ToggleButtonGroupContext);
 
   // Merge props with precedence: direct props > context props
   const finalSize = size ?? groupContext?.size;
 
-  const styles = toggleButtonVariants({
-    isIconOnly,
-    size: finalSize,
-    variant,
-  });
+  const styles = useMemo(
+    () =>
+      toggleButtonVariants({
+        isIconOnly,
+        size: finalSize,
+        variant,
+      }),
+    [finalSize, isIconOnly, variant],
+  );
+  const resolvedClassName = useResolvedClassName(className, styles);
 
   return (
     <ToggleButtonPrimitive
-      className={composeTwRenderProps(className, styles)}
+      className={resolvedClassName}
       data-slot="toggle-button"
       style={style}
       {...rest}
     >
-      {(renderProps) => (typeof children === "function" ? children(renderProps) : children)}
+      {children}
     </ToggleButtonPrimitive>
   );
 };
+
+ToggleButtonRoot.displayName = "BlakeUI.ToggleButton";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

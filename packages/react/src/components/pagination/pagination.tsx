@@ -5,10 +5,10 @@ import type {PaginationVariants} from "@blakeui/styles";
 import type {ComponentPropsWithRef, ReactNode} from "react";
 
 import {paginationVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {Button as ButtonPrimitive} from "react-aria-components/Button";
 
-import {composeTwRenderProps} from "../../utils";
+import {useResolvedClassName} from "../../utils";
 import {composeSlotClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 import {IconChevronLeft, IconChevronRight} from "../icons";
@@ -41,9 +41,10 @@ const PaginationRoot = <E extends keyof React.JSX.IntrinsicElements = "nav">({
   ...props
 }: PaginationRootProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof PaginationRootProps<E>>) => {
   const slots = React.useMemo(() => paginationVariants({size}), [size]);
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <PaginationContext value={{slots}}>
+    <PaginationContext value={contextValue}>
       <dom.nav
         aria-label="pagination"
         data-slot="pagination"
@@ -75,12 +76,16 @@ const PaginationSummary = <E extends keyof React.JSX.IntrinsicElements = "div">(
   ...props
 }: PaginationSummaryProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof PaginationSummaryProps<E>>) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
 
   return (
     <dom.div
       className={composeSlotClassName(slots?.summary, className)}
       data-slot="pagination-summary"
+      // Auto-detect base direction from the summary's own text so mixed
+      // number/word content (e.g. "1 to 5 of 10 invoices") is not bidi-reordered
+      // by an RTL ancestor. User-provided `dir` still overrides via `...props`.
+      dir="auto"
       {...(props as any)}
     >
       {children}
@@ -106,7 +111,7 @@ const PaginationContent = <E extends keyof React.JSX.IntrinsicElements = "ul">({
   ...props
 }: PaginationContentProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof PaginationContentProps<E>>) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
 
   return (
     <dom.ul
@@ -136,7 +141,7 @@ const PaginationItem = <E extends keyof React.JSX.IntrinsicElements = "li">({
   className,
   ...props
 }: PaginationItemProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof PaginationItemProps<E>>) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
 
   return (
     <dom.li
@@ -161,12 +166,12 @@ interface PaginationLinkProps extends ComponentPropsWithRef<typeof ButtonPrimiti
 }
 
 const PaginationLink = ({children, className, isActive, ...props}: PaginationLinkProps) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
 
   return (
     <ButtonPrimitive
       aria-current={isActive ? "page" : undefined}
-      className={composeTwRenderProps(className, slots?.link())}
+      className={useResolvedClassName(className, slots?.link())}
       data-active={isActive ? "true" : undefined}
       data-slot="pagination-link"
       {...props}
@@ -187,12 +192,12 @@ interface PaginationPreviousProps extends ComponentPropsWithRef<typeof ButtonPri
 }
 
 const PaginationPrevious = ({children, className, ...props}: PaginationPreviousProps) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
   const baseClass = `${slots?.link() ?? ""} pagination__link--nav`.trim();
 
   return (
     <ButtonPrimitive
-      className={composeTwRenderProps(className, baseClass)}
+      className={useResolvedClassName(className, baseClass)}
       data-slot="pagination-previous"
       {...props}
     >
@@ -242,12 +247,12 @@ interface PaginationNextProps extends ComponentPropsWithRef<typeof ButtonPrimiti
 }
 
 const PaginationNext = ({children, className, ...props}: PaginationNextProps) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
   const baseClass = `${slots?.link() ?? ""} pagination__link--nav`.trim();
 
   return (
     <ButtonPrimitive
-      className={composeTwRenderProps(className, baseClass)}
+      className={useResolvedClassName(className, baseClass)}
       data-slot="pagination-next"
       {...props}
     >
@@ -302,7 +307,7 @@ const PaginationEllipsis = <E extends keyof React.JSX.IntrinsicElements = "span"
   ...props
 }: PaginationEllipsisProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof PaginationEllipsisProps<E>>) => {
-  const {slots} = useContext(PaginationContext);
+  const {slots} = use(PaginationContext);
 
   return (
     <dom.span

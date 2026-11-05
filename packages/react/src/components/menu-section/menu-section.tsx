@@ -26,6 +26,8 @@ const MenuSectionRoot = ({children, className, ...props}: MenuSectionRootProps) 
   );
 };
 
+MenuSectionRoot.displayName = "BlakeUI.MenuSection";
+
 /* -------------------------------------------------------------------------------------------------
  * Exports
  * -----------------------------------------------------------------------------------------------*/

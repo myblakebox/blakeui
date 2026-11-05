@@ -7,7 +7,7 @@ import {textFieldVariants} from "@blakeui/styles";
 import React, {createContext} from "react";
 import {TextField as TextFieldPrimitive} from "react-aria-components/TextField";
 
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
 
 /* ------------------------------------------------------------------------------------------------
  * TextField Context
@@ -32,21 +32,20 @@ interface TextFieldRootProps
 
 const TextFieldRoot = ({children, className, fullWidth, variant, ...props}: TextFieldRootProps) => {
   const styles = React.useMemo(() => textFieldVariants({fullWidth}), [fullWidth]);
+  const contextValue = React.useMemo(() => ({variant}), [variant]);
+
+  const resolvedClassName = useResolvedClassName(className, styles);
 
   return (
-    <TextFieldPrimitive
-      data-slot="textfield"
-      {...props}
-      className={composeTwRenderProps(className, styles)}
-    >
-      {(values) => (
-        <TextFieldContext value={{variant}}>
-          <>{typeof children === "function" ? children(values) : children}</>
-        </TextFieldContext>
-      )}
-    </TextFieldPrimitive>
+    <TextFieldContext value={contextValue}>
+      <TextFieldPrimitive data-slot="textfield" {...props} className={resolvedClassName}>
+        {children}
+      </TextFieldPrimitive>
+    </TextFieldContext>
   );
 };
+
+TextFieldRoot.displayName = "BlakeUI.TextField";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

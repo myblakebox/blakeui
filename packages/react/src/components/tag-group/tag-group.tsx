@@ -4,13 +4,14 @@ import type {TagVariants} from "../tag";
 import type {ComponentPropsWithRef} from "react";
 
 import {tagGroupVariants} from "@blakeui/styles";
-import React, {createContext, useContext, useMemo} from "react";
+import React, {createContext, use, useMemo} from "react";
 import {
   TagGroup as TagGroupPrimitive,
   TagList as TagListPrimitive,
 } from "react-aria-components/TagGroup";
 
-import {composeTwRenderProps} from "../../utils/compose";
+import {useResolvedClassName} from "../../utils/compose";
+import {FieldSlotsGate} from "../../utils/field-slots-gate";
 
 /* -------------------------------------------------------------------------------------------------
  * TagGroup Context
@@ -33,21 +34,20 @@ type TagGroupRootProps = ComponentPropsWithRef<typeof TagGroupPrimitive> & {
 
 const TagGroupRoot = ({children, className, size, variant, ...restProps}: TagGroupRootProps) => {
   const slots = useMemo(() => tagGroupVariants(), []);
+  const contextValue = useMemo(() => ({slots, size, variant}), [slots, size, variant]);
 
   return (
-    <TagGroupContext
-      value={{
-        slots,
-        size,
-        variant,
-      }}
-    >
-      <TagGroupPrimitive className={slots.base({className})} data-slot="tag-group" {...restProps}>
-        {children}
-      </TagGroupPrimitive>
-    </TagGroupContext>
+    <FieldSlotsGate>
+      <TagGroupContext value={contextValue}>
+        <TagGroupPrimitive className={slots.base({className})} data-slot="tag-group" {...restProps}>
+          {children}
+        </TagGroupPrimitive>
+      </TagGroupContext>
+    </FieldSlotsGate>
   );
 };
+
+TagGroupRoot.displayName = "BlakeUI.TagGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * TagGroup List
@@ -59,11 +59,11 @@ const TagGroupList = <T extends object>({
   className,
   ...restProps
 }: TagGroupListProps<T>) => {
-  const {slots} = useContext(TagGroupContext);
+  const {slots} = use(TagGroupContext);
 
   return (
     <TagListPrimitive
-      className={composeTwRenderProps(className, slots?.list())}
+      className={useResolvedClassName(className, slots?.list())}
       data-slot="tag-group-list"
       {...restProps}
     >
@@ -71,6 +71,8 @@ const TagGroupList = <T extends object>({
     </TagListPrimitive>
   );
 };
+
+TagGroupList.displayName = "BlakeUI.TagGroup.List";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

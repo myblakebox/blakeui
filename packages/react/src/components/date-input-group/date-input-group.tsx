@@ -11,14 +11,14 @@ import type {
 } from "react-aria-components/DateField";
 
 import {dateInputGroupVariants} from "@blakeui/styles";
-import React, {createContext, useContext} from "react";
+import React, {createContext, use} from "react";
 import {
   DateInput as DateInputPrimitive,
   DateSegment as DateSegmentPrimitive,
 } from "react-aria-components/DateField";
 import {Group as GroupPrimitive} from "react-aria-components/Group";
 
-import {composeSlotClassName, composeTwRenderProps} from "../../utils/compose";
+import {composeSlotClassName, useResolvedClassName} from "../../utils/compose";
 import {dom} from "../../utils/dom";
 
 /* -------------------------------------------------------------------------------------------------
@@ -47,19 +47,22 @@ const DateInputGroupRoot = ({
     () => dateInputGroupVariants({fullWidth, variant}),
     [fullWidth, variant],
   );
+  const contextValue = React.useMemo(() => ({slots}), [slots]);
 
   return (
-    <DateInputGroupContext value={{slots}}>
+    <DateInputGroupContext value={contextValue}>
       <GroupPrimitive
-        className={composeTwRenderProps(className, slots?.base())}
+        className={useResolvedClassName(className, slots?.base())}
         data-slot="date-input-group"
         {...props}
       >
-        {(values) => <>{typeof children === "function" ? children(values) : children}</>}
+        {children}
       </GroupPrimitive>
     </DateInputGroupContext>
   );
 };
+
+DateInputGroupRoot.displayName = "BlakeUI.DateInputGroup";
 
 /* -------------------------------------------------------------------------------------------------
  * DateInputGroup Prefix
@@ -77,7 +80,7 @@ const DateInputGroupPrefix = <E extends keyof React.JSX.IntrinsicElements = "div
   ...props
 }: DateInputGroupPrefixProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof DateInputGroupPrefixProps<E>>) => {
-  const {slots} = useContext(DateInputGroupContext);
+  const {slots} = use(DateInputGroupContext);
 
   return (
     <dom.div
@@ -90,6 +93,8 @@ const DateInputGroupPrefix = <E extends keyof React.JSX.IntrinsicElements = "div
   );
 };
 
+DateInputGroupPrefix.displayName = "BlakeUI.DateInputGroup.Prefix";
+
 /* -------------------------------------------------------------------------------------------------
  * DateInputGroup Input
  * -----------------------------------------------------------------------------------------------*/
@@ -99,19 +104,21 @@ interface DateInputGroupInputProps
     Partial<Omit<TimeInputPrimitiveProps, keyof DateInputPrimitiveProps>> {}
 
 const DateInputGroupInput = ({className, ...props}: DateInputGroupInputProps) => {
-  const {slots} = useContext(DateInputGroupContext);
+  const {slots} = use(DateInputGroupContext);
 
   // TimeInput and DateInput have compatible interfaces
   // React Aria Components will handle the correct primitive based on parent context (TimeField vs DateField)
   // We use DateInputPrimitive as the default, but it will work with TimeField context
   return (
     <DateInputPrimitive
-      className={composeTwRenderProps(className, slots?.input())}
+      className={useResolvedClassName(className, slots?.input())}
       data-slot="date-input-group-input"
       {...(props as DateInputPrimitiveProps)}
     />
   );
 };
+
+DateInputGroupInput.displayName = "BlakeUI.DateInputGroup.Input";
 
 /* -------------------------------------------------------------------------------------------------
  * DateInputGroup Segment
@@ -125,7 +132,7 @@ interface DateInputGroupSegmentProps
 }
 
 const DateInputGroupSegment = ({className, segment, ...props}: DateInputGroupSegmentProps) => {
-  const {slots} = useContext(DateInputGroupContext);
+  const {slots} = use(DateInputGroupContext);
 
   // TimeSegment and DateSegment have compatible interfaces
   // React Aria Components will handle the correct primitive based on parent context
@@ -139,6 +146,8 @@ const DateInputGroupSegment = ({className, segment, ...props}: DateInputGroupSeg
     />
   );
 };
+
+DateInputGroupSegment.displayName = "BlakeUI.DateInputGroup.Segment";
 
 /* -------------------------------------------------------------------------------------------------
  * DateInputGroup InputContainer
@@ -156,7 +165,7 @@ const DateInputGroupInputContainer = <E extends keyof React.JSX.IntrinsicElement
   ...props
 }: DateInputGroupInputContainerProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof DateInputGroupInputContainerProps<E>>) => {
-  const {slots} = useContext(DateInputGroupContext);
+  const {slots} = use(DateInputGroupContext);
 
   return (
     <dom.div
@@ -168,6 +177,8 @@ const DateInputGroupInputContainer = <E extends keyof React.JSX.IntrinsicElement
     </dom.div>
   );
 };
+
+DateInputGroupInputContainer.displayName = "BlakeUI.DateInputGroup.InputContainer";
 
 /* -------------------------------------------------------------------------------------------------
  * DateInputGroup Suffix
@@ -185,7 +196,7 @@ const DateInputGroupSuffix = <E extends keyof React.JSX.IntrinsicElements = "div
   ...props
 }: DateInputGroupSuffixProps<E> &
   Omit<React.JSX.IntrinsicElements[E], keyof DateInputGroupSuffixProps<E>>) => {
-  const {slots} = useContext(DateInputGroupContext);
+  const {slots} = use(DateInputGroupContext);
 
   return (
     <dom.div
@@ -197,6 +208,8 @@ const DateInputGroupSuffix = <E extends keyof React.JSX.IntrinsicElements = "div
     </dom.div>
   );
 };
+
+DateInputGroupSuffix.displayName = "BlakeUI.DateInputGroup.Suffix";
 
 /* -------------------------------------------------------------------------------------------------
  * Exports

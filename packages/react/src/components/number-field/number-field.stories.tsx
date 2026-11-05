@@ -436,7 +436,7 @@ export const WithChevrons: Story = {
       <Label>Number field with chevrons</Label>
       <NumberField.Group className="flex">
         <NumberField.Input className="flex-1" />
-        <div className="flex h-full flex-col border-l border-field-placeholder/15">
+        <div className="flex h-full flex-col border-s border-field-placeholder/15">
           <NumberField.IncrementButton className="flex h-1/2 w-6 items-center justify-center rounded-none border-0 pt-0.5 text-sm">
             <svg
               aria-hidden="true"
@@ -482,7 +482,7 @@ export const FormExample: Story = {
     const STOCK_AVAILABLE = 3;
     const isOutOfStock = value !== undefined && value > STOCK_AVAILABLE;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (value === undefined || value === null || value < 1 || value > STOCK_AVAILABLE) {
