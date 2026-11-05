@@ -100,3 +100,7 @@ packages/react/tsconfig.build.json
 
 # Machine-local Claude Code preview launch config (absolute paths; not shared)
 .claude/launch.json
+
+# Copied in by packages/react/scripts/copy-legal.mjs during pack
+packages/react/LICENSE
+packages/react/NOTICE

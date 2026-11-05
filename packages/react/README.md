@@ -87,4 +87,4 @@ Please adhere to this project's [CODE_OF_CONDUCT](https://github.com/myblakebox/
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)

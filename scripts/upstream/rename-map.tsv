@@ -1,0 +1,14 @@
+kind	heroui (upstream)	blakeui	scope	codemod (sed -E, apply in this order)
+url	https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/	https://cdn.blakeui.com/	stories, README, docs	s#https://heroui-assets\.nyc3\.cdn\.digitaloceanspaces\.com/#https://cdn.blakeui.com/#g
+url	https://img.heroui.chat/image/avatar?w=400&h=400&u=N	https://cdn.blakeui.com/avatars/users/N.jpg	stories	s#https://img\.heroui\.chat/image/avatar\?w=400&h=400&u=([0-9]+)#https://cdn.blakeui.com/avatars/users/\1.jpg#g
+url	https://github.com/heroui-inc/heroui	https://github.com/myblakebox/BlakeUI	README, package.json	s#https://github\.com/heroui-inc/heroui#https://github.com/myblakebox/BlakeUI#g
+url	https://storybook-v3.heroui.com/	https://storybook.blakeui.com	README	s#https://storybook-v3\.heroui\.com/?#https://storybook.blakeui.com#g
+social	https://x.com/hero_ui / @hero_ui	https://x.com/blake_ui / @blake_ui	README	s#hero_ui#blake_ui#g
+email	support@heroui.com	support@blakebill.com	package.json author	s#support@heroui\.com#support@blakebill.com#g
+repo-slug	heroui-inc/heroui (CHANGELOG commit links)	blakeui-inc/blakeui	CHANGELOG	s#heroui-inc/heroui#blakeui-inc/blakeui#g
+const	HEROUI_* (e.g. __HEROUI_VERSION__)	BLAKEUI_*	src/version.ts, rollup	s#HEROUI#BLAKEUI#g
+brand/displayName	HeroUI (displayName "HeroUI.X.Y", HeroUIToastOptions, docs prose)	BlakeUI	all	s#HeroUI#BlakeUI#g
+package/import	@heroui/react, @heroui/styles, @heroui/standard, @heroui/testing	@blakeui/react, @blakeui/styles, @blakeui/standard, @blakeui/testing	all imports + package.json	s#heroui#blakeui#g (covers @scope, blakeui-theme, blakeui-cli, dist/blakeui, emails like bob@blakeui.com)
+import	import {Icon} from "@iconify/react";	import {Icon} from "../iconify";	src/components/*/*.stories.tsx only	s#^import \{Icon\} from "@iconify/react";$#import {Icon} from "../iconify";#  (then re-sort imports with eslint --fix)
+path	packages/react/src/components/disclosure-group/use-disclosure-group-navigation.ts	packages/react/src/components/accordion/use-disclosure-group-navigation.ts	patch headers	s#components/disclosure-group/use-disclosure-group-navigation\.ts#components/accordion/use-disclosure-group-navigation.ts#g
+UNCHANGED	BEM classes (button, button--primary, card__header), data-slot values, CSS custom properties (--accent, --radius, --surface...), file/folder names, export names	identical	—	no transform

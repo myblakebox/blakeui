@@ -20,7 +20,9 @@
     "react ui"
   ],
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE"
   ],
   "publishConfig": {
     "access": "public"
@@ -50,8 +52,8 @@
     "add:component": "node scripts/add-component.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "prepack": "clean-package && node scripts/update-exports.mjs",
-    "postpack": "clean-package restore"
+    "prepack": "node scripts/copy-legal.mjs && clean-package && node scripts/update-exports.mjs",
+    "postpack": "clean-package restore && node scripts/copy-legal.mjs --clean"
   },
   "clean-package": "./clean-package.config.json",
   "dependencies": {
